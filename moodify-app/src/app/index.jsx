@@ -1,8 +1,7 @@
 import * as Device from 'expo-device';
-import { Button, Image, Platform, StyleSheet, TextInput } from 'react-native';
+import { View, Image, Platform, StyleSheet, TextInput } from 'react-native';
+import { Button } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { HintRow } from '@/components/hint-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
@@ -79,14 +78,21 @@ export default function HomeScreen() {
       }}
       autoCapitalize="none"
       ></TextInput>
+       <View style={styles.buttons}>
       <Button
           title="Acceder"
+          color={'#DDAADD'}
           onPress={() => showAlert('Accediendo')}
         />
         <Button
           title="Regístrate"
+          type="outline"
+          buttonStyle={{ borderColor: '#99AAFF' }}
+          titleStyle={{ color: '#99AAFF' }}
           onPress={() => showAlert('Registrando')}
         />
+        </View>
+        
         {/* <ThemedView type="backgroundElement" style={styles.stepContainer}>
           <HintRow
             title="Try editing"
@@ -110,7 +116,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#f1edd5',
   },
   safeArea: {
     flex: 1,
@@ -128,4 +134,11 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.four,
     gap: Spacing.four,
   },
+
+  buttons:{
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%'
+  }
 });
