@@ -7,7 +7,7 @@ import {
   TabListProps,
 } from 'expo-router/ui';
 import { SymbolView } from 'expo-symbols';
-import React from 'react';
+import React, { use } from 'react';
 import { Pressable, useColorScheme, View, StyleSheet } from 'react-native';
 
 import { ExternalLink } from './external-link';
@@ -15,8 +15,17 @@ import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
+import { UserContext } from './user-provider';
+import { Stack } from 'expo-router';
 
 export default function AppTabs() {
+  const { isLoggedIn } = use(UserContext);
+  if (!isLoggedIn) {
+    return <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="login" />
+    </Stack>
+  }
+
   return (
     <Tabs>
       <TabSlot style={{ height: '100%' }} />
