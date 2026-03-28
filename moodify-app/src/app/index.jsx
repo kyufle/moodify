@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useState } from 'react';
 
-// Assets provided by the user
+// IMGS portada/login/register
 import fondoClaro from '@/assets/images/fondo_claro.svg';
 import fondoFirstTime from '@/assets/images/fondofirsttime_114.3 x 203.2 mm.svg';
 
@@ -15,8 +15,8 @@ const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('ruth');
-  const [fullName, setFullName] = useState('Ruth Romero Carretero');
+  const [username, setUsername] = useState('user');
+  const [fullName, setFullName] = useState('user name');
   const [password, setPassword] = useState('**********');
   const [isLogin, setIsLogin] = useState(true);
   const [showWelcome, setShowWelcome] = useState(true);
@@ -29,7 +29,7 @@ export default function HomeScreen() {
     }
   }
 
-  // Welcome / Portada Screen Render
+  // Pantalla portada
   if (showWelcome) {
     return (
       <ThemedView style={styles.welcomeContainer}>
@@ -43,7 +43,7 @@ export default function HomeScreen() {
                 en tonos suaves para que encuentres la claridad que necesitas, un día a la vez.
               </ThemedText>
 
-              {/* Pill Button with Arrow Icon */}
+              {/* Botón con flecha */}
               <TouchableOpacity 
                 style={styles.welcomeButton} 
                 onPress={() => setShowWelcome(false)}
@@ -56,7 +56,7 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Bottom Illustration - Using the correct asset provided by user */}
+            {/* Illustration de portada */}
             <View style={styles.illustrationContainer}>
               <Image 
                 source={fondoFirstTime} 
@@ -70,15 +70,15 @@ export default function HomeScreen() {
     );
   }
 
-  // Original Login/Register Form Render
+  // Pantalla login/register
   return (
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} bounces={false} showsVerticalScrollIndicator={false}>
-        {/* Top Banner with Pattern */}
+        {/* Banner superior con patrón */}
         <View style={styles.headerContainer}>
           <Image source={fondoClaro} style={styles.backgroundImage} contentFit="cover" />
           
-          {/* Floating Gray Card */}
+          {/* Tarjeta gris flotante */}
           <View style={styles.floatingCard}>
             <ThemedText style={styles.holaText}>¡Hola!</ThemedText>
             <ThemedText style={styles.bienvenidoText}>Bienvenid@</ThemedText>
@@ -100,7 +100,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Form Section */}
+        {/* Formulario login/register */}
         <View style={styles.formSection}>
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -197,7 +197,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  // Welcome View Styles
+  // Estilos pantalla bienvenida
   welcomeContainer: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -258,6 +258,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  // Illustration de portada
   illustrationContainer: {
     width: width,
     height: height * 0.85,
@@ -267,7 +268,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     zIndex: 1,
   },
-  
+
   emotionsImage: {
     width: '200%', 
     height: '100%',
@@ -275,12 +276,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.4 }],
   },
 
-
-
-
-
-
-  // Form View Styles
+  // Estilos formulario login/register
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
