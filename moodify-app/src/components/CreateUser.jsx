@@ -5,7 +5,6 @@ import { Image } from 'expo-image';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
-import CreateUser from '@/components/CreateUser';
 import { useState } from 'react';
 
 // IMGS portada/login/register
@@ -14,13 +13,36 @@ import fondoFirstTime from '@/assets/images/fondofirsttime_114.3 x 203.2 mm.svg'
 
 const { width, height } = Dimensions.get('window');
 
-export default function HomeScreen() {
-  const [email, setEmail] = useState();
-  const [username, setUsername] = useState();
-  const [fullName, setFullName] = useState();
-  const [password, setPassword] = useState();
-  const [isLogin, setIsLogin] = useState(true);
-  const [showWelcome, setShowWelcome] = useState(true); //en el caso que no tenga token
+export default function CreateUser() {
+    const [userData, setUserData] = useState({
+        fullName: '',
+        username: '',
+        email: '',
+        password: '',
+        password_confirmation: ''
+    })
+
+    const handleFetch = async (userData) => {
+        try {
+            const response = await fetch('http://tu-dominio.test/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(userData)
+            });
+
+            const data = await response.json();
+                console.log(data);
+            } catch (error) {
+                console.error("Error en la petición:", error);
+        }
+    };
+        //   const [isLogin, setIsLogin] = useState(true);
+        //   const [showWelcome, setShowWelcome] = useState(true); //en el caso que no tenga token
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isConfirmVisible, setIsConfirmVisible] = useState(false);
 
   function showAlert(message) {
     if (Platform.OS === 'web') {
@@ -31,173 +53,103 @@ export default function HomeScreen() {
   }
 
   // Pantalla portada
-  if (showWelcome) {
-    return (
-      <ThemedView style={styles.welcomeContainer}>
-        <SafeAreaView style={{ flex: 1, width: '100%', alignItems: 'center' }}>
-          <View style={styles.welcomeContent}>
-            <View style={styles.welcomeTextSection}>
-              <ThemedText style={styles.welcomeTitle}>Moodify</ThemedText>
-              <ThemedText style={styles.welcomeSlogan}>Respira. Registra. Conecta.</ThemedText>
-              <ThemedText style={styles.welcomeDesc}>
-                En un mundo que nunca se detiene, Moodify es tu refugio digital. Un espacio diseñado 
-                en tonos suaves para que encuentres la claridad que necesitas, un día a la vez.
-              </ThemedText>
-
-              {/* Botón con flecha */}
-              <TouchableOpacity 
-                style={styles.welcomeButton} 
-                onPress={() => setShowWelcome(false)}
-                activeOpacity={0.8}
-              >
-                <ThemedText style={styles.welcomeButtonText}>Comenzar mi viaje</ThemedText>
-                <View style={styles.arrowIconContainer}>
-                   <Icon name="arrow-right" type="material-community" color="#FFFFFF" size={24} />
-                </View>
-              </TouchableOpacity>
-            </View>
-
-            {/* Illustration de portada */}
-            <View style={styles.illustrationContainer}>
-              <Image 
-                source={fondoFirstTime} 
-                style={styles.emotionsImage} 
-                contentFit="contain" 
-              />
-            </View>
-          </View>
-        </SafeAreaView>
-      </ThemedView>
-    );
-  }
-
-  // Pantalla login/register
   return (
     <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} bounces={false} showsVerticalScrollIndicator={false}>
-        {/* Banner superior con patrón */}
-        <View style={styles.headerContainer}>
-          <Image source={fondoClaro} style={styles.backgroundImage} contentFit="cover" />
-          
-          {/* Tarjeta gris flotante */}
-          <View style={styles.floatingCard}>
-            <ThemedText style={styles.holaText}>¡Hola!</ThemedText>
-            <ThemedText style={styles.bienvenidoText}>Bienvenid@</ThemedText>
-            
-            <View style={styles.tabContainer}>
-              <TouchableOpacity 
-                style={[styles.tabButton, isLogin && styles.activeTab]}
-                onPress={() => setIsLogin(true)}
-              >
-                <ThemedText style={[styles.tabText, isLogin && styles.activeTabText]}>Entra</ThemedText>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.tabButton, !isLogin && styles.activeTab]}
-                onPress={() => setIsLogin(false)}
-              >
-                <ThemedText style={[styles.tabText, !isLogin && styles.activeTabText]}>Únete</ThemedText>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        {/* Formulario login/register */}
-        {/* <View style={styles.formSection}>
+        <View style={styles.formSection}>
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.keyboardView}
           >
             <View style={styles.inputWrapper}>
-              
               <View style={styles.styledInputContainer}>
                 <View style={styles.iconGroup}>
                   <Icon name="at" type="material-community" color="#FF9A7B" size={28} />
-                  {isLogin && (
-                    <>
-                      <ThemedText style={styles.iconSeparator}>/</ThemedText>
-                      <Icon name="email-outline" type="material-community" color="#FF9A7B" size={26} />
-                    </>
-                  )}
                 </View>
                 <TextInput
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)} //en el caso que no
+                  value={userData.name}
+                  onChangeText={(text) => setUserData({...userData, username: text})} //en el caso que no este cogido
                   style={styles.textInput}
-                  placeholder={isLogin ? "Email o Usuario" : "Usuario"}
+                  placeholder={"Usuario"}
                   placeholderTextColor="#FFB7A1"
                 />
-                {!isLogin && (
-                  <Icon name="check-circle" type="material-community" color="#CFD8DC" size={28} style={{ marginRight: 15 }} />
-                )}
+                  {/* <Icon name="check-circle" type="material-community" color="#CFD8DC" size={28} style={{ marginRight: 15 }} /> */}
               </View>
 
-              {!isLogin && (
+              
                 <View style={styles.styledInputContainer}>
                   <Icon name="account-outline" type="material-community" color="#FF9A7B" size={28} style={{ marginLeft: 15 }} />
                   <TextInput
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    value={userData.fullName}
+                    onChangeText={(text) => setUserData({...userData, fullName: text})}
                     style={styles.textInput}
                     placeholder="Nombre completo"
                     placeholderTextColor="#FFB7A1"
                   />
                 </View>
-              )}
+              
 
-              {!isLogin && (
-                <View style={styles.styledInputContainer}>
+              <View style={styles.styledInputContainer}>
                   <Icon name="email-outline" type="material-community" color="#FF9A7B" size={28} style={{ marginLeft: 15 }} />
                   <TextInput
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={userData.email}
+                    onChangeText={(text) => setUserData({...userData, email: text})}
                     style={styles.textInput}
-                    placeholder="Tu correo electrónico"
+                    placeholder="Correo electrónico"
                     placeholderTextColor="#FFB7A1"
                   />
-                  <Icon name="check-circle" type="material-community" color="#CFD8DC" size={28} style={{ marginRight: 15 }} />
+                  {/* <Icon name="check-circle" type="material-community" color="#CFD8DC" size={28} style={{ marginRight: 15 }} /> */}
                 </View>
-              )}
 
               <View style={styles.styledInputContainer}>
                 <Icon name="lock-outline" type="material-community" color="#FF9A7B" size={26} style={{ marginLeft: 15 }} />
                 <TextInput
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={userData.password}
+                  onChangeText={(text) => setUserData({...userData, password: text})}
                   style={styles.textInput}
-                  secureTextEntry
+                  secureTextEntry={!isPasswordVisible}
                   placeholder="Contraseña"
                   placeholderTextColor="#FFB7A1"
                 />
-                <TouchableOpacity style={{ marginRight: 15 }}>
-                  <Icon name="eye-off-outline" type="material-community" color="#FF9A7B" size={24} />
+                <TouchableOpacity style={{ marginRight: 15 }} onPress={()=> setIsPasswordVisible(!isPasswordVisible)}>
+                  <Icon name={isPasswordVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
+                </TouchableOpacity>
+              </View>
+
+               <View style={styles.styledInputContainer}>
+                <Icon name="lock-outline" type="material-community" color="#FF9A7B" size={26} style={{ marginLeft: 15 }} />
+                <TextInput
+                  value={userData.password_confirmation}
+                  onChangeText={(text) => setUserData({...userData, password_confirmation: text})}
+                  style={styles.textInput}
+                  secureTextEntry={!isConfirmVisible}
+                  placeholder="Repite la contraseña"
+                  placeholderTextColor="#FFB7A1"
+                />
+                <TouchableOpacity style={{ marginRight: 15 }} onPress={()=> setIsConfirmVisible(!isConfirmVisible)}>
+                  <Icon name={isConfirmVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
                 </TouchableOpacity>
               </View>
             </View>
-
-            <Button
-              title={isLogin ? "Entra" : "Únete"}
+             <Button
+              title={"Únete"}
               buttonStyle={styles.mainButton}
               titleStyle={styles.mainButtonText}
-              onPress={() => showAlert(isLogin ? 'Accediendo...' : 'Creando cuenta...')}
+              onPress={handleFetch}
               containerStyle={styles.mainButtonContainer}
             />
-
             <View style={styles.footerContainer}>
               <ThemedText style={styles.footerText}>
-                {isLogin ? "¿Eres nuevo por aquí? " : "¿Ya nos conocemos? "}
+                ¿Ya nos conocemos?
                 <ThemedText style={styles.linkText} onPress={() => setIsLogin(!isLogin)}>
-                  {isLogin ? "Únete" : "Inicia sesión"}
+                  Únete
                 </ThemedText>
               </ThemedText>
             </View>
           </KeyboardAvoidingView>
-        </View> */}
-        <CreateUser/>
-      </ScrollView>
+        </View>
     </ThemedView>
   );
 }
-
 const styles = StyleSheet.create({
   // Estilos pantalla bienvenida
   welcomeContainer: {
@@ -395,7 +347,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   mainButton: {
-    backgroundColor: '#CFD3D6', 
+    backgroundColor: '#a5adb0', 
     height: 60,
     borderRadius: 20,
   },
