@@ -4,7 +4,7 @@
     "slug": "moodify-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/moodifyLogo.png",
     "scheme": "moodifyapp",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -21,7 +21,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/moodifyLogo.png"
     },
     "plugins": [
       "expo-router",
