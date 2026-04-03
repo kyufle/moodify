@@ -9,8 +9,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
-    {
+    public function login(Request $request){
         $request->validate([
             'emailUsername' => 'required',
             'password' => 'required',
@@ -39,5 +38,44 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'Bearer',
         ]);
+    }
+    public function register(Request $request){
+        $request-> validate([
+            'userData.fullName' => 'required',
+            'userData.username' => 'required',
+            'userData.email' => 'required',
+            'userData.password' => 'required'
+        ]);
+        if (filter_var($request->userData.email, FILTER_VALIDATE_EMAIL)) {
+            $register = User::where('email', $request->emailUsername)->first();
+            if($register){
+            return response()->json([
+                'success' => false,
+                'message' => 'Ya existe una cuenta con este email',
+            ]);
+            }
+        }
+        else {
+            $register = User::where('username', $request->userData.username)->first();
+            if($register){
+            return response()->json([
+                'success' => false,
+                'message' => 'Ya existe una cuenta con este usuario',
+            ]);
+            }
+        }
+
+        $register = User::create([
+            'name'     => $request->userData.fullName,
+            'email'    => $request->userData.email,
+            'username' => $request->userData.username,
+            'password' => Hash::make($request->userData.password),
+        ]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Usuario creado con éxito',
+            'user' => $user
+        ], 201);
+        
     }
 }

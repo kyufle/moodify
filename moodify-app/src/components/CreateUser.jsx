@@ -1,4 +1,4 @@
-import { View, StyleSheet, TextInput, KeyboardAvoidingView, ScrollView, TouchableOpacity, Alert, Platform, Dimensions } from 'react-native';
+import {View, StyleSheet, TextInput, KeyboardAvoidingView, ScrollView, TouchableOpacity, Alert, Platform, Dimensions } from 'react-native';
 import { Button, Icon } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useState } from 'react';
-
+import { HelperText } from 'react-native-paper';
 // IMGS portada/login/register
 import fondoClaro from '@/assets/images/fondo_claro.svg';
 import fondoFirstTime from '@/assets/images/fondofirsttime_114.3 x 203.2 mm.svg';
@@ -19,12 +19,13 @@ export default function CreateUser() {
         username: '',
         email: '',
         password: '',
-        password_confirmation: ''
-    })
+        password_confirmation:'',
+      })
 
     const handleFetch = async (userData) => {
+      if (userData.password === userData.password_confirmation){
         try {
-            const response = await fetch('http://tu-dominio.test/api/login', {
+            const response = await fetch('http://moodify_backend/api/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -38,9 +39,10 @@ export default function CreateUser() {
             } catch (error) {
                 console.error("Error en la petición:", error);
         }
+      }
+        //mensaje de error visual diciendo que las contraseñas no son iguales.
     };
-        //   const [isLogin, setIsLogin] = useState(true);
-        //   const [showWelcome, setShowWelcome] = useState(true); //en el caso que no tenga token
+        
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isConfirmVisible, setIsConfirmVisible] = useState(false);
 
@@ -112,8 +114,11 @@ export default function CreateUser() {
                 />
                 <TouchableOpacity style={{ marginRight: 15 }} onPress={()=> setIsPasswordVisible(!isPasswordVisible)}>
                   <Icon name={isPasswordVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
-                </TouchableOpacity>
+                </TouchableOpacity> 
               </View>
+              <HelperText type="error" visible={userData.password !== userData.password_confirmation && userData.password_confirmation}>
+                  Las contraseñas no coinciden
+                </HelperText>
 
                <View style={styles.styledInputContainer}>
                 <Icon name="lock-outline" type="material-community" color="#FF9A7B" size={26} style={{ marginLeft: 15 }} />
@@ -129,6 +134,9 @@ export default function CreateUser() {
                   <Icon name={isConfirmVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
                 </TouchableOpacity>
               </View>
+              <HelperText type="error" visible={userData.password !== userData.password_confirmation && userData.password_confirmation}>
+                  Las contraseñas no coinciden
+                </HelperText>
             </View>
              <Button
               title={"Únete"}
