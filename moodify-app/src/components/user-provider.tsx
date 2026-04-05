@@ -1,14 +1,18 @@
 import { createContext, ReactNode, useState } from "react";
 
 const defaultValue = {
-    isLoggedIn: false,
+    accessToken: null,
+    user: null
 };
 
-export const UserContext = createContext(defaultValue);
+export const UserContext = createContext<any>(null);
 
 export default function UserProvider({ children }: { children: ReactNode }) {
-    const [userContextValue, setUserContextValue] = useState(defaultValue);
-    return <UserContext value={userContextValue}>
+    const [userValue, setUserValue] = useState(defaultValue);
+    return <UserContext value={{
+        setUserValue,
+        userValue
+    }}>
         {children}
     </UserContext>
 }

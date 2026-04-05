@@ -25,7 +25,7 @@ class AuthController extends Controller
         // Comparamos la contraseña usando el hash que vimos antes
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message' => 'Credenciales incorrectas',
+                'message' => 'message.login.incorrectCredentials',
                 'success' => false,
                 ], 401);
         }
@@ -36,6 +36,7 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'access_token' => $token,
+            'user' => $user,
             'token_type' => 'Bearer',
         ]);
     }
@@ -46,10 +47,10 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8'
         ],[
-            'email.unique' => 'Ya existe una cuenta con este correo',
-            'username.unique' => 'Ya existe una cuenta con este nombre de usuario',
-            'email.email' => 'El formato del correo no es válido',
-            'required' => 'Este campo es obligatorio'
+            'email.unique' => 'message.register.accountAlreadyExistEmail',
+            'username.unique' => 'message.register.accountAlreadyExistUsername',
+            'email.email' => 'message.register.emailFormatInvalid',
+            'required' => 'message.fieldRequired'
         ]);
 
         $register = User::create([
@@ -60,7 +61,7 @@ class AuthController extends Controller
         ]);
         return response()->json([
             'status' => 'success',
-            'message' => 'Usuario creado con éxito',
+            'message' => 'message.register.createUserSuccess',
             'user' => $register
         ], 201);
         
