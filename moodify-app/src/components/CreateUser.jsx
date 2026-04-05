@@ -1,164 +1,221 @@
-import {View, StyleSheet, TextInput, KeyboardAvoidingView, ScrollView, TouchableOpacity, Alert, Platform, Dimensions } from 'react-native';
+import { View, StyleSheet, TextInput, KeyboardAvoidingView, ScrollView, TouchableOpacity, Alert, Platform, Dimensions } from 'react-native';
 import { Button, Icon } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Image } from 'expo-image';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useState } from 'react';
 import { HelperText } from 'react-native-paper';
-// IMGS portada/login/register
-import fondoClaro from '@/assets/images/fondo_claro.svg';
-import fondoFirstTime from '@/assets/images/fondofirsttime_114.3 x 203.2 mm.svg';
+import { STATUS_COLORS_CLARO } from '@/constants/status-colors-claro';
 
 const { width, height } = Dimensions.get('window');
 
-export default function CreateUser({onChangePage}) {
-    const [userData, setUserData] = useState({
-        fullName: '',
-        username: '',
-        email: '',
-        password: '',
-        password_confirmation:'',
-      })
+export default function CreateUser({ onChangePage }) {
+  const [userData, setUserData] = useState({
+    fullName: '',
+    username: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+  })
+  const [notification, setNotification] = useState({ message: null, type: null });
+  const [error, setError] = useState({
+    username: '',
+    fullName: '',
+    email: '',
+    password: '',
+  });
+  const handleFetch = async () => {
+    setNotification(null);
+    setError(null);
+    if (userData.password === userData.password_confirmation) {
+      try {
+        console.log(JSON.stringify(userData));
+        const response = await fetch('http://moodify_backend.test/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify(userData),
+        });
 
-    const handleFetch = ()=>{
-      if (userData.password === userData.password_confirmation){
-        try {
-            console.log(JSON.stringify(userData));
-            const response = fetch('http://moodify_backend.test/api/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify(userData),
-            });
 
+        const data = await response.json();
+        console.log(data);
+        if (data.errors) {
+          const hasRequiredErrors = Object.values(data.errors).some(errArray =>
+            errArray.includes("message.fieldRequired")
+          );
 
-            const data = response.json;
-                console.log(data);
-            } catch (error) {
-                console.error("Error en la petición:", error);
+          if (hasRequiredErrors) {
+            setNotification({ message: "message.fieldRequired", type: "error" });
+          }
+          setError({
+            username: data.errors.username ? data.errors.username[0] : null,
+            fullName: data.errors.fullName ? data.errors.fullName[0] : null,
+            email: data.errors.email ? data.errors.email[0] : null,
+            password: data.errors.password ? data.errors.password[0] : null,
+          });
         }
-      }
-    };
-        
-    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-    const [isConfirmVisible, setIsConfirmVisible] = useState(false);
 
-  function showAlert(message) {
-    if (Platform.OS === 'web') {
-      window.alert(message);
-    } else {
-      Alert.alert('Moodify', message);
+      }
+      catch (error) {
+      console.error("Error en la petición:", error);
     }
   }
+};
 
-  // Pantalla portada
-  const passwordErrorVisibility = userData.password !== userData.password_confirmation && userData.password_confirmation !== "";
-  return (
-    <ThemedView style={styles.container}>
-        <View style={styles.formSection}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.keyboardView}
-          >
-            <View style={styles.inputWrapper}>
-              <View style={styles.styledInputContainer}>
-                <View style={styles.iconGroup}>
-                  <Icon name="at" type="material-community" color="#FF9A7B" size={28} />
-                </View>
-                <TextInput
-                  value={userData.name}
-                  onChangeText={(text) => setUserData({...userData, username: text})} //en el caso que no este cogido
-                  style={styles.textInput}
-                  placeholder={"Usuario"}
-                  placeholderTextColor="#FFB7A1"
-                />
-                  {/* <Icon name="check-circle" type="material-community" color="#CFD8DC" size={28} style={{ marginRight: 15 }} /> */}
-              </View>
+const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+const [isConfirmVisible, setIsConfirmVisible] = useState(false);
 
-              
-                <View style={styles.styledInputContainer}>
-                  <Icon name="account-outline" type="material-community" color="#FF9A7B" size={28} style={{ marginLeft: 15 }} />
-                  <TextInput
-                    value={userData.fullName}
-                    onChangeText={(text) => setUserData({...userData, fullName: text})}
-                    style={styles.textInput}
-                    placeholder="Nombre completo"
-                    placeholderTextColor="#FFB7A1"
-                  />
-                </View>
-              
+function showAlert(message) {
+  if (Platform.OS === 'web') {
+    window.alert(message);
+  } else {
+    Alert.alert('Moodify', message);
+  }
+}
 
-              <View style={styles.styledInputContainer}>
-                  <Icon name="email-outline" type="material-community" color="#FF9A7B" size={28} style={{ marginLeft: 15 }} />
-                  <TextInput
-                    value={userData.email}
-                    onChangeText={(text) => setUserData({...userData, email: text})}
-                    style={styles.textInput}
-                    placeholder="Correo electrónico"
-                    placeholderTextColor="#FFB7A1"
-                  />
-                  {/* <Icon name="check-circle" type="material-community" color="#CFD8DC" size={28} style={{ marginRight: 15 }} /> */}
-                </View>
-
-              <View style={styles.styledInputContainer}>
-                <Icon name="lock-outline" type="material-community" color="#FF9A7B" size={26} style={{ marginLeft: 15 }} />
-                <TextInput
-                  value={userData.password}
-                  onChangeText={(text) => setUserData({...userData, password: text})}
-                  style={styles.textInput}
-                  secureTextEntry={!isPasswordVisible}
-                  placeholder="Contraseña"
-                  placeholderTextColor="#FFB7A1"
-                />
-                <TouchableOpacity style={{ marginRight: 15 }} onPress={()=> setIsPasswordVisible(!isPasswordVisible)}>
-                  <Icon name={isPasswordVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
-                </TouchableOpacity> 
-              </View>
-              {passwordErrorVisibility ? <HelperText type="error" visible={passwordErrorVisibility}>
-                  Las contraseñas no coinciden
-                </HelperText> : null}
-
-               <View style={styles.styledInputContainer}>
-                <Icon name="lock-outline" type="material-community" color="#FF9A7B" size={26} style={{ marginLeft: 15 }} />
-                <TextInput
-                  value={userData.password_confirmation}
-                  onChangeText={(text) => setUserData({...userData, password_confirmation: text})}
-                  style={styles.textInput}
-                  secureTextEntry={!isConfirmVisible}
-                  placeholder="Repite la contraseña"
-                  placeholderTextColor="#FFB7A1"
-                />
-                <TouchableOpacity style={{ marginRight: 15 }} onPress={()=> setIsConfirmVisible(!isConfirmVisible)}>
-                  <Icon name={isConfirmVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
-                </TouchableOpacity>
-              </View>
-              {passwordErrorVisibility ? <HelperText type="error" visible={passwordErrorVisibility}>
-                  Las contraseñas no coinciden
-                </HelperText> : null}
-            </View>
-             <Button
-              title={"Únete"}
-              buttonStyle={styles.mainButton}
-              titleStyle={styles.mainButtonText}
-              onPress={handleFetch}
-              containerStyle={styles.mainButtonContainer}
+// Pantalla portada
+const passwordErrorVisibility = userData.password !== userData.password_confirmation && userData.password_confirmation !== "";
+return (
+  <ThemedView style={styles.container}>
+    <View style={styles.formSection}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardView}
+      >
+        {notification && notification.message && (
+          <View style={[
+            styles.notifContainer,
+            {
+              backgroundColor: STATUS_COLORS_CLARO[notification.type].bg,
+              borderColor: STATUS_COLORS_CLARO[notification.type].border
+            }
+          ]}>
+            <Icon
+              name={STATUS_COLORS_CLARO[notification.type].icon}
+              type="material-community"
+              color={STATUS_COLORS_CLARO[notification.type].color}
+              size={22}
             />
-            <View style={styles.footerContainer}>
-              <ThemedText style={styles.footerText}>
-                ¿Ya nos conocemos?{' '}
-                <ThemedText style={styles.linkText} onPress={() => onChangePage()}>
-                  Inicia sesión
-                </ThemedText>
-              </ThemedText>
+            <ThemedText style={[styles.notifText, { color: STATUS_COLORS_CLARO[notification.type].color }]}>
+              {notification.message}
+            </ThemedText>
+          </View>
+        )}
+        <View style={styles.inputWrapper}>
+          <View style={styles.styledInputContainer}>
+            <View style={styles.iconGroup}>
+              <Icon name="at" type="material-community" color="#FF9A7B" size={28} />
             </View>
-          </KeyboardAvoidingView>
+            <TextInput
+              value={userData.name}
+              onChangeText={(text) => setUserData({ ...userData, username: text })}
+              style={styles.textInput}
+              placeholder={"Usuario"}
+              placeholderTextColor="#FFB7A1"
+            />
+
+          </View>
+          {error?.username ? <HelperText type="error" visible>
+            {error.username}
+          </HelperText> : null}
+
+
+          <View style={styles.styledInputContainer}>
+            <Icon name="account-outline" type="material-community" color="#FF9A7B" size={28} style={{ marginLeft: 15 }} />
+            <TextInput
+              value={userData.fullName}
+              onChangeText={(text) => setUserData({ ...userData, fullName: text })}
+              style={styles.textInput}
+              placeholder="Nombre completo"
+              placeholderTextColor="#FFB7A1"
+            />
+          </View>
+          {error?.fullName ? <HelperText type="error" visible>
+            {error.fullName}
+          </HelperText> : null}
+
+
+
+          <View style={styles.styledInputContainer}>
+            <Icon name="email-outline" type="material-community" color="#FF9A7B" size={28} style={{ marginLeft: 15 }} />
+            <TextInput
+              value={userData.email}
+              onChangeText={(text) => setUserData({ ...userData, email: text })}
+              style={styles.textInput}
+              placeholder="Correo electrónico"
+              placeholderTextColor="#FFB7A1"
+            />
+          </View>
+          {error?.email ? <HelperText type="error" visible>
+            {error.email}
+          </HelperText> : null}
+
+          <View style={styles.styledInputContainer}>
+            <Icon name="lock-outline" type="material-community" color="#FF9A7B" size={26} style={{ marginLeft: 15 }} />
+            <TextInput
+              value={userData.password}
+              onChangeText={(text) => setUserData({ ...userData, password: text })}
+              style={styles.textInput}
+              secureTextEntry={!isPasswordVisible}
+              placeholder="Contraseña"
+              placeholderTextColor="#FFB7A1"
+            />
+            <TouchableOpacity style={{ marginRight: 15 }} onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+              <Icon name={isPasswordVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
+            </TouchableOpacity>
+          </View>
+          {error?.password ? <HelperText type="error" visible>
+            {error.password}
+          </HelperText> : null}
+          {passwordErrorVisibility ? <HelperText type="error" visible={passwordErrorVisibility}>
+            Las contraseñas no coinciden
+          </HelperText> : null}
+
+          <View style={styles.styledInputContainer}>
+            <Icon name="lock-outline" type="material-community" color="#FF9A7B" size={26} style={{ marginLeft: 15 }} />
+            <TextInput
+              value={userData.password_confirmation}
+              onChangeText={(text) => setUserData({ ...userData, password_confirmation: text })}
+              style={styles.textInput}
+              secureTextEntry={!isConfirmVisible}
+              placeholder="Repite la contraseña"
+              placeholderTextColor="#FFB7A1"
+            />
+            <TouchableOpacity style={{ marginRight: 15 }} onPress={() => setIsConfirmVisible(!isConfirmVisible)}>
+              <Icon name={isConfirmVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
+            </TouchableOpacity>
+          </View>
+          {error?.password ? <HelperText type="error" visible>
+            {error.password}
+          </HelperText> : null}
+          {passwordErrorVisibility ? <HelperText type="error" visible={passwordErrorVisibility}>
+            Las contraseñas no coinciden
+          </HelperText> : null}
+          
         </View>
-    </ThemedView>
-  );
+        <Button
+          title={"Únete"}
+          buttonStyle={styles.mainButton}
+          titleStyle={styles.mainButtonText}
+          onPress={handleFetch}
+          containerStyle={styles.mainButtonContainer}
+        />
+        <View style={styles.footerContainer}>
+          <ThemedText style={styles.footerText}>
+            ¿Ya nos conocemos?{' '}
+            <ThemedText style={styles.linkText} onPress={() => onChangePage()}>
+              Inicia sesión
+            </ThemedText>
+          </ThemedText>
+        </View>
+      </KeyboardAvoidingView>
+    </View>
+  </ThemedView>
+);
 }
 const styles = StyleSheet.create({
   // Estilos pantalla bienvenida
@@ -234,7 +291,7 @@ const styles = StyleSheet.create({
   },
 
   emotionsImage: {
-    width: '200%', 
+    width: '200%',
     height: '100%',
     marginLeft: '-50%',
     transform: [{ scale: 1.4 }],
@@ -326,7 +383,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   styledInputContainer: {
-    backgroundColor: '#FFE5D9', 
+    backgroundColor: '#FFE5D9',
     height: 64,
     borderRadius: 20,
     flexDirection: 'row',
@@ -357,7 +414,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   mainButton: {
-    backgroundColor: '#a5adb0', 
+    backgroundColor: '#a5adb0',
     height: 60,
     borderRadius: 20,
   },
@@ -378,5 +435,26 @@ const styles = StyleSheet.create({
     color: '#95A5A6',
     fontWeight: '700',
     textDecorationLine: 'underline',
+  },
+  notifContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 18,
+    width: '100%',
+    marginBottom: 20,
+    borderWidth: 1,
+    // Sombras suaves para que resalte
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3.84,
+    elevation: 2,
+  },
+  notifText: {
+    fontWeight: '700',
+    marginLeft: 10,
+    fontSize: 14,
+    flex: 1,
   },
 });
