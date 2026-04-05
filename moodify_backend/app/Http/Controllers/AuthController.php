@@ -41,40 +41,27 @@ class AuthController extends Controller
     }
     public function register(Request $request){
         $request-> validate([
-            'userData.fullName' => 'required',
-            'userData.username' => 'required',
-            'userData.email' => 'required',
-            'userData.password' => 'required'
+            'fullName' => 'required|string|max:255',
+            'username' => 'required|string|max:50|unique:users,username',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8'
+        ],[
+            'email.unique' => 'Ya existe una cuenta con este correo',
+            'username.unique' => 'Ya existe una cuenta con este nombre de usuario',
+            'email.email' => 'El formato del correo no es válido',
+            'required' => 'Este campo es obligatorio'
         ]);
-        if (filter_var($request->userData.email, FILTER_VALIDATE_EMAIL)) {
-            $register = User::where('email', $request->emailUsername)->first();
-            if($register){
-            return response()->json([
-                'success' => false,
-                'message' => 'Ya existe una cuenta con este email',
-            ]);
-            }
-        }
-        else {
-            $register = User::where('username', $request->userData.username)->first();
-            if($register){
-            return response()->json([
-                'success' => false,
-                'message' => 'Ya existe una cuenta con este usuario',
-            ]);
-            }
-        }
 
         $register = User::create([
-            'name'     => $request->userData.fullName,
-            'email'    => $request->userData.email,
-            'username' => $request->userData.username,
-            'password' => Hash::make($request->userData.password),
+            'name'     => $request->fullName,
+            'email'    => $request->email,
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
         ]);
         return response()->json([
             'status' => 'success',
             'message' => 'Usuario creado con éxito',
-            'user' => $user
+            'user' => $register
         ], 201);
         
     }

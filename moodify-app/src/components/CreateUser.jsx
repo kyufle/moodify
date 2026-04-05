@@ -22,19 +22,21 @@ export default function CreateUser() {
         password_confirmation:'',
       })
 
-    const handleFetch = async (userData) => {
+    const handleFetch = ()=>{
       if (userData.password === userData.password_confirmation){
         try {
-            const response = await fetch('http://moodify_backend/api/register', {
+            console.log(JSON.stringify(userData));
+            const response = fetch('http://moodify_backend.test/api/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             },
-            body: JSON.stringify(userData)
+            body: JSON.stringify(userData),
             });
 
-            const data = await response.json();
+
+            const data = response.json;
                 console.log(data);
             } catch (error) {
                 console.error("Error en la petición:", error);
