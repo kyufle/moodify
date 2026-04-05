@@ -13,7 +13,7 @@ import fondoFirstTime from '@/assets/images/fondofirsttime_114.3 x 203.2 mm.svg'
 
 const { width, height } = Dimensions.get('window');
 
-export default function CreateUser() {
+export default function CreateUser({onChangePage}) {
     const [userData, setUserData] = useState({
         fullName: '',
         username: '',
@@ -149,9 +149,9 @@ export default function CreateUser() {
             />
             <View style={styles.footerContainer}>
               <ThemedText style={styles.footerText}>
-                ¿Ya nos conocemos?
-                <ThemedText style={styles.linkText} onPress={() => setIsLogin(!isLogin)}>
-                  Únete
+                ¿Ya nos conocemos?{' '}
+                <ThemedText style={styles.linkText} onPress={() => onChangePage()}>
+                  Inicia sesión
                 </ThemedText>
               </ThemedText>
             </View>
