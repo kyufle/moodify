@@ -5,9 +5,8 @@ import { Image } from 'expo-image';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
-import { use, useState } from 'react';
+import { useContext, useState } from 'react';
 import { UserContext } from './user-provider';
-import { useToast } from "react-native-toast-notifications";
 import { STATUS_COLORS_CLARO } from '@/constants/status-colors-claro';
 const { width, height } = Dimensions.get('window');
 
@@ -17,7 +16,7 @@ export default function Login({ onChangePage }) {
         password: '',
     })
 
-    const { userValue, setUserValue } = use(UserContext);
+    const { userValue, setUserValue } = useContext(UserContext);
     const [notification, setNotification] = useState({ message: null, type: null });
 
     const handleFetch = async () => {
@@ -51,7 +50,6 @@ export default function Login({ onChangePage }) {
 
     };
 
-    const toast = useToast();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     function showAlert(message) {

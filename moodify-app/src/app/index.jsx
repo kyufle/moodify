@@ -8,6 +8,7 @@ import { Spacing } from '@/constants/theme';
 import CreateUser from '@/components/CreateUser';
 import Login from '@/components/Login';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // IMGS portada/login/register
 import fondoClaro from '@/assets/images/fondo_claro.svg';
@@ -16,6 +17,7 @@ import fondoFirstTime from '@/assets/images/fondofirsttime_114.3 x 203.2 mm.svg'
 const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
   const [showWelcome, setShowWelcome] = useState(true); //en el caso que no tenga token
 
@@ -35,11 +37,8 @@ export default function HomeScreen() {
           <View style={styles.welcomeContent}>
             <View style={styles.welcomeTextSection}>
               <ThemedText style={styles.welcomeTitle}>Moodify</ThemedText>
-              <ThemedText style={styles.welcomeSlogan}>Respira. Registra. Conecta.</ThemedText>
-              <ThemedText style={styles.welcomeDesc}>
-                En un mundo que nunca se detiene, Moodify es tu refugio digital. Un espacio diseñado 
-                en tonos suaves para que encuentres la claridad que necesitas, un día a la vez.
-              </ThemedText>
+              <ThemedText style={styles.welcomeSlogan}>{t('firstPage.eslogan')}</ThemedText>
+              <ThemedText style={styles.welcomeDesc}>{t('firstPage.text')}</ThemedText>
 
               {/* Botón con flecha */}
               <TouchableOpacity 
@@ -47,7 +46,7 @@ export default function HomeScreen() {
                 onPress={() => setShowWelcome(false)}
                 activeOpacity={0.8}
               >
-                <ThemedText style={styles.welcomeButtonText}>Comenzar mi viaje</ThemedText>
+                <ThemedText style={styles.welcomeButtonText}>{t('firstPage.button')}</ThemedText>
                 <View style={styles.arrowIconContainer}>
                    <Icon name="arrow-right" type="material-community" color="#FFFFFF" size={24} />
                 </View>
