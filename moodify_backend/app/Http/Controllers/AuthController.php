@@ -9,8 +9,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
-    {
+    public function login(Request $request){
         $request->validate([
             'emailUsername' => 'required',
             'password' => 'required',
@@ -26,7 +25,7 @@ class AuthController extends Controller
         // Comparamos la contraseña usando el hash que vimos antes
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message' => 'Credenciales incorrectas',
+                'message' => 'message.login.incorrectCredentials',
                 'success' => false,
                 ], 401);
         }
@@ -37,7 +36,34 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'access_token' => $token,
+            'user' => $user,
             'token_type' => 'Bearer',
         ]);
+    }
+    public function register(Request $request){
+        $request-> validate([
+            'fullName' => 'required|string|max:255',
+            'username' => 'required|string|max:50|unique:users,username',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8'
+        ],[
+            'email.unique' => 'message.register.accountAlreadyExistEmail',
+            'username.unique' => 'message.register.accountAlreadyExistUsername',
+            'email.email' => 'message.register.emailFormatInvalid',
+            'required' => 'message.fieldRequired'
+        ]);
+
+        $register = User::create([
+            'name'     => $request->fullName,
+            'email'    => $request->email,
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
+        ]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'message.register.createUserSuccess',
+            'user' => $register
+        ], 201);
+        
     }
 }
