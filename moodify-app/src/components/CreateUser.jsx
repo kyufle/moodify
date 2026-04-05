@@ -42,7 +42,6 @@ export default function CreateUser() {
                 console.error("Error en la petición:", error);
         }
       }
-        //mensaje de error visual diciendo que las contraseñas no son iguales.
     };
         
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -57,6 +56,7 @@ export default function CreateUser() {
   }
 
   // Pantalla portada
+  const passwordErrorVisibility = userData.password !== userData.password_confirmation && userData.password_confirmation !== "";
   return (
     <ThemedView style={styles.container}>
         <View style={styles.formSection}>
@@ -118,9 +118,9 @@ export default function CreateUser() {
                   <Icon name={isPasswordVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
                 </TouchableOpacity> 
               </View>
-              <HelperText type="error" visible={userData.password !== userData.password_confirmation && userData.password_confirmation}>
+              {passwordErrorVisibility ? <HelperText type="error" visible={passwordErrorVisibility}>
                   Las contraseñas no coinciden
-                </HelperText>
+                </HelperText> : null}
 
                <View style={styles.styledInputContainer}>
                 <Icon name="lock-outline" type="material-community" color="#FF9A7B" size={26} style={{ marginLeft: 15 }} />
@@ -136,9 +136,9 @@ export default function CreateUser() {
                   <Icon name={isConfirmVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
                 </TouchableOpacity>
               </View>
-              <HelperText type="error" visible={userData.password !== userData.password_confirmation && userData.password_confirmation}>
+              {passwordErrorVisibility ? <HelperText type="error" visible={passwordErrorVisibility}>
                   Las contraseñas no coinciden
-                </HelperText>
+                </HelperText> : null}
             </View>
              <Button
               title={"Únete"}
