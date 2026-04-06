@@ -7,10 +7,12 @@ import { Spacing } from '@/constants/theme';
 import { useState } from 'react';
 import { HelperText } from 'react-native-paper';
 import { STATUS_COLORS_CLARO } from '@/constants/status-colors-claro';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
 export default function CreateUser({ onChangePage }) {
+  const { t } = useTranslation();
   const [userData, setUserData] = useState({
     fullName: '',
     username: '',
@@ -49,7 +51,7 @@ export default function CreateUser({ onChangePage }) {
           );
 
           if (hasRequiredErrors) {
-            setNotification({ message: "message.fieldRequired", type: "error" });
+            setNotification({ message: t('message.fieldRequiredMessageFull'), type: "error" });
           }
           setError({
             username: data.errors.username ? data.errors.username[0] : null,
@@ -120,7 +122,7 @@ return (
 
           </View>
           {error?.username ? <HelperText type="error" visible>
-            {error.username}
+            {error.username === 'message.fieldRequired' ? t('message.fieldRequired') : t('message.register.accountAlreadyExistUsername')}
           </HelperText> : null}
 
 
@@ -135,7 +137,7 @@ return (
             />
           </View>
           {error?.fullName ? <HelperText type="error" visible>
-            {error.fullName}
+            {t('message.fieldRequired')}
           </HelperText> : null}
 
 
@@ -151,7 +153,7 @@ return (
             />
           </View>
           {error?.email ? <HelperText type="error" visible>
-            {error.email}
+            {error.email === 'message.fieldRequired' ? t('message.fieldRequired') : t('message.register.emailFormatInvalid')}
           </HelperText> : null}
 
           <View style={styles.styledInputContainer}>
@@ -169,7 +171,7 @@ return (
             </TouchableOpacity>
           </View>
           {error?.password ? <HelperText type="error" visible>
-            {error.password}
+            {t('message.fieldRequired')}
           </HelperText> : null}
           {passwordErrorVisibility ? <HelperText type="error" visible={passwordErrorVisibility}>
             Las contraseñas no coinciden
@@ -189,8 +191,8 @@ return (
               <Icon name={isConfirmVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
             </TouchableOpacity>
           </View>
-          {error?.password ? <HelperText type="error" visible>
-            {error.password}
+          {userData.password_confirmation === '' ? <HelperText type="error" visible>
+            {t('message.fieldRequired')}
           </HelperText> : null}
           {passwordErrorVisibility ? <HelperText type="error" visible={passwordErrorVisibility}>
             Las contraseñas no coinciden
