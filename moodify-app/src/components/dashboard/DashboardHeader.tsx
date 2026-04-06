@@ -1,9 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { Feather } from '@expo/vector-icons';
+import { UserContext } from '../user-provider';
 
 export const DashboardHeader = () => {
+  const { user, logout } = React.use(UserContext);
+
   // Configurado para la zona horaria de Barcelona, Catalunya
   const currentDateFormatted = new Intl.DateTimeFormat('es-ES', {
     timeZone: 'Europe/Madrid',
@@ -21,7 +24,7 @@ export const DashboardHeader = () => {
           {/* Contenedor del Avatar con un anillo estilizado tipo "Historia" */}
           <View style={styles.avatarRing}>
             <Image 
-              source={{ uri: 'https://i.pravatar.cc/150?img=44' }} // Imagen de perfil (cambiada a otra más estética)
+              source={{ uri: 'https://i.pravatar.cc/150?img=44' }} // Imagen de perfil 
               style={styles.avatar}
               contentFit="cover"
             />
@@ -29,20 +32,25 @@ export const DashboardHeader = () => {
           
           <View style={styles.textContainer}>
             <Text style={styles.welcomeText}>Bienvenid@ de vuelta</Text>
-            <Text style={styles.nameText}>Maria Orpi</Text>
+            <Text style={styles.nameText}>{user.name}</Text>
             <Text style={styles.dateText}>{currentDateFormatted.toUpperCase()}</Text>
           </View>
         </View>
 
-        {/* Lado derecho: Puntos (Diamantes) */}
-        <View style={styles.pointsBadge}>
-          <Text style={styles.pointsText}>275</Text>
-          {/* Usamos el diamante SVG que agregaste antes para mantener consistencia */}
-          <Image 
-            source={require('@/assets/images/diamante-racha.svg')}
-            style={styles.diamondIcon}
-            contentFit="contain"
-          />
+        {/* Lado derecho: Puntos y Logout */}
+        <View style={styles.rightActions}>
+          <View style={styles.pointsBadge}>
+            <Text style={styles.pointsText}>275</Text>
+            <Image 
+              source={require('@/assets/images/diamante-racha.svg')}
+              style={styles.diamondIcon}
+              contentFit="contain"
+            />
+          </View>
+          
+          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+            <Feather name="log-out" size={18} color="#64748B" />
+          </TouchableOpacity>
         </View>
 
       </View>
@@ -53,8 +61,8 @@ export const DashboardHeader = () => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-    paddingTop: 15, // Reducido para evitar altura excesiva (usa el SafeArea global)
-    paddingBottom: 15, // Más pegado a las tarjetas
+    paddingTop: 15,
+    paddingBottom: 15,
     backgroundColor: 'rgba(255, 255, 255, 0.9)', 
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
@@ -74,7 +82,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  // Anillo decorativo tipo Instagram más compacto
   avatarRing: {
     width: 48,
     height: 48,
@@ -137,5 +144,18 @@ const styles = StyleSheet.create({
   diamondIcon: {
     width: 14,
     height: 14,
+  },
+  rightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  logoutButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F1F5F9',
+    justifyContent: 'center',
+    alignItems: 'center',
   }
 });

@@ -1,13 +1,18 @@
-import * as Device from 'expo-device';
-import { View, Image, Platform, StyleSheet, TextInput } from 'react-native';
+import { useState, useContext } from 'react';
+import { View, Image, Platform, StyleSheet, TextInput, Alert } from 'react-native';
 import { Button } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Redirect } from 'expo-router';
+import { UserContext } from '@/components/user-provider';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useState } from 'react';
 import moodify from '@/assets/images/moodifyLogo.png';
+
+// Import Device to fix the previous error
+import * as Device from 'expo-device';
+
 function getDevMenuHint() {
   if (Platform.OS === 'web') {
     return <ThemedText type="small">use browser devtools</ThemedText>;
@@ -22,7 +27,6 @@ function getDevMenuHint() {
   const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
   
   return (
-    
     <ThemedText type="small">
       press <ThemedText type="code">{shortcut}</ThemedText>
     </ThemedText>
@@ -30,8 +34,15 @@ function getDevMenuHint() {
 }
 
 export default function HomeScreen() {
+  const { isLoggedIn } = useContext(UserContext);
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+
+  // Redirigir al dashboard si ya estamos "logueados" (modo prueba)
+  if (isLoggedIn) {
+     return <Redirect href="/dashboard" />;
+  }
+
   function showAlert(message) {
     if (Platform.OS === 'web') {
       window.alert(message);
@@ -39,6 +50,7 @@ export default function HomeScreen() {
       Alert.alert(message);
     }
   }
+
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
@@ -54,57 +66,37 @@ export default function HomeScreen() {
         </ThemedView>
 
         <TextInput
-        placeholder='Email o nombre de usuario'
-        value={email}
-        onChangeText={val => setEmail(val)}
-        style={{
-        backgroundColor: "white",
-        borderRadius: 20,
-        height: 40,
-        paddingLeft: 20
-      }}
-      autoCapitalize="none"
-      ></TextInput>
+          placeholder='Email o nombre de usuario'
+          value={email}
+          onChangeText={val => setEmail(val)}
+          style={styles.input}
+          autoCapitalize="none"
+        />
 
-      <TextInput
-        placeholder='Contraseña'
-        value={password}
-        onChangeText={val => setPassword(val)}
-        style={{
-        backgroundColor: "white",
-        borderRadius: 20,
-        height: 40,
-        paddingLeft: 20
-      }}
-      autoCapitalize="none"
-      ></TextInput>
-       <View style={styles.buttons}>
-      <Button
-          title="Acceder"
-          color={'#DDAADD'}
-          onPress={() => showAlert('Accediendo')}
+        <TextInput
+          placeholder='Contraseña'
+          value={password}
+          onChangeText={val => setPassword(val)}
+          style={styles.input}
+          autoCapitalize="none"
+          secureTextEntry
         />
-        <Button
-          title="Regístrate"
-          type="outline"
-          buttonStyle={{ borderColor: '#99AAFF' }}
-          titleStyle={{ color: '#99AAFF' }}
-          onPress={() => showAlert('Registrando')}
-        />
+
+        <View style={styles.buttons}>
+          <Button
+            title="Acceder"
+            color={'#DDAADD'}
+            onPress={() => showAlert('Accediendo')}
+          />
+          <Button
+            title="Regístrate"
+            type="outline"
+            buttonStyle={{ borderColor: '#99AAFF' }}
+            titleStyle={{ color: '#99AAFF' }}
+            onPress={() => showAlert('Registrando')}
+          />
         </View>
         
-        {/* <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView> */}
-
         {Platform.OS === 'web' && <WebBadge />}
       </SafeAreaView>
     </ThemedView>
@@ -127,18 +119,25 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
     paddingBottom: BottomTabInset + Spacing.three,
   },
-  
   heroSection: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: Spacing.four,
     gap: Spacing.four,
   },
-
+  input: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    height: 40,
+    paddingLeft: 20,
+    width: '100%',
+    marginBottom: 10,
+  },
   buttons:{
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '100%'
+    width: '100%',
+    marginTop: 20,
   }
 });
