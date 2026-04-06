@@ -1,24 +1,23 @@
 const es = {
-  "firstPage": {
-    "eslogan": "Respira. Registra. Conecta.",
-    "text": "En un mundo que nunca se detiene, Moodify es tu refugio digital. Un espacio diseñado en tonos suaves para que encuentres la claridad que necesitas, un día a la vez.",
-    "button": "Comenzar mi viaje"
+  'firstPage': {
+    'eslogan': 'Respira. Registra. Conecta.',
+    'text': 'En un mundo que nunca se detiene, Moodify es tu refugio digital. Un espacio diseñado en tonos suaves para que encuentres la claridad que necesitas, un día a la vez.',
+    'button': 'Comenzar mi viaje'
   },
-  "auth": {
-    "login": "Login",
-    "signup": "Sign Up",
-    "email_placeholder": "Enter your email",
-    "password_error": "Password must be at least 6 characters"
+  'panel':{
+    'hello': '¡Hola!',
+    'welcome': 'Bienvenid@',
+    'unite': 'Únete',
+    'enter': 'Entra'
   },
-  "home": {
-    "welcome": "Hello, {{name}}!",
-    "description": "Welcome to your React Native project",
-    "empty_list": "There are no items to show"
-  },
-  "profile": {
-    "title": "My Profile",
-    "edit_button": "Edit profile",
-    "logout": "Logout"
+  'message':{
+    'fieldRequiredMessageFull': '¡A un paso! Parece que falta algún campo por rellenar para poder continuar.',
+    'fieldRequired': '¡Ups! Parece que olvidaste completar este campo.',
+    'register':{
+      'emailFormatInvalid': 'El formato del correo electrónico no es válido.',
+      'accountAlreadyExistUsername': 'Este nombre de usuario ya está en uso. Prueba con otro.',
+
+    }
   }
 }
 export default es;

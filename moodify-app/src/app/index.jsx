@@ -17,6 +17,7 @@ import fondoFirstTime from '@/assets/images/fondofirsttime_114.3 x 203.2 mm.svg'
 const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen() {
+  
   const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
   const [showWelcome, setShowWelcome] = useState(true); //en el caso que no tenga token
@@ -77,21 +78,21 @@ export default function HomeScreen() {
           
           {/* Tarjeta gris flotante */}
           <View style={styles.floatingCard}>
-            <ThemedText style={styles.holaText}>¡Hola!</ThemedText>
-            <ThemedText style={styles.bienvenidoText}>Bienvenid@</ThemedText>
+            <ThemedText style={styles.holaText}>{t('panel.hello')}</ThemedText>
+            <ThemedText style={styles.bienvenidoText}>{t('panel.welcome')}</ThemedText>
             
             <View style={styles.tabContainer}>
               <TouchableOpacity 
                 style={[styles.tabButton, isLogin && styles.activeTab]}
                 onPress={() => setIsLogin(true)}
               >
-                <ThemedText style={[styles.tabText, isLogin && styles.activeTabText]}>Entra</ThemedText>
+                <ThemedText style={[styles.tabText, isLogin && styles.activeTabText]}>{t('panel.enter')}</ThemedText>
               </TouchableOpacity>
               <TouchableOpacity 
                 style={[styles.tabButton, !isLogin && styles.activeTab]}
                 onPress={() => setIsLogin(false)}
               >
-                <ThemedText style={[styles.tabText, !isLogin && styles.activeTabText]}>Únete</ThemedText>
+                <ThemedText style={[styles.tabText, !isLogin && styles.activeTabText]}>{t('panel.unite')}</ThemedText>
               </TouchableOpacity>
             </View>
           </View>

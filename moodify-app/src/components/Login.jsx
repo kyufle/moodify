@@ -8,9 +8,12 @@ import { Spacing } from '@/constants/theme';
 import { useContext, useState } from 'react';
 import { UserContext } from './user-provider';
 import { STATUS_COLORS_CLARO } from '@/constants/status-colors-claro';
+import { useTranslation } from 'react-i18next';
 const { width, height } = Dimensions.get('window');
 
+
 export default function Login({ onChangePage }) {
+    const { t } = useTranslation();
     const [userData, setUserData] = useState({
         emailUsername: '',
         password: '',
@@ -45,7 +48,7 @@ export default function Login({ onChangePage }) {
                 console.error("Error en la petición:", error);
             }
         } else {
-            setNotification({message:"message.fieldRequired", type:"error"});
+            setNotification({ message: t('message.fieldRequiredMessageFull'), type: "error" });
         }
 
     };
