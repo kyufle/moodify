@@ -4,7 +4,7 @@ import { router } from "expo-router";
 const defaultValue = {
     isLoggedIn: true,
     user: {
-        name: "Kyufle",
+        name: "user",
         email: "user@moodify.com",
         avatar: null
     },
@@ -14,19 +14,20 @@ const defaultValue = {
 export const UserContext = createContext(defaultValue);
 
 export default function UserProvider({ children }: { children: ReactNode }) {
-    // Mantener siempre true para facilitar las pruebas de UI
-    const [isLoggedIn] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     
+    const login = () => {
+        setIsLoggedIn(true);
+    };
+
     const logout = () => {
-        // En modo prueba de frontend, solo mostramos un aviso
-        import('react-native').then(({ Alert }) => {
-            Alert.alert("Logout", "Has pulsado el botón de cerrar sesión (Mockup de prueba)");
-        });
+        setIsLoggedIn(false);
     };
 
     const userContextValue = {
         isLoggedIn,
         user: defaultValue.user,
+        login, // Añadimos la función login
         logout
     };
 
