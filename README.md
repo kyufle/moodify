@@ -5,7 +5,7 @@ Aplicación desarrollada con [Expo](https://expo.dev) y React Native.
 ## Arquitectura
 
 - **Frontend:** React Native (Expo) en la carpeta `moodify-app`.
-- **Backend:** Laravel y MySQL en la carpeta `moodify-backend`.
+- **Backend:** Laravel y MySQL en la carpeta `moodify_backend`.
 
 ## Cómo arrancar la aplicación (Paso a paso)
 
@@ -17,11 +17,11 @@ Abre una terminal nueva, sitúate en la carpeta principal `moodify` y sigue esto
 
 1. **Entra al directorio del backend:**
    ```bash
-   cd moodify-backend
+   cd moodify_backend
    ```
 
 2. *(Solo la primera vez)* **Prepara la base de datos MySQL**:
-   Asegúrate de que tu servidor MySQL esté corriendo y crea una base de datos llamada `moodify`. Verifica que las credenciales en tu archivo `moodify-backend/.env` sean correctas. Después, ejecuta las migraciones:
+   Asegúrate de que tu servidor MySQL esté corriendo y crea una base de datos llamada `moodify`. Verifica que las credenciales en tu archivo `moodify_backend/.env` sean correctas. Después, ejecuta las migraciones:
    ```bash
    php artisan migrate
    ```
