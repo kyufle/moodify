@@ -9,18 +9,36 @@ const volver = () => {
 
 <template>
   <div class="caja-descubre">
-    <img
-      src="/home/super/.gemini/antigravity/brain/f17f18b2-492f-4a11-976a-51213d9f3ba5/descubre_page_image_1775669686447.png"
-      alt="Descubrimiento"
-      class="imagen-premium"
-    />
-    <h1>Descubre tu potencial</h1>
-    <p>
-      Aquí es donde comienza tu viaje. Con Moodify, podrás registrar cada paso
-      hacia tus metas y entender mejor tus patrones de comportamiento.
-    </p>
-    <button @click="volver" class="btn-volver">
-      <i class="pi pi-arrow-left"></i>Sigue descubriendo cosas
+    <h1>El perquè de MOODIFY</h1>
+    <div class="text-content">
+      <p class="origin">
+        El nom neix de la fusió de dos conceptes: <strong>Mood</strong> (Estat d'ànim i reflexió) i <strong>Modify</strong> (Acció i transformació). 
+        La nostra motivació és oferir un espai segur en una societat accelerada on no sempre tenim temps per expressar com ens sentim.
+      </p>
+
+      <div class="pilars-section">
+        <h3>Els tres pilars fonamentals</h3>
+        <div class="pilars-grid">
+          <div class="pilar">
+            <i class="pi pi-compass icon-pilar"></i>
+            <strong>Hàbits</strong>
+            <span>Construir rutines de valor</span>
+          </div>
+          <div class="pilar">
+            <i class="pi pi-heart icon-pilar"></i>
+            <strong>Mentalitat</strong>
+            <span>Autoconeixement emocional</span>
+          </div>
+          <div class="pilar">
+            <i class="pi pi-chart-line icon-pilar"></i>
+            <strong>Progrés</strong>
+            <span>Observar l'evolució</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button @click="volver" class="btn-primary">
+      Veure Funcionalitats <i class="pi pi-arrow-right"></i>
     </button>
   </div>
 </template>
@@ -41,43 +59,77 @@ const volver = () => {
   margin-bottom: 40px;
 }
 
-.imagen-premium {
-  width: 50%;
-  height: auto;
-  border-radius: 16px;
-  margin-bottom: 24px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
 h1 {
   color: #111827;
   font-size: 2.5rem;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
-p {
-  color: #374151;
-  font-size: 1.1rem;
-  line-height: 1.6;
+.text-content {
+  text-align: left;
   margin-bottom: 32px;
 }
 
-.btn-volver {
-  padding: 12px 24px;
-  background: var(--accent);
-  color: white;
-  border: none;
+.text-content .origin {
+  color: #374151;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 20px;
   border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 auto;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
-.btn-volver:hover {
-  transform: scale(1.05);
+.pilars-section {
+  text-align: center;
 }
+
+.pilars-section h3 {
+  color: #1f2937;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+}
+
+.pilars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.pilar {
+  background: linear-gradient(135deg, rgba(255,171,145,0.2), rgba(255,255,255,0.6));
+  padding: 20px 15px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(255, 171, 145, 0.3);
+}
+
+.pilar:hover {
+  transform: translateY(-5px);
+}
+
+.icon-pilar {
+  font-size: 2rem;
+  color: var(--accent);
+  margin-bottom: 5px;
+}
+
+.pilar strong {
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.pilar span {
+  font-size: 0.85rem;
+  color: #4b5563;
+  text-align: center;
+}
+
 </style>

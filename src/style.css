@@ -5,6 +5,8 @@
   --border: #d5dbdb;
   --code-bg: #d6eaf8;
   --accent: #ffab91;
+  --accent-2: #9e9ec9;
+  --accent-2-border: #E1E1F5;
   --accent-bg: rgba(255, 171, 145, 0.15);
   --accent-border: rgba(255, 171, 145, 0.5);
   --social-bg: #e6e6fa80;
@@ -298,4 +300,30 @@ code {
     right: 0;
     border-right-color: var(--border);
   }
+}
+
+.btn-primary {
+  padding: 12px 24px;
+  background: var(--accent-2);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0 auto;
+  box-shadow: 0 4px 15px var(--accent-2-border);
+  margin-top: 32px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px var(--accent-2-border);
 }

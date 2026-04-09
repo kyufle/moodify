@@ -13,13 +13,17 @@ const irADescubre = () => {
 <template>
   <div class="caja">
     <h2>{{ mensaje }}</h2>
+    <h3 class="subtitle">~ On les teves emocions cobren forma ~</h3>
     <p>
-      Bienvenido a la presentación de la nueva app con la que podrás controlar y
-      mejorar tus hábitos.
+      Una aplicació web interactiva centrada en el benestar emocional i la creació d’hàbits saludables.
     </p>
+    <div class="authors">
+      <span><i class="pi pi-user"></i> Valeria Santana Megia</span>
+      <span><i class="pi pi-user"></i> Ruth Romero Carretero</span>
+    </div>
 
-    <button @click="irADescubre" class="shadow__btn">
-      Descubre más <i class="pi pi-arrow-right"></i>
+    <button @click="irADescubre" class="btn-primary">
+      Dona un cop d'ull <i class="pi pi-arrow-right"></i>
     </button>
   </div>
 </template>
@@ -52,9 +56,17 @@ const irADescubre = () => {
 h2 {
   color: #111827;
   font-size: 3.5rem;
-  margin-bottom: 24px;
+  margin-bottom: 5px;
   letter-spacing: -2px;
   font-weight: 700;
+}
+
+.subtitle {
+  color: var(--accent-2);
+  font-size: 1.2rem;
+  font-style: italic;
+  font-weight: 500;
+  margin-bottom: 24px;
 }
 
 p {
@@ -62,33 +74,16 @@ p {
   font-size: 1.2rem;
   line-height: 1.6;
   font-weight: 500;
+  margin-bottom: 24px;
 }
 
-.shadow__btn {
-  margin-top: 60px;
-  margin-bottom: 20px;
-  padding: 10px 20px;
-  border: none;
-  font-size: 17px;
-  color: #fff;
-  border-radius: 7px;
-  letter-spacing: 4px;
-  font-weight: 700;
-  text-transform: uppercase;
-  transition: 0.5s;
-  transition-property: box-shadow;
+.authors {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #6b7280;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-.shadow__btn {
-  background: rgb(250, 131, 230);
-  box-shadow: 0 0 25px rgb(250, 131, 230);
-}
-
-.shadow__btn:hover {
-  box-shadow:
-    0 0 5px rgb(250, 131, 230),
-    0 0 25px rgb(250, 131, 230),
-    0 0 50px rgb(250, 131, 230),
-    0 0 100px rgb(250, 131, 230);
-}
 </style>

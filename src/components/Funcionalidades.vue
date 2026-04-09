@@ -6,7 +6,7 @@ const router = useRouter();
 const hoveredCard = ref(null);
 
 const volver = () => {
-  router.push("/");
+  router.push("/demo");
 };
 </script>
 
@@ -15,24 +15,23 @@ const volver = () => {
     <div class="cards">
       <div
         v-for="(card, index) in [
-          { color: 'red', tip: 'Registro Diario', desc: 'Anota cómo te sientes' },
-          { color: 'blue', tip: 'Estadísticas', desc: 'Visualiza tu progreso' },
-          { color: 'green', tip: 'Recordatorios', desc: 'No olvides tus hábitos' },
-          { color: 'red', tip: 'Metas', desc: 'Define tus objetivos' },
-          { color: 'blue', tip: 'Comunidad', desc: 'Comparte tus logros' },
-          { color: 'green', tip: 'Soporte 24/7', desc: 'Siempre contigo' },
+          { color: 'peach', tip: 'Diari emocional', desc: 'Anota emocions i pensaments' },
+          { color: 'lightblue', tip: 'Gràfics d\'evolució', desc: 'Evolució setmanal i mensual' },
+          { color: 'yellow', tip: 'Sistema d\'hàbits', desc: 'Crear hàbits i seguiment' },
+          { color: 'pink', tip: 'Fòrum comunitari', desc: 'Publicacions i moderació' },
+          { color: 'lavender', tip: 'Chat IA integrat', desc: 'Assistent emocional intel·ligent' },
+          { color: 'peach', tip: 'Notificacions', desc: 'Recordatoris i resums periòdics' },
         ]"
         :key="index"
-        class="card"
+        :class="['card', card.color]"
       >
         <p class="tip">{{ card.tip }}</p>
         <p class="second-text">{{ card.desc }}</p>
       </div>
-
-      <button @click="volver" class="btn-volver">
-        <i class="pi pi-arrow-left"></i> Volver al inicio
-      </button>
     </div>
+    <button @click="volver" class="btn-primary" style="margin-top: 32px">
+      Accedir a la Demo <i class="pi pi-arrow-right"></i>
+    </button>
   </div>
 </template>
 
@@ -44,7 +43,9 @@ const volver = () => {
   border-radius: 24px;
   max-width: 900px;
   width: 95%;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   text-align: center;
   box-shadow: var(--shadow);
   margin-top: 40px;
@@ -70,15 +71,21 @@ const volver = () => {
   }
 }
 
-/* COLORES CON GRADIENT */
-.cards .red {
-  background: linear-gradient(135deg, #f43f5e, #fb7185);
+/* COLORES BASADOS EN BG-WEB.SVG */
+.cards .peach {
+  background: linear-gradient(135deg, #ffab91, #ffccbc);
 }
-.cards .blue {
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+.cards .lightblue {
+  background: linear-gradient(135deg, #d6eaf8, #aed6f1);
 }
-.cards .green {
-  background: linear-gradient(135deg, #22c55e, #4ade80);
+.cards .pink {
+  background: linear-gradient(135deg, #f5b7b1, #fadbd8);
+}
+.cards .yellow {
+  background: linear-gradient(135deg, #fff24a, #fff9ae);
+}
+.cards .lavender {
+  background: linear-gradient(135deg, #e6e6fa, #d8bfd8);
 }
 
 /* CARD BASE */
@@ -89,11 +96,12 @@ const volver = () => {
   flex-direction: column;
   height: 120px;
   border-radius: 18px;
-  color: white;
+  color: #1f2937;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 /* HOVER ANIMADO */
@@ -137,27 +145,4 @@ const volver = () => {
   transform: translateY(-1px);
 }
 
-/* BOTÓN */
-.btn-volver {
-  grid-column: 1 / -1;
-  justify-self: center;
-  margin-top: 20px;
-  padding: 12px 24px;
-  border: none;
-  font-size: 17px;
-  color: #fff;
-  border-radius: 10px;
-  letter-spacing: 2px;
-  font-weight: 700;
-  text-transform: uppercase;
-  transition: 0.3s;
-  cursor: pointer;
-  background: var(--accent);
-  box-shadow: 0 0 20px var(--accent-bg);
-}
-
-.btn-volver:hover {
-  box-shadow: 0 0 40px var(--accent);
-  transform: translateY(-2px);
-}
 </style>
