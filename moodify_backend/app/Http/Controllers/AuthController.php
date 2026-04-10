@@ -12,25 +12,28 @@ class AuthController extends Controller
     public function login(Request $request){
         $request->validate([
             'emailUsername' => 'required',
-            'password' => 'required',
+            'password' => 'required'
         ]);
 
-        if (filter_var($request->emailUsername, FILTER_VALIDATE_EMAIL)) {
-            $user = User::where('email', $request->emailUsername)->first();
-        }
-        else {
-            $user = User::where('username', $request->emailUsername)->first();
-        }
+        $field = filter_var($request->emailUsername, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        // Comparamos la contraseña usando el hash que vimos antes
+        $user = User::where($field, $request->emailUsername)
+                    ->whereNotNull('email_verified_at')
+                    ->first();
+             
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message' => 'message.login.incorrectCredentials',
+                'message' => 'message.incorrectCredentials',
                 'success' => false,
                 ], 401);
         }
 
-        // Creamos el token. El nombre 'auth_token' puede ser cualquier cosa.
+        if (is_null($user->email_verified_at)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'message.notVerified',
+        ], 403);
+    }
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

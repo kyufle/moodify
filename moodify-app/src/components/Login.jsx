@@ -40,7 +40,7 @@ export default function Login({ onChangePage }) {
                         accessToken: data.access_token,
                         user: data.user
                     });
-                    setNotification({message:"message.correctLogin", type:"success"});
+                    setNotification({message: t('message.correctLogin'), type:"success"});
                 } else {
                     setNotification({message: data.message, type:"error"});
                 }
