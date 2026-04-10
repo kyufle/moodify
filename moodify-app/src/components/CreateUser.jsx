@@ -116,7 +116,7 @@ return (
               value={userData.name}
               onChangeText={(text) => setUserData({ ...userData, username: text })}
               style={styles.textInput}
-              placeholder={"Usuario"}
+              placeholder={t('loginRegister.user')}
               placeholderTextColor="#FFB7A1"
             />
 
@@ -132,7 +132,7 @@ return (
               value={userData.fullName}
               onChangeText={(text) => setUserData({ ...userData, fullName: text })}
               style={styles.textInput}
-              placeholder="Nombre completo"
+              placeholder={t('loginRegister.completeName')}
               placeholderTextColor="#FFB7A1"
             />
           </View>
@@ -148,7 +148,7 @@ return (
               value={userData.email}
               onChangeText={(text) => setUserData({ ...userData, email: text })}
               style={styles.textInput}
-              placeholder="Correo electrónico"
+              placeholder={t('loginRegister.email')}
               placeholderTextColor="#FFB7A1"
             />
           </View>
@@ -163,7 +163,7 @@ return (
               onChangeText={(text) => setUserData({ ...userData, password: text })}
               style={styles.textInput}
               secureTextEntry={!isPasswordVisible}
-              placeholder="Contraseña"
+              placeholder={'loginRegister.password'}
               placeholderTextColor="#FFB7A1"
             />
             <TouchableOpacity style={{ marginRight: 15 }} onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
@@ -174,7 +174,7 @@ return (
             {t('message.fieldRequired')}
           </HelperText> : null}
           {passwordErrorVisibility ? <HelperText type="error" visible={passwordErrorVisibility}>
-            Las contraseñas no coinciden
+            {t('loginRegister.passwordsDontMatch')}
           </HelperText> : null}
 
           <View style={styles.styledInputContainer}>
@@ -184,7 +184,7 @@ return (
               onChangeText={(text) => setUserData({ ...userData, password_confirmation: text })}
               style={styles.textInput}
               secureTextEntry={!isConfirmVisible}
-              placeholder="Repite la contraseña"
+              placeholder={t('loginRegister.repeatPassword')}
               placeholderTextColor="#FFB7A1"
             />
             <TouchableOpacity style={{ marginRight: 15 }} onPress={() => setIsConfirmVisible(!isConfirmVisible)}>
@@ -195,12 +195,12 @@ return (
             {t('message.fieldRequired')}
           </HelperText> : null}
           {passwordErrorVisibility ? <HelperText type="error" visible={passwordErrorVisibility}>
-            Las contraseñas no coinciden
+            {t('loginRegister.passwordsDontMatch')}
           </HelperText> : null}
           
         </View>
         <Button
-          title={"Únete"}
+          title={t('loginRegister.join')}
           buttonStyle={styles.mainButton}
           titleStyle={styles.mainButtonText}
           onPress={handleFetch}
@@ -208,9 +208,9 @@ return (
         />
         <View style={styles.footerContainer}>
           <ThemedText style={styles.footerText}>
-            ¿Ya nos conocemos?{' '}
+            {'loginRegister.weAlreadyKnowEachOther'}{' '}
             <ThemedText style={styles.linkText} onPress={() => onChangePage()}>
-              Inicia sesión
+              {t('loginRegister.loginRegister')}
             </ThemedText>
           </ThemedText>
         </View>
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.4 }],
   },
 
-  // Estilos formulario login/register
+  // Estilos formulario loginRegister/register
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',

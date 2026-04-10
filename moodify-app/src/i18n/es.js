@@ -16,8 +16,21 @@ const es = {
     'register':{
       'emailFormatInvalid': 'El formato del correo electrónico no es válido.',
       'accountAlreadyExistUsername': 'Este nombre de usuario ya está en uso. Prueba con otro.',
-
-    }
+    },
+    
+  },
+  'loginRegister':{
+      'user': 'Usuario',
+      'completeName': 'Nombre completo',
+      'email': 'Correo electrónico',
+      'password': 'Contraseña',
+      'repeatPassword': 'Repite la contraseña',
+      'passwordsDontMatch': 'Las contraseñas no coinciden',
+      'join': 'Únete',
+      'weAlreadyKnowEachOther': '¿Ya nos conocemos?',
+      'login': 'Inicia sesión',
+      'userOrEmail': 'Usuario o email',
+      'dontHaveAccount': '¿No tienes cuenta?',
   }
 }
 export default es;
