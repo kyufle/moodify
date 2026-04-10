@@ -103,7 +103,7 @@ export default function Login({ onChangePage }) {
                                 value={userData.emailUsername}
                                 onChangeText={(text) => setUserData({ ...userData, emailUsername: text })}
                                 style={styles.textInput}
-                                placeholder={"Usuario o email"}
+                                placeholder={t('loginRegister.userOrEmail')}
                                 placeholderTextColor="#FFB7A1"
                             />
                         </View>
@@ -114,7 +114,7 @@ export default function Login({ onChangePage }) {
                                 onChangeText={(text) => setUserData({ ...userData, password: text })}
                                 style={styles.textInput}
                                 secureTextEntry={!isPasswordVisible}
-                                placeholder="Contraseña"
+                                placeholder={t('loginRegister.password')}
                                 placeholderTextColor="#FFB7A1"
                             />
                             <TouchableOpacity style={{ marginRight: 15 }} onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
@@ -123,7 +123,7 @@ export default function Login({ onChangePage }) {
                         </View>
                     </View>
                     <Button
-                        title={"Iniciar sesión"}
+                        title={t('loginRegister.login')}
                         buttonStyle={styles.mainButton}
                         titleStyle={styles.mainButtonText}
                         onPress={handleFetch}
@@ -131,9 +131,9 @@ export default function Login({ onChangePage }) {
                     />
                     <View style={styles.footerContainer}>
                         <ThemedText style={styles.footerText}>
-                            ¿No tienes cuenta?{' '}
+                            {'loginRegister.dontHaveAccount'}{' '}
                             <ThemedText style={styles.linkText} onPress={() => onChangePage()}>
-                                Únete
+                                {t('loginRegister.join')}
                             </ThemedText>
                         </ThemedText>
                     </View>
