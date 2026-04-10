@@ -5,6 +5,10 @@ const router = useRouter();
 const volver = () => {
   router.push("/funcionalidades");
 };
+
+const anterior = () => {
+  router.push("/");
+};
 </script>
 
 <template>
@@ -37,9 +41,14 @@ const volver = () => {
         </div>
       </div>
     </div>
-    <button @click="volver" class="btn-primary">
-      Veure Funcionalitats <i class="pi pi-arrow-right"></i>
-    </button>
+    <div class="button-group">
+      <button @click="anterior" class="btn-primary">
+        <i class="pi pi-arrow-left"></i> Enrere
+      </button>
+      <button @click="volver" class="btn-primary" style="margin-top: 0">
+        Veure Funcionalitats <i class="pi pi-arrow-right"></i>
+      </button>
+    </div>
   </div>
 </template>
 

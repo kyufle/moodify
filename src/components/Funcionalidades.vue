@@ -6,7 +6,11 @@ const router = useRouter();
 const hoveredCard = ref(null);
 
 const volver = () => {
-  router.push("/demo");
+  router.push("/equip");
+};
+
+const anterior = () => {
+  router.push("/descubre");
 };
 </script>
 
@@ -20,7 +24,7 @@ const volver = () => {
           { color: 'yellow', tip: 'Sistema d\'hàbits', desc: 'Crear hàbits i seguiment' },
           { color: 'pink', tip: 'Fòrum comunitari', desc: 'Publicacions i moderació' },
           { color: 'lavender', tip: 'Chat IA integrat', desc: 'Assistent emocional intel·ligent' },
-          { color: 'peach', tip: 'Notificacions', desc: 'Recordatoris i resums periòdics' },
+          { color: 'green', tip: 'Notificacions', desc: 'Recordatoris i resums periòdics' },
         ]"
         :key="index"
         :class="['card', card.color]"
@@ -29,20 +33,25 @@ const volver = () => {
         <p class="second-text">{{ card.desc }}</p>
       </div>
     </div>
-    <button @click="volver" class="btn-primary" style="margin-top: 32px">
-      Accedir a la Demo <i class="pi pi-arrow-right"></i>
-    </button>
+    <div class="button-group">
+      <button @click="anterior" class="btn-primary">
+        <i class="pi pi-arrow-left"></i> Enrere
+      </button>
+      <button @click="volver" class="btn-primary" style="margin-top: 0">
+        Coneix l'Equip <i class="pi pi-arrow-right"></i>
+      </button>
+    </div>
   </div>
 </template>
 
 <style scoped>
-/* CONTENEDOR CON GLASSMORPHISM */
 .contenedor-funcionalidades {
   border: 2px solid var(--accent-border);
   padding: 40px;
   border-radius: 24px;
-  max-width: 900px;
-  width: 95%;
+  height: 100%;
+  max-width: 1100px;
+  width: 100%;
   background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -51,14 +60,12 @@ const volver = () => {
   margin-top: 40px;
 }
 
-/* GRID REAL */
 .cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 25px;
 }
 
-/* RESPONSIVE */
 @media (max-width: 900px) {
   .cards {
     grid-template-columns: repeat(2, 1fr);
@@ -86,6 +93,10 @@ const volver = () => {
 }
 .cards .lavender {
   background: linear-gradient(135deg, #e6e6fa, #d8bfd8);
+}
+
+.cards .green {
+  background: linear-gradient(135deg, #b2dfdb, #80cbc4);
 }
 
 /* CARD BASE */

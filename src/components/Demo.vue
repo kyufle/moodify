@@ -24,6 +24,10 @@ const volver = () => {
       </div>
     </div>
     
+    <div class="end-message">
+      <i class="pi pi-check-circle end-icon"></i>
+      <p>Gràcies per descobrir MOODIFY! 💛</p>
+    </div>
     <button @click="volver" class="btn-primary">
       <i class="pi pi-home"></i> Tornar a l'inici
     </button>
@@ -95,5 +99,20 @@ h1 {
 .qr-icon {
   font-size: 5rem;
   color: var(--accent-2);
+}
+.end-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  color: #4b5563;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.end-icon {
+  font-size: 2.5rem;
+  color: var(--accent);
 }
 </style>

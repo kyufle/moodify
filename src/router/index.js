@@ -4,6 +4,8 @@ import Descubre from '../components/Descubre.vue'
 import Funcionalidades from '../components/Funcionalidades.vue'
 import Demo from '../components/Demo.vue'
 
+import Equip from '../components/Equip.vue'
+
 const routes = [
   {
     path: '/',
@@ -19,6 +21,11 @@ const routes = [
     path: '/funcionalidades',
     name: 'Funcionalidades',
     component: Funcionalidades
+  },
+  {
+    path: '/equip',
+    name: 'Equip',
+    component: Equip
   },
   {
     path: '/demo',
