@@ -9,7 +9,8 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $request->validate([
             'emailUsername' => 'required',
             'password' => 'required'
@@ -17,23 +18,21 @@ class AuthController extends Controller
 
         $field = filter_var($request->emailUsername, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        $user = User::where($field, $request->emailUsername)
-                    ->whereNotNull('email_verified_at')
-                    ->first();
-             
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        $user = User::where($field, $request->emailUsername)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'message' => 'message.incorrectCredentials',
                 'success' => false,
-                ], 401);
+            ], 401);
+        }
+        if (is_null($user->email_verified_at)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'message.notVerified',
+            ], 403);
         }
 
-        if (is_null($user->email_verified_at)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'message.notVerified',
-        ], 403);
-    }
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -43,13 +42,14 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
         ]);
     }
-    public function register(Request $request){
-        $request-> validate([
+    public function register(Request $request)
+    {
+        $request->validate([
             'fullName' => 'required|string|max:255',
             'username' => 'required|string|max:50|unique:users,username',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8'
-        ],[
+        ], [
             'email.unique' => 'message.register.accountAlreadyExistEmail',
             'username.unique' => 'message.register.accountAlreadyExistUsername',
             'email.email' => 'message.register.emailFormatInvalid',
@@ -57,8 +57,8 @@ class AuthController extends Controller
         ]);
 
         $register = User::create([
-            'name'     => $request->fullName,
-            'email'    => $request->email,
+            'name' => $request->fullName,
+            'email' => $request->email,
             'username' => $request->username,
             'password' => Hash::make($request->password),
         ]);
@@ -67,6 +67,6 @@ class AuthController extends Controller
             'message' => 'message.register.createUserSuccess',
             'user' => $register
         ], 201);
-        
+
     }
 }
