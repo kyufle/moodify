@@ -38,10 +38,16 @@ export default function CreateUser({ onChangePage }) {
     password_confirmation: '',
   });
 
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[a-zA-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    return regex.test(password);
+  };
+
   const handleFetch = async () => {
     setNotification({ message: null, type: null });
     setErrorForRepeatPassword(false);
-    const newErrors = {
+
+    const localErrors = {
       username: !userData.username ? 'message.fieldRequired' : '',
       fullName: !userData.fullName ? 'message.fieldRequired' : '',
       email: !userData.email ? 'message.fieldRequired' : '',
@@ -49,15 +55,28 @@ export default function CreateUser({ onChangePage }) {
       password_confirmation: !userData.password_confirmation ? 'message.fieldRequired' : '',
     };
 
-    setError(newErrors);
-    const hasEmptyFields = Object.values(newErrors).some(err => err !== '');
-    const passwordsDontMatch = userData.password !== userData.password_confirmation;
+    const hasEmptyFields = Object.values(localErrors).some(err => err === 'message.fieldRequired');
 
-    if (hasEmptyFields || passwordsDontMatch) {
-      if (userData.password_confirmation && passwordsDontMatch) {
+    if (userData.password && !validatePassword(userData.password)) {
+      localErrors.password = 'message.register.passwordDontWork';
+      localErrors.password_confirmation = 'message.register.passwordDontWork';
+    }
+
+    setError(localErrors);
+
+    const passwordsDontMatch = userData.password !== userData.password_confirmation;
+    const hasValidationErrors = localErrors.password === 'message.register.passwordDontWork';
+
+    if (hasEmptyFields) {
+      setNotification({ message: 'message.fieldRequiredMessageFull', type: "error" });
+      return;
+    }
+
+    if (passwordsDontMatch || hasValidationErrors) {
+      if (passwordsDontMatch && userData.password_confirmation) {
         setErrorForRepeatPassword(true);
       }
-      setNotification({ message: 'message.fieldRequiredMessageFull', type: "error" });
+      setNotification({ message: 'message.fieldError', type: "error" });
       return; 
     }
 
@@ -67,85 +86,109 @@ export default function CreateUser({ onChangePage }) {
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(userData),
       });
+      
       const data = await response.json();
       
-      if (data.errors) {
+      if (response.ok) {
+        // Si el status es 200-299, consideramos éxito
+        setNotification({ message: 'message.correctRegister', type: "success" });
+        // Opcional: limpiar el formulario tras éxito
+        /* setUserData({ fullName: '', username: '', email: '', password: '', password_confirmation: '' }); */
+      } else if (data.errors) {
         setError({
           username: data.errors.username ? data.errors.username[0] : '',
           fullName: data.errors.fullName ? data.errors.fullName[0] : '',
           email: data.errors.email ? data.errors.email[0] : '',
-          password: data.errors.password ? data.errors.password[0] : '',
-          password_confirmation: '',
+          password: data.errors.password ? 'message.register.passwordDontWork' : '',
+          password_confirmation: data.errors.password ? 'message.register.passwordDontWork' : '',
         });
-      } else if (data.success) {
-        setNotification({ message: 'message.correctRegister', type: "success" });
+        setNotification({ message: 'message.fieldError', type: "error" });
       }
     } catch (err) {
       setNotification({ message: "Error de conexión", type: "error" });
     }
   };
+
   const passwordsMatchError = userData.password !== userData.password_confirmation && userData.password_confirmation !== "";
 
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={{ flex: 1 }}>
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-          style={styles.keyboardView}
-        >
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardView}>
           <View style={styles.formSection}>
+            
+            {/* COMPONENTE DE NOTIFICACIÓN MEJORADO */}
             {notification.message && (
-              <View style={[styles.notifContainer, { backgroundColor: STATUS_COLORS_CLARO[notification.type].bg, borderColor: STATUS_COLORS_CLARO[notification.type].border }]}>
-                <Icon name={STATUS_COLORS_CLARO[notification.type].icon} type="material-community" color={STATUS_COLORS_CLARO[notification.type].color} size={22} />
-                <ThemedText style={[styles.notifText, { color: STATUS_COLORS_CLARO[notification.type].color }]}>{t(notification.message)}</ThemedText>
+              <View style={[
+                styles.notifContainer, 
+                { 
+                  backgroundColor: STATUS_COLORS_CLARO[notification.type]?.bg || '#f0f0f0', 
+                  borderColor: STATUS_COLORS_CLARO[notification.type]?.border || '#ccc' 
+                }
+              ]}>
+                <Icon 
+                  name={STATUS_COLORS_CLARO[notification.type]?.icon || 'information'} 
+                  type="material-community" 
+                  color={STATUS_COLORS_CLARO[notification.type]?.color || '#333'} 
+                  size={22} 
+                />
+                <ThemedText style={[styles.notifText, { color: STATUS_COLORS_CLARO[notification.type]?.color || '#333' }]}>
+                  {t(notification.message)}
+                </ThemedText>
               </View>
             )}
+
             <View style={styles.inputWrapper}>
               <View style={styles.styledInputContainer}>
                 <Icon name="at" type="material-community" color="#FF9A7B" size={28} style={{ marginLeft: 15 }} />
                 <TextInput value={userData.username} onChangeText={(text) => setUserData({ ...userData, username: text })} style={styles.textInput} placeholder={t('loginRegister.user')} placeholderTextColor="#FFB7A1" />
               </View>
-              {!!error.username && <HelperText type="error" visible>{error.username === 'message.fieldRequired' ? t('message.fieldRequired') : t('message.register.accountAlreadyExistUsername')}</HelperText>}
+              {!!error.username && (
+                <HelperText type="error" visible>
+                    {error.username.toLowerCase().includes('taken') || error.username.toLowerCase().includes('already') 
+                    ? t('message.register.accountAlreadyExistUsername') 
+                    : t(error.username)}
+                </HelperText>
+              )}
+
               <View style={styles.styledInputContainer}>
                 <Icon name="account-outline" type="material-community" color="#FF9A7B" size={28} style={{ marginLeft: 15 }} />
                 <TextInput value={userData.fullName} onChangeText={(text) => setUserData({ ...userData, fullName: text })} style={styles.textInput} placeholder={t('loginRegister.completeName')} placeholderTextColor="#FFB7A1" />
               </View>
-              {!!error.fullName && <HelperText type="error" visible>{t('message.fieldRequired')}</HelperText>}
+              {!!error.fullName && <HelperText type="error" visible>{t(error.fullName)}</HelperText>}
+
               <View style={styles.styledInputContainer}>
                 <Icon name="email-outline" type="material-community" color="#FF9A7B" size={28} style={{ marginLeft: 15 }} />
                 <TextInput value={userData.email} onChangeText={(text) => setUserData({ ...userData, email: text })} style={styles.textInput} placeholder={t('loginRegister.email')} placeholderTextColor="#FFB7A1" keyboardType="email-address" />
               </View>
-              {!!error.email && <HelperText type="error" visible>{error.email === 'message.fieldRequired' ? t('message.fieldRequired') : t('message.register.emailFormatInvalid')}</HelperText>}
+              {!!error.email && (
+                <HelperText type="error" visible>
+                  {error.email.toLowerCase().includes('taken') || error.email.toLowerCase().includes('already') 
+                    ? t('message.register.accountAlreadyExistEmail') 
+                    : error.email === 'message.fieldRequired' ? t('message.fieldRequired') : t('message.register.emailFormatInvalid')}
+                </HelperText>
+              )}
+
               <View style={styles.styledInputContainer}>
                 <Icon name="lock-outline" type="material-community" color="#FF9A7B" size={26} style={{ marginLeft: 15 }} />
                 <TextInput value={userData.password} onChangeText={(text) => setUserData({ ...userData, password: text })} style={styles.textInput} secureTextEntry={!isPasswordVisible} placeholder={t('loginRegister.password')} placeholderTextColor="#FFB7A1" />
-                <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={{ marginRight: 15 }}>
-                  <Icon name={isPasswordVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
-                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={{ marginRight: 15 }}><Icon name={isPasswordVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} /></TouchableOpacity>
               </View>
-              {!!error.password && <HelperText type="error" visible>{t('message.fieldRequired')}</HelperText>}
+              {!!error.password && <HelperText type="error" visible>{t(error.password)}</HelperText>}
+
               <View style={styles.styledInputContainer}>
                 <Icon name="lock-check-outline" type="material-community" color="#FF9A7B" size={26} style={{ marginLeft: 15 }} />
                 <TextInput value={userData.password_confirmation} onChangeText={(text) => setUserData({ ...userData, password_confirmation: text })} style={styles.textInput} secureTextEntry={!isConfirmVisible} placeholder={t('loginRegister.repeatPassword')} placeholderTextColor="#FFB7A1" />
-                <TouchableOpacity onPress={() => setIsConfirmVisible(!isConfirmVisible)} style={{ marginRight: 15 }}>
-                  <Icon name={isConfirmVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
-                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setIsConfirmVisible(!isConfirmVisible)} style={{ marginRight: 15 }}><Icon name={isConfirmVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} /></TouchableOpacity>
               </View>
-              
               {!!error.password_confirmation ? (
-                <HelperText type="error" visible>{t('message.fieldRequired')}</HelperText>
+                <HelperText type="error" visible>{t(error.password_confirmation)}</HelperText>
               ) : (passwordsMatchError || errorForRepeatPassword) ? (
                 <HelperText type="error" visible>{t('loginRegister.passwordsDontMatch')}</HelperText>
               ) : null}
             </View>
 
-            <Button 
-              title={t('loginRegister.join')} 
-              buttonStyle={styles.mainButton} 
-              titleStyle={styles.mainButtonText} 
-              onPress={handleFetch} 
-              containerStyle={styles.mainButtonContainer} 
-            />
+            <Button title={t('loginRegister.join')} buttonStyle={styles.mainButton} titleStyle={styles.mainButtonText} onPress={handleFetch} containerStyle={styles.mainButtonContainer} />
 
             <View style={styles.footerContainer}>
               <TouchableOpacity onPress={onChangePage}>
@@ -175,6 +218,16 @@ const styles = StyleSheet.create({
   footerContainer: { marginTop: 20, paddingBottom: 20 },
   footerText: { fontSize: 15, color: '#333' },
   linkText: { color: '#95A5A6', fontWeight: '700', textDecorationLine: 'underline' },
-  notifContainer: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 18, width: '100%', marginBottom: 10, borderWidth: 1 },
+  notifContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: 12, 
+    borderRadius: 18, 
+    width: '100%', 
+    marginBottom: 15, 
+    borderWidth: 1,
+    // Aseguramos que se vea bien
+    minHeight: 50 
+  },
   notifText: { fontWeight: '700', marginLeft: 10, fontSize: 13, flex: 1 }
 });
