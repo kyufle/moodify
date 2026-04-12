@@ -11,14 +11,12 @@ export const DashboardHeader = () => {
     return; // El usuario no está logueado
 
   const user = userValue.user;
-
-  // Configurado para la zona horaria de Barcelona, Catalunya
-  const currentDateFormatted = new Intl.DateTimeFormat('es-ES', {
-    timeZone: 'Europe/Madrid',
+//coge la ubicación de la región del dispositivo
+  const currentDateFormatted = new Intl.DateTimeFormat(undefined, {
     day: '2-digit',
-    month: 'short', // 'abr' en lugar de 'abril' para un look más limpio
+    month: 'long',
     year: 'numeric'
-  }).format(new Date());
+  }).format(new Date()); 
 
   return (
     <View style={styles.container}>
