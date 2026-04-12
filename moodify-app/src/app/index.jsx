@@ -1,143 +1,148 @@
-import { useState, useContext } from 'react';
-import { View, Image, Platform, StyleSheet, TextInput, Alert } from 'react-native';
-import { Button } from '@rneui/themed';
+// --- HomeScreen.jsx ---
+
+import { View, StyleSheet, TextInput, KeyboardAvoidingView, ScrollView, TouchableOpacity, Alert, Platform, Dimensions } from 'react-native';
+import { Button, Icon } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Redirect } from 'expo-router';
-import { UserContext } from '@/components/user-provider';
+import { Image } from 'expo-image';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import moodify from '@/assets/images/moodifyLogo.png';
+import { Spacing } from '@/constants/theme';
+import CreateUser from '@/components/CreateUser';
+import Login from '@/components/Login';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { StatusBar } from 'expo-status-bar';
 
-// Import Device to fix the previous error
-import * as Device from 'expo-device';
+// IMGS portada/login/register
+import fondoClaro from '@/assets/images/fondo_claro.svg';
+import fondoFirstTime from '@/assets/images/fondofirsttime_114.3 x 203.2 mm.svg';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen() {
-  const { isLoggedIn } = useContext(UserContext);
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  
+  const { t } = useTranslation();
+  const [isLogin, setIsLogin] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(true);
 
-  // Redirigir al dashboard si ya estamos "logueados" (modo prueba)
-  if (isLoggedIn) {
-     return <Redirect href="/dashboard" />;
-  }
+  // TODO Si el usuario no se ha logueado, redirigir a Index
 
-  function showAlert(message) {
-    if (Platform.OS === 'web') {
-      window.alert(message);
-    } else {
-      Alert.alert(message);
-    }
+  if (showWelcome) {
+    return (
+      <ThemedView style={styles.welcomeContainer}>
+        <StatusBar style="dark" /> 
+        <SafeAreaView style={{ flex: 1, width: '100%', alignItems: 'center' }}>
+          <View style={styles.welcomeContent}>
+            <View style={styles.welcomeTextSection}>
+              <ThemedText style={styles.welcomeTitle}>Moodify</ThemedText>
+              <ThemedText style={styles.welcomeSlogan}>{t('firstPage.eslogan')}</ThemedText>
+              <ThemedText style={styles.welcomeDesc}>{t('firstPage.text')}</ThemedText>
+              <TouchableOpacity style={styles.welcomeButton} onPress={() => setShowWelcome(false)} activeOpacity={0.8}>
+                <ThemedText style={styles.welcomeButtonText}>{t('firstPage.button')}</ThemedText>
+                <View style={styles.arrowIconContainer}><Icon name="arrow-right" type="material-community" color="#FFFFFF" size={24} /></View>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.illustrationContainer}><Image source={fondoFirstTime} style={styles.emotionsImage} contentFit="contain" /></View>
+          </View>
+        </SafeAreaView>
+      </ThemedView>
+    );
   }
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <Image 
-            source={moodify} 
-            style={{ width: 150, height: 150 }} 
-            resizeMode="contain" 
-          />
-          <ThemedText type="title" style={styles.title}>
-            Bienvenid@ a&nbsp;Moodify
-          </ThemedText>
-        </ThemedView>
+      <StatusBar style="dark" />
+      <View style={styles.statusBarOverlay} />
 
-        <TextInput
-          placeholder='Email o nombre de usuario'
-          value={email}
-          onChangeText={val => setEmail(val)}
-          style={styles.input}
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          placeholder='Contraseña'
-          value={password}
-          onChangeText={val => setPassword(val)}
-          style={styles.input}
-          autoCapitalize="none"
-          secureTextEntry
-        />
-
-        <View style={styles.buttons}>
-          <Button
-            title="Acceder"
-            color={'#DDAADD'}
-            onPress={() => showAlert('Accediendo')}
-          />
-          <Button
-            title="Regístrate"
-            type="outline"
-            buttonStyle={{ borderColor: '#99AAFF' }}
-            titleStyle={{ color: '#99AAFF' }}
-            onPress={() => showAlert('Registrando')}
-          />
+      <ScrollView contentContainerStyle={styles.scrollContent} bounces={false} showsVerticalScrollIndicator={false}>
+        <View style={styles.headerContainer}>
+          <Image source={fondoClaro} style={styles.backgroundImage} contentFit="cover" />
+          
+          <SafeAreaView edges={['top']} style={styles.safeAreaInternal}>
+            <View style={styles.floatingCard}>
+              <ThemedText style={styles.holaText}>{t('panel.hello')}</ThemedText>
+              <ThemedText style={styles.bienvenidoText}>{t('panel.welcome')}</ThemedText>
+              
+              <View style={styles.tabContainer}>
+                <TouchableOpacity 
+                  style={[styles.tabButton, isLogin && styles.activeTab]}
+                  onPress={() => setIsLogin(true)}
+                >
+                  <ThemedText style={[styles.tabText, isLogin && styles.activeTabText]}>{t('panel.enter')}</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.tabButton, !isLogin && styles.activeTab]}
+                  onPress={() => setIsLogin(false)}
+                >
+                  <ThemedText style={[styles.tabText, !isLogin && styles.activeTabText]}>{t('panel.unite')}</ThemedText>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </SafeAreaView>
         </View>
-        
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
+
+        {isLogin && <Login onChangePage={() => setIsLogin(false)} />}
+        {!isLogin && <CreateUser onChangePage={() => setIsLogin(true)} />}
+      </ScrollView>
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
+  
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  
+  statusBarOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: Platform.OS === 'ios' ? 50 : 35, 
+    backgroundColor: 'rgba(0, 0, 0, 0.20)', 
+    zIndex: 100,
+  },
+
+  headerContainer: {
+    height: 350,
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f1edd5',
+    overflow: 'visible',
   },
-  safeArea: {
-    flex: 1,
-    width: '100%',           
-    maxWidth: MaxContentWidth,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-  },
-  heroSection: {
+
+  safeAreaInternal: {
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: Spacing.four,
-    gap: Spacing.four,
+    marginTop: Platform.OS === 'ios' ? 20 : 10, 
   },
-  input: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    height: 40,
-    paddingLeft: 20,
-    width: '100%',
-    marginBottom: 10,
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.8,
   },
-  buttons:{
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: 20,
-  }
+
+  welcomeContainer: { flex: 1, backgroundColor: '#FFFFFF' },
+  welcomeContent: { flex: 1, justifyContent: 'flex-start', paddingTop: 80 },
+  welcomeTextSection: { width: '100%', paddingHorizontal: 40, zIndex: 10 },
+  welcomeTitle: { fontSize: 56, fontWeight: '800', color: '#000000', marginBottom: 10, lineHeight: 64 },
+  welcomeSlogan: { fontSize: 24, fontWeight: '500', color: '#333333', marginBottom: 24 },
+  welcomeDesc: { fontSize: 18, color: '#333333', lineHeight: 26, marginBottom: 40, fontWeight: '400' },
+  welcomeButton: { backgroundColor: '#EEEEEE', height: 70, borderRadius: 35, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 30, paddingRight: 10, width: '100%', maxWidth: 320, alignSelf: 'flex-start' },
+  welcomeButtonText: { fontSize: 18, fontWeight: '600', color: '#333333' },
+  arrowIconContainer: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#000000', justifyContent: 'center', alignItems: 'center' },
+  illustrationContainer: { width: width, height: height * 0.85, position: 'absolute', bottom: -100, left: 0, overflow: 'hidden', zIndex: 1 },
+  emotionsImage: { width: '200%', height: '100%', marginLeft: '-50%', transform: [{ scale: 1.4 }] },
+  scrollContent: { flexGrow: 1 },
+  floatingCard: { backgroundColor: 'rgba(189, 195, 199, 0.8)', width: '85%', maxWidth: 340, borderRadius: 24, padding: 24, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.15, shadowRadius: 15, elevation: 8 },
+  holaText: { fontSize: 24, fontWeight: '700', color: '#FFFFFF', marginBottom: 4 },
+  bienvenidoText: { fontSize: 22, fontWeight: '500', color: '#FFFFFF', marginBottom: 20 },
+  tabContainer: { flexDirection: 'row', backgroundColor: 'rgba(127, 140, 141, 0.5)', borderRadius: 12, padding: 4, width: '100%' },
+  tabButton: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
+  activeTab: { backgroundColor: '#FFFFFF' },
+  tabText: { fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
+  activeTabText: { color: '#95A5A6' },
 });
