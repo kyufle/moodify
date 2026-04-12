@@ -5,15 +5,18 @@ import { Feather } from '@expo/vector-icons';
 import { UserContext } from '../user-provider';
 
 export const DashboardHeader = () => {
-  const { user, logout } = React.use(UserContext);
+  const { userValue, logout } = React.use(UserContext);
 
-  // Configurado para la zona horaria de Barcelona, Catalunya
-  const currentDateFormatted = new Intl.DateTimeFormat('es-ES', {
-    timeZone: 'Europe/Madrid',
+  if (userValue?.user == null)
+    return; // El usuario no está logueado
+
+  const user = userValue.user;
+//coge la ubicación de la región del dispositivo
+  const currentDateFormatted = new Intl.DateTimeFormat(undefined, {
     day: '2-digit',
-    month: 'short', // 'abr' en lugar de 'abril' para un look más limpio
+    month: 'long',
     year: 'numeric'
-  }).format(new Date());
+  }).format(new Date()); 
 
   return (
     <View style={styles.container}>

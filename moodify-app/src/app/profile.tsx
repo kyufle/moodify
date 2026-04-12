@@ -12,7 +12,12 @@ import { ChallengesSection } from '@/components/profile/ChallengesSection';
 import { AchievementsBar } from '@/components/profile/AchievementsBar';
 
 export default function ProfileScreen() {
-  const { user, logout } = useContext(UserContext);
+
+  const { userValue, logout } = useContext(UserContext);
+  if (!userValue?.user)
+    return;
+  const user = userValue.user;
+
   const router = useRouter();
 
   return (
@@ -25,7 +30,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.container}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
@@ -33,16 +38,16 @@ export default function ProfileScreen() {
           {/* Contenedor principal con fondo blanco para legibilidad */}
           <View style={styles.mainCard}>
             <ProfileHeader name={user.name} email={user.email} />
-            
+
             <View style={styles.divider} />
-            
+
             <HabitProgress />
             <ChallengesSection />
             <AchievementsBar />
 
             <View style={styles.footerActions}>
-              <TouchableOpacity 
-                style={styles.settingsButton} 
+              <TouchableOpacity
+                style={styles.settingsButton}
                 onPress={() => router.push('/settings')}
               >
                 <Feather name="settings" size={18} color="#64748B" />
