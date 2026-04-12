@@ -39,6 +39,7 @@ export const StaticBottomNavBar = ({ activeTab }: { activeTab: 'calendar' | 'com
       
       <TouchableOpacity 
         style={styles.tabItem} 
+        onPress={() => router.navigate('/chat')}
         activeOpacity={0.7}
       >
         <Feather name="message-circle" size={24} color={activeTab === 'chat' ? '#1E293B' : '#94A3B8'} />

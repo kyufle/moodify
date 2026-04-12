@@ -1,65 +1,60 @@
-import React, { use } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useContext } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { UserContext } from '@/components/user-provider';
 import { DashboardBackground } from '@/components/dashboard/DashboardBackground';
 import { StaticBottomNavBar } from '@/components/StaticBottomNavBar';
 
+import { ProfileHeader } from '@/components/profile/ProfileHeader';
+import { HabitProgress } from '@/components/profile/HabitProgress';
+import { ChallengesSection } from '@/components/profile/ChallengesSection';
+import { AchievementsBar } from '@/components/profile/AchievementsBar';
+
 export default function ProfileScreen() {
-  const { user, logout } = use(UserContext);
+
+  const { userValue, logout } = useContext(UserContext);
+  if (!userValue?.user)
+    return;
+  const user = userValue.user;
+
+  const router = useRouter();
 
   return (
     <View style={{ flex: 1 }}>
       <DashboardBackground>
-        <ScrollView 
+        <View style={styles.topBar}>
+          <Text style={styles.topBarTitle}>Configuración</Text>
+          <TouchableOpacity style={styles.iconButton} onPress={() => router.push('/settings')}>
+            <Feather name="settings" size={20} color="#1E293B" />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
           style={styles.container}
           contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
-            <View style={styles.avatarContainer}>
-              <View style={styles.avatarLarge}>
-                <Feather name="user" size={50} color="#94A3B8" />
-              </View>
-              <TouchableOpacity style={styles.editBadge}>
-                <Feather name="edit-2" size={12} color="#FFFFFF" />
+          {/* Contenedor principal con fondo blanco para legibilidad */}
+          <View style={styles.mainCard}>
+            <ProfileHeader name={user.name} email={user.email} />
+
+            <View style={styles.divider} />
+
+            <HabitProgress />
+            <ChallengesSection />
+            <AchievementsBar />
+
+            <View style={styles.footerActions}>
+              <TouchableOpacity
+                style={styles.settingsButton}
+                onPress={() => router.push('/settings')}
+              >
+                <Feather name="settings" size={18} color="#64748B" />
+                <Text style={styles.settingsText}>Ajustes de la cuenta</Text>
+                <Feather name="chevron-right" size={18} color="#94A3B8" />
               </TouchableOpacity>
             </View>
-            
-            <Text style={styles.userName}>{user.name}</Text>
-            <Text style={styles.userEmail}>{user.email}</Text>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Cuenta</Text>
-            
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={[styles.iconWrapper, { backgroundColor: '#E0F2FE' }]}>
-                <Feather name="settings" size={20} color="#0EA5E9" />
-              </View>
-              <Text style={styles.menuText}>Configuración</Text>
-              <Feather name="chevron-right" size={20} color="#94A3B8" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={[styles.iconWrapper, { backgroundColor: '#F0F9FF' }]}>
-                <Feather name="shield" size={20} color="#0369A1" />
-              </View>
-              <Text style={styles.menuText}>Privacidad</Text>
-              <Feather name="chevron-right" size={20} color="#94A3B8" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Seguridad</Text>
-            <TouchableOpacity 
-              style={[styles.menuItem, styles.logoutItem]} 
-              onPress={logout}
-            >
-              <View style={[styles.iconWrapper, { backgroundColor: '#FEE2E2' }]}>
-                <Feather name="log-out" size={20} color="#EF4444" />
-              </View>
-              <Text style={[styles.menuText, { color: '#EF4444' }]}>Cerrar Sesión</Text>
-            </TouchableOpacity>
           </View>
         </ScrollView>
       </DashboardBackground>
@@ -74,95 +69,64 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingTop: 80,
-    paddingBottom: 100,
+    paddingHorizontal: 15,
+    paddingBottom: 110,
   },
-  header: {
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 40,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 15,
   },
-  avatarContainer: {
-    position: 'relative',
-    marginBottom: 16,
-  },
-  avatarLarge: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  editBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#334155',
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: '#F8FAFC',
-  },
-  userName: {
-    fontSize: 24,
+  topBarTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#1E293B',
   },
-  userEmail: {
-    fontSize: 14,
-    color: '#64748B',
-    marginTop: 4,
-  },
-  section: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#94A3B8',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 16,
-    paddingLeft: 4,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  iconWrapper: {
+  iconButton: {
     width: 40,
     height: 40,
-    borderRadius: 12,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
   },
-  menuText: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#334155',
-  },
-  logoutItem: {
-    borderColor: '#FEE2E2',
+  mainCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 32,
+    paddingVertical: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 5,
     borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#F1F5F9',
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  footerActions: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  settingsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+    padding: 16,
+    borderRadius: 16,
+    gap: 12,
+  },
+  settingsText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#475569',
   }
 });

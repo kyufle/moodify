@@ -4,12 +4,15 @@ import { Feather } from '@expo/vector-icons';
 import { UserContext } from '@/components/user-provider';
 
 export const ForumHeader = () => {
-  const { user, logout } = React.use(UserContext);
+  const { userValue, logout } = React.use(UserContext);
+
+  if (userValue?.user)
+    return;
   
   return (
     <View style={styles.header}>
       <View>
-        <Text style={styles.title}>Hola, {user.name}!</Text>
+        <Text style={styles.title}>Hola, {userValue.user.name}!</Text>
         <Text style={styles.subtitle}>Conecta y comparte con otros</Text>
       </View>
       
