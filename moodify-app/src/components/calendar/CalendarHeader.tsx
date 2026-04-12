@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from 'expo-router';
+import { UserContext } from '@/components/user-provider';
 
 export const CalendarHeader = () => {
   const navigation = useNavigation();
+  const { logout } = useContext(UserContext);
 
   return (
     <View style={styles.container}>
@@ -20,11 +22,19 @@ export const CalendarHeader = () => {
       {/* Textos centrales */}
       <View style={styles.textContainer}>
         <Text style={styles.title}>Calendario de mood</Text>
-        <Text style={styles.subtitle}>Abril, 2026</Text>
+        <Text style={styles.subtitle}>
+          {new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric', timeZone: 'Europe/Madrid' }).toUpperCase()}
+        </Text>
       </View>
 
-      {/* Espaciador invisible para centrar exactamente el texto */}
-      <View style={{ width: 44 }} />
+      {/* Botón Cerrar Sesión */}
+      <TouchableOpacity 
+        style={styles.backButton}
+        onPress={logout}
+        activeOpacity={0.8}
+      >
+        <Feather name="log-out" size={20} color="#EF4444" />
+      </TouchableOpacity>
     </View>
   );
 };

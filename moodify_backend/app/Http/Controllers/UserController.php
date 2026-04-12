@@ -21,4 +21,6 @@ class UserController extends Controller
         // Opción B: Retornar JSON (Para APIs)
         return response()->json($users);
     }
+
+    
 }

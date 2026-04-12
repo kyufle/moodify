@@ -10,7 +10,11 @@ export const StaticBottomNavBar = ({ activeTab }: { activeTab: 'calendar' | 'com
         <Feather name="calendar" size={24} color={activeTab === 'calendar' ? '#1E293B' : '#94A3B8'} />
       </TouchableOpacity>
       
-      <TouchableOpacity style={styles.tabItem} activeOpacity={0.7}>
+      <TouchableOpacity 
+        style={styles.tabItem} 
+        onPress={() => router.navigate('/community')} 
+        activeOpacity={0.7}
+      >
         <Feather name="users" size={24} color={activeTab === 'community' ? '#1E293B' : '#94A3B8'} />
       </TouchableOpacity>
 
@@ -25,11 +29,19 @@ export const StaticBottomNavBar = ({ activeTab }: { activeTab: 'calendar' | 'com
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.tabItem} activeOpacity={0.7}>
+      <TouchableOpacity 
+        style={styles.tabItem} 
+        onPress={() => router.navigate('/profile')} 
+        activeOpacity={0.7}
+      >
         <Feather name="user" size={24} color={activeTab === 'user' ? '#1E293B' : '#94A3B8'} />
       </TouchableOpacity>
       
-      <TouchableOpacity style={styles.tabItem} activeOpacity={0.7}>
+      <TouchableOpacity 
+        style={styles.tabItem} 
+        onPress={() => router.navigate('/chat')}
+        activeOpacity={0.7}
+      >
         <Feather name="message-circle" size={24} color={activeTab === 'chat' ? '#1E293B' : '#94A3B8'} />
       </TouchableOpacity>
     </View>
