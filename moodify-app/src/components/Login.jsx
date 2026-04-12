@@ -7,11 +7,11 @@ import { useContext, useState } from 'react';
 import { UserContext } from './user-provider';
 import { STATUS_COLORS_CLARO } from '@/constants/status-colors-claro';
 import { useTranslation } from 'react-i18next';
-
-const { width } = Dimensions.get('window');
+import { useRouter } from 'expo-router';
 
 export default function Login({ onChangePage }) {
     const { t } = useTranslation();
+    const router = useRouter();
     const [userData, setUserData] = useState({
         emailUsername: '',
         password: '',
@@ -43,6 +43,9 @@ export default function Login({ onChangePage }) {
                         user: data.user
                     });
                     setNotification({ message: t('message.correctLogin'), type: "success" });
+                    setTimeout(()=>{
+                        router.replace('/dashboard');
+                    }, 2000);
                 } else {
                     setNotification({ 
                         message: t(data.message), 

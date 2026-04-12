@@ -5,7 +5,12 @@ import { Feather } from '@expo/vector-icons';
 import { UserContext } from '../user-provider';
 
 export const DashboardHeader = () => {
-  const { user, logout } = React.use(UserContext);
+  const { userValue, logout } = React.use(UserContext);
+
+  if (userValue?.user == null)
+    return; // El usuario no está logueado
+
+  const user = userValue.user;
 
   // Configurado para la zona horaria de Barcelona, Catalunya
   const currentDateFormatted = new Intl.DateTimeFormat('es-ES', {

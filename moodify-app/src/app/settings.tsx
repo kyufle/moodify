@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 're
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { DashboardBackground } from '@/components/dashboard/DashboardBackground';
-
+import { UserContext } from '../components/user-provider';
 export default function SettingsScreen() {
   const router = useRouter();
   const [notifications, setNotifications] = React.useState(true);
   const [darkMode, setDarkMode] = React.useState(false);
-
+  const { logout } = React.use(UserContext);
   const SettingItem = ({ icon, label, type = 'chevron', value, onValueChange }: any) => (
     <TouchableOpacity style={styles.item} disabled={type === 'switch'}>
       <View style={styles.itemLeft}>
@@ -72,7 +72,7 @@ export default function SettingsScreen() {
             <SettingItem icon="mail" label="Contactar Soporte" />
             <SettingItem icon="file-text" label="Términos y Condiciones" />
 
-            <TouchableOpacity style={styles.logoutButton}>
+            <TouchableOpacity style={styles.logoutButton} onPress={logout}>
               <Feather name="log-out" size={20} color="#EF4444" />
               <Text style={styles.logoutText}>Cerrar Sesión</Text>
             </TouchableOpacity>

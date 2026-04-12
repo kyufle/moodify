@@ -25,6 +25,8 @@ export default function HomeScreen() {
   const [isLogin, setIsLogin] = useState(true);
   const [showWelcome, setShowWelcome] = useState(true);
 
+  // TODO Si el usuario no se ha logueado, redirigir a Index
+
   if (showWelcome) {
     return (
       <ThemedView style={styles.welcomeContainer}>
