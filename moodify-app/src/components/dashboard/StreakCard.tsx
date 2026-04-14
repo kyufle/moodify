@@ -1,62 +1,93 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { Feather } from '@expo/vector-icons';
+import { ThemedText } from '../themed-text';
+import { UserContext } from '../user-provider';
+import React, { useState } from 'react';
 
 export const StreakCard = () => {
-  // Para obtener el día de la semana actual con la zona horaria de Barcelona
-  const dateInBarcelona = new Date(new Date().toLocaleString("en-US", {timeZone: "Europe/Madrid"}));
+  const [loading, setLoading] = useState(false);
+  const { userValue, setUserValue } = React.use(UserContext);
+
+  if (userValue?.user == null) return null;
+
+  const user = userValue.user;
+
+  const handleStreak = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://moodify_backend.test/api/streakRegister', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + userValue.accessToken,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+      });
+
+      // Validar si hay contenido antes de parsear
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : {};
+
+      if (response.ok) {
+        console.log("Éxito:", data.message);
+        setUserValue(data.user)
+        // Aquí podrías actualizar tu UserContext con data.user
+      } else {
+        console.log("Error del servidor:", data.message || "Error desconocido");
+      }
+    } catch (err) {
+      console.error("Error de red:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const dateInBarcelona = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Madrid" }));
+
   // getDay() devuelve 0(Domingo) - 6(Sábado). Convertimos para que Lunes sea 0 y Domingo 6.
   let todayIndex = dateInBarcelona.getDay() - 1;
-  if (todayIndex === -1) todayIndex = 6; // Domingo
+  if (todayIndex === -1) todayIndex = 6;
 
-  // Generando datos de ejemplo para la semana actual
-  // En una app real, esto vendría de tu base de datos o estado global.
+  // Datos de la semana actual
   const weekDays = [
-    { label: 'L', recorded: true, isToday: false }, // Lunes: Registrado
-    { label: 'M', recorded: true, isToday: false }, // Martes: Registrado
-    { label: 'X', recorded: false, isToday: false },// Miércoles (Hoy): Pendiente
-    { label: 'J', recorded: false, isToday: false },// Jueves (Futuro): Vacío
-    { label: 'V', recorded: false, isToday: false },// Viernes (Futuro): Vacío
+    { label: 'L', recorded: true, isToday: false },
+    { label: 'M', recorded: true, isToday: false },
+    { label: 'X', recorded: false, isToday: false },
+    { label: 'J', recorded: false, isToday: false },
+    { label: 'V', recorded: false, isToday: false },
     { label: 'S', recorded: false, isToday: false },
     { label: 'D', recorded: false, isToday: false },
   ];
 
-  // Marcamos dinámicamente cuál es "Hoy"
   weekDays[todayIndex].isToday = true;
-
-  // Lógica de Racha Consecutiva (siempre hacia atrás desde ayer u hoy)
-  let currentStreak = 0;
-  for (let i = todayIndex; i >= 0; i--) {
-    if (weekDays[i].recorded) {
-      currentStreak++;
-    } else if (i !== todayIndex) {
-      // Si el día NO está registrado y NO es hoy, la racha se rompe inmediatamente
-      break; 
-    }
-    // Si i === todayIndex y no está registrado, no cortamos la racha (el usuario tiene tiempo de registrar hoy)
-    // Pero tampoco suma a la racha hasta que lo registre.
-  }
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>{currentStreak} días en racha!</Text>
-      
-      {/* Calendario semanal */}
+      <View style={styles.pointsBadge}>
+        <ThemedText style={styles.pointsText}>{user.points}</ThemedText>
+        <Image
+          source={require('@/assets/images/diamante-racha.svg')}
+          style={styles.diamondIcon}
+          contentFit="contain"
+        />
+      </View>
+      <Text style={styles.title}>{user.streak} días en racha!</Text>
+
       <View style={styles.weekContainer}>
         {weekDays.map((day, index) => (
-          <View 
-            key={index} 
+          <View
+            key={index}
             style={[
               styles.dayItem,
               day.isToday && styles.dayItemToday
             ]}
           >
-            {/* Ícono de diamante en formato SVG */}
-            <Image 
+            <Image
               source={require('@/assets/images/diamante-racha.svg')}
               style={[
                 styles.diamondIcon,
-                { opacity: day.recorded ? 1 : 0.2 } // Diamante apagado si no hay registro
+                { opacity: day.recorded ? 1 : 0.2 }
               ]}
               contentFit="contain"
             />
@@ -70,10 +101,16 @@ export const StreakCard = () => {
         ))}
       </View>
 
-      {/* Botón de Progreso (reemplaza Iniciar sesión) */}
-      <TouchableOpacity style={styles.button} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={[styles.button, loading && { opacity: 0.7 }]}
+        activeOpacity={0.8}
+        onPress={handleStreak}
+        disabled={loading}
+      >
         <Feather name="bar-chart-2" size={18} color="#6B21A8" style={styles.buttonIcon} />
-        <Text style={styles.buttonText}>Ver mi progreso</Text>
+        <Text style={styles.buttonText}>
+          {loading ? "Registrando..." : "Registrar progreso"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -81,11 +118,11 @@ export const StreakCard = () => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#E8EAFD', // Violeta pastel fondo
+    backgroundColor: '#E8EAFD',
     borderRadius: 24,
     padding: 20,
     marginHorizontal: 20,
-    marginTop: 20, 
+    marginTop: 20,
     zIndex: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -111,16 +148,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 56,
     borderRadius: 20,
-    backgroundColor: 'transparent',
   },
   dayItemToday: {
-    backgroundColor: '#FFF1E6', // Fondo especial para el día de hoy
+    backgroundColor: '#FFF1E6',
     borderWidth: 2,
     borderColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   diamondIcon: {
     width: 24,
@@ -133,7 +165,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   dayLabelToday: {
-    color: '#D97706', // Naranja/Dorado para el día activo
+    color: '#D97706',
     fontWeight: '700',
   },
   button: {
@@ -143,10 +175,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#8a62a6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
     elevation: 3,
   },
   buttonIcon: {
@@ -156,5 +184,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: '#6B21A8',
-  }
+  },
+  pointsBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: '#F3E8FF',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E9D5FF',
+    marginBottom: 10,
+  },
+  pointsText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#6B21A8',
+    marginRight: 4,
+  },
 });

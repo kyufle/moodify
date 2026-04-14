@@ -1,19 +1,24 @@
-import React from 'react';
-import { ScrollView, StyleSheet, View, Text } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-// Importación de las partes del dashboard
 import { DashboardBackground } from './DashboardBackground';
 import { DashboardHeader } from './DashboardHeader';
 import { StreakCard } from './StreakCard';
 import { ActionAlertCard } from './ActionAlertCard';
-import { StatsBoard } from './StatsBoard';
-import { MoodTrackerCard } from './MoodTrackerCard';
+import { StatsBoard } from './StatsBoard'; 
 import { QuoteCard } from './QuoteCard';
-
-// Footer Barra de Nav Estática
+import { Sleep } from './Sleep'; // Importado desde tu carpeta actual
 import { StaticBottomNavBar } from '../StaticBottomNavBar';
 
-export const DashboardView = () => {
+const DashboardView = () => {
+  // Estado para controlar qué vista mostrar
+  const [showSleep, setShowSleep] = useState(false);
+
+  // Si showSleep es true, renderizamos el componente Sleep directamente
+  if (showSleep) {
+    return <Sleep onBack={() => setShowSleep(false)} />;
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <DashboardBackground>
@@ -23,25 +28,11 @@ export const DashboardView = () => {
           showsVerticalScrollIndicator={false}
         >
           <DashboardHeader />
-          
-          <MoodTrackerCard />
-          
-          <View style={styles.sectionDivider}>
-            <View style={styles.sectionDot} />
-            <Text style={styles.sectionLabel}>Tu Actividad</Text>
-          </View>
-          
-          <ActionAlertCard />
           <StreakCard />
-          <StatsBoard />
-          
-          <View style={styles.sectionDivider}>
-            <View style={styles.sectionDot} />
-            <Text style={styles.sectionLabel}>Inspiración</Text>
-          </View>
-          
+          <ActionAlertCard />
+          {/* Pasamos la función para abrir Sleep */}
+          <StatsBoard onPressSleep={() => setShowSleep(true)} />
           <QuoteCard />
-          
         </ScrollView>
       </DashboardBackground>
 

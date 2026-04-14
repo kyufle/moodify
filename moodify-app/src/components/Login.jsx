@@ -8,6 +8,7 @@ import { UserContext } from './user-provider';
 import { STATUS_COLORS_CLARO } from '@/constants/status-colors-claro';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
+import { Fonts } from '@/constants/theme';
 
 export default function Login({ onChangePage }) {
     const { t } = useTranslation();
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     },
     iconGroup: { flexDirection: 'row', alignItems: 'center', marginLeft: 15, gap: 4 },
     iconSeparator: { fontSize: 18, color: '#FF9A7B', fontWeight: '300' },
-    textInput: { flex: 1, paddingHorizontal: 15, fontSize: 16, color: '#333', fontWeight: '500' },
+    textInput: { flex: 1, paddingHorizontal: 15, fontSize: 16, color: '#333', fontWeight: '500', fontFamily: Fonts.sans },
     mainButtonContainer: { width: '100%', marginTop: 15 },
     mainButton: { backgroundColor: '#a5adb0', height: 60, borderRadius: 20 },
     mainButtonText: { fontSize: 18, fontWeight: '600', color: '#FFFFFF' },

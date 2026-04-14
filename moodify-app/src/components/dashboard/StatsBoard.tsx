@@ -1,35 +1,39 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
-export const StatsBoard = () => {
+// Añadimos onPressSleep como prop
+export const StatsBoard = ({ onPressSleep }) => {
   return (
     <View style={styles.container}>
       {/* Tarjeta de Sueño */}
-      <View style={[styles.card, styles.sleepCard]}>
-        <View style={styles.header}>
-          <Feather name="moon" size={16} color="#333" />
-          <Text style={styles.cardTitle}>Duración del sueño</Text>
-        </View>
-        
-        {/* Gráfico de barras simulado (sueño) */}
-        <View style={styles.chartContainer}>
-          {[40, 60, 30, 80, 50, 40, 70].map((h, i) => (
-            <View key={i} style={styles.barColumn}>
-              {/* Barra superior de sueño */}
-              <View style={[styles.barPart, { height: h, backgroundColor: '#D9894A', opacity: 0.8 }]} />
-              <View style={{height: 2}} />
-              {/* Barra inferior */}
-              <View style={[styles.barPart, { height: 100 - h - 40, backgroundColor: '#D9894A' }]} />
-            </View>
-          ))}
-        </View>
+      <TouchableOpacity 
+        style={{ flex: 1 }} 
+        onPress={onPressSleep} // Ahora llama a la función del padre
+        activeOpacity={0.7}
+      >
+        <View style={[styles.card, styles.sleepCard]}>
+          <View style={styles.header}>
+            <Feather name="moon" size={16} color="#333" />
+            <Text style={styles.cardTitle}>Duración del sueño</Text>
+          </View>
+          
+          <View style={styles.chartContainer}>
+            {[40, 60, 30, 80, 50, 40, 70].map((h, i) => (
+              <View key={i} style={styles.barColumn}>
+                <View style={[styles.barPart, { height: h, backgroundColor: '#D9894A', opacity: 0.8 }]} />
+                <View style={{ height: 2 }} />
+                <View style={[styles.barPart, { height: 100 - h - 40, backgroundColor: '#D9894A' }]} />
+              </View>
+            ))}
+          </View>
 
-        <Text style={styles.valueText}>
-          7h <Text style={styles.valueSub}>20min</Text>
-        </Text>
-      </View>
-
+          <Text style={styles.valueText}>
+            7h <Text style={styles.valueSub}>20min</Text>
+          </Text>
+        </View>
+      </TouchableOpacity>
+      
       {/* Tarjeta de Estrés */}
       <View style={[styles.card, styles.stressCard]}>
         <View style={styles.header}>
@@ -37,7 +41,6 @@ export const StatsBoard = () => {
           <Text style={styles.cardTitle}>Indicador de estrés</Text>
         </View>
 
-        {/* Gráfico de barras simulado (estrés) */}
         <View style={styles.chartContainerStress}>
           {[10, 15, 20, 25, 30, 40, 60].map((h, i) => (
             <View key={i} style={[styles.solidBar, { height: h, backgroundColor: '#A88AE6' }]} />
@@ -71,10 +74,10 @@ const styles = StyleSheet.create({
     minHeight: 140,
   },
   sleepCard: {
-    backgroundColor: '#FFCDA3', // Naranja/Melocotón claro
+    backgroundColor: '#FFCDA3', 
   },
   stressCard: {
-    backgroundColor: '#E0D4FF', // Lila/Violeta claro
+    backgroundColor: '#E0D4FF', 
   },
   header: {
     flexDirection: 'row',

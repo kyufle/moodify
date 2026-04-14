@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { Feather } from '@expo/vector-icons';
 import { UserContext } from '../user-provider';
+import { ThemedText } from '../themed-text';
+import { avatarMap } from '../../utils/utils';
 
 export const DashboardHeader = () => {
   const { userValue, logout } = React.use(UserContext);
@@ -11,6 +13,7 @@ export const DashboardHeader = () => {
     return; // El usuario no está logueado
 
   const user = userValue.user;
+  console.log(user.image_path);
 //coge la ubicación de la región del dispositivo
   const currentDateFormatted = new Intl.DateTimeFormat(undefined, {
     day: '2-digit',
@@ -20,43 +23,39 @@ export const DashboardHeader = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerRow}>
-        
-        {/* Lado izquierdo: Avatar e Info */}
-        <View style={styles.userInfoContainer}>
-          {/* Contenedor del Avatar con un anillo estilizado tipo "Historia" */}
-          <View style={styles.avatarRing}>
-            <Image 
-              source={{ uri: 'https://i.pravatar.cc/150?img=44' }} // Imagen de perfil 
-              style={styles.avatar}
-              contentFit="cover"
-            />
-          </View>
+      <View style={styles.rightActions}>
           
-          <View style={styles.textContainer}>
-            <Text style={styles.welcomeText}>Bienvenid@ de vuelta</Text>
-            <Text style={styles.nameText}>{user.name}</Text>
-            <Text style={styles.dateText}>{currentDateFormatted.toUpperCase()}</Text>
-          </View>
-        </View>
-
-        {/* Lado derecho: Puntos y Logout */}
-        <View style={styles.rightActions}>
-          <View style={styles.pointsBadge}>
-            <Text style={styles.pointsText}>275</Text>
-            <Image 
-              source={require('@/assets/images/diamante-racha.svg')}
-              style={styles.diamondIcon}
-              contentFit="contain"
-            />
-          </View>
           
           <TouchableOpacity style={styles.logoutButton} onPress={logout}>
             <Feather name="log-out" size={18} color="#64748B" />
           </TouchableOpacity>
         </View>
+      <View style={styles.headerRow}>
+        
+        <View style={styles.userInfoContainer}>
+          <View style={styles.avatarRing}>
+            <Image 
+              source={user.image_id ? avatarMap[user.image_id] : null}
+              style={styles.avatar}
+              contentFit="cover"
+            />
+          </View>
+          <View style={styles.textContainer}>
+            <ThemedText style={styles.welcomeText}>Bienvenid@ de vuelta</ThemedText>
+            <ThemedText style={styles.nameText}>{user.name}</ThemedText>
+          </View>
+          
+        </View>
+        
 
+        {/* Lado derecho: Puntos y Logout */}
+        
+      
       </View>
+      <View>
+              <ThemedText style={styles.dateText}>{currentDateFormatted}</ThemedText>
+              <ThemedText style={styles.fraseText}>¡Hola {user.name}! ¿Cómo te sientes hoy?</ThemedText>
+        </View>
     </View>
   );
 };
@@ -65,8 +64,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingTop: 15,
-    paddingBottom: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+    backgroundColor: 'rgb(255, 255, 255)', 
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
     shadowColor: '#8a62a6', 
@@ -75,20 +73,27 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
     zIndex: 10,
+    paddingBottom: 30,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: '17px',
     alignItems: 'center',
+    marginLeft: 15,
+    marginBottom: 15
   },
   userInfoContainer: {
+    gap: '17px',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 15
   },
   avatarRing: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 58,
+    height: 58,
+    borderRadius: 30,
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
     borderColor: '#D4B3E0', 
@@ -98,60 +103,51 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    marginTop: 31,
   },
   avatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 52,
+    height: 52,
+    borderRadius: 28,
+    
+    
   },
   textContainer: {
     marginLeft: 12,
     justifyContent: 'center',
+    marginTop: 25,
   },
   welcomeText: {
-    fontSize: 9,
-    color: '#8B8BA7',
-    fontWeight: '600',
-    textTransform: 'uppercase',
+    fontSize: 15,
+    color: '#606060',
     letterSpacing: 0.5,
     marginBottom: 1,
+    
   },
   nameText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '800',
     color: '#1E1E2D',
     marginBottom: 1,
   },
+  fraseText: {
+    fontSize: 15,
+    color: '#1E1E2D',
+    marginBottom: 1,
+    marginLeft: 15
+  },
   dateText: {
-    fontSize: 9,
-    color: '#A0A0B8',
-    fontWeight: '700',
+    fontSize: 12,
+    color: '#606060',
     letterSpacing: 0.5,
+    marginLeft: 15
   },
-  pointsBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F3E8FF', 
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E9D5FF',
-  },
-  pointsText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#6B21A8', 
-    marginRight: 4,
-  },
-  diamondIcon: {
-    width: 14,
-    height: 14,
-  },
+  
   rightActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    justifyContent: 'flex-end',
+    gap: '5px'
   },
   logoutButton: {
     width: 36,
