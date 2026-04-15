@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { UserContext } from '../user-provider';
 import { MOOD_CONFIG, getRandomMoodPhrase } from '../../utils/utils';
 import { Image } from 'expo-image';
-import { router } from 'expo-router'; // Importado router
+import { router } from 'expo-router';
 
 export const ActionAlertCard = () => {
   const { userValue } = React.use(UserContext);
@@ -14,7 +14,7 @@ export const ActionAlertCard = () => {
     const registerStreak = async () => {
       if (!userValue?.accessToken) return;
       try {
-        const response = await fetch('http://moodify_backend.test/api/actionAlert', {
+        const response = await fetch(process.env.EXPO_PUBLIC_API_URL +'actionAlert', {
           method: 'POST',
           headers: {
             'Authorization': 'Bearer ' + userValue.accessToken,

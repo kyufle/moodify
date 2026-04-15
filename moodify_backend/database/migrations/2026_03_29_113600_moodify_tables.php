@@ -20,6 +20,15 @@ return new class extends Migration {
             $table->string('image_id')->nullable();
         });
 
+        Schema::create('sleep_logs', function (Blueprint $table){
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade')->nullable();
+            $table->date('date')->nullable();
+            $table->dateTime('start_time')->nullable();
+            $table->dateTime('end_time')->nullable();
+            $table->integer('total_minutes')->nullable();
+        });
+
         Schema::create('mood_registers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

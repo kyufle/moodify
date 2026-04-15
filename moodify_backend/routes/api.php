@@ -13,3 +13,5 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/streakRegister', [UserController::class, 'streakRegister'])->middleware('auth:sanctum');
 Route::post('/actionAlert',[UserController::class, 'actionAlert'])->middleware('auth:sanctum');
+Route::post('/saveSleepLog',[UserController::class, 'saveSleepLog'])->middleware('auth:sanctum');
+Route::post('/fillInHours',[UserController::class, 'fillInHours'])->middleware('auth:sanctum');

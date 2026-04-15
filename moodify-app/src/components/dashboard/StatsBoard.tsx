@@ -1,15 +1,54 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { UserContext } from '../user-provider';
 
-// Añadimos onPressSleep como prop
 export const StatsBoard = ({ onPressSleep }) => {
+  const { userValue } = useContext(UserContext);
+  const [sleepDisplay, setSleepDisplay] = useState('Cargando...');
+
+  useEffect(() => {
+    async function fetchSleepStats() {
+        if (!userValue?.user) return null;
+      try {
+        const response = await fetch(process.env.EXPO_PUBLIC_API_URL+'fillInHours', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + userValue.accessToken,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        });
+
+        if (response.status === 200) {
+          const data = await response.json();
+          
+          if (data && data.total_minutes) {
+            const mins = data.total_minutes;
+            const hours = Math.floor(mins / 60);
+            const remainingMins = mins % 60;
+            
+            setSleepDisplay(`${hours}h y ${remainingMins}min`);
+          } else {
+            setSleepDisplay('No registrado hoy');
+          }
+        } else {
+          setSleepDisplay('No registrado hoy');
+        }
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+        setSleepDisplay('No registrado hoy');
+      }
+    }
+
+    fetchSleepStats();
+  }, [userValue.accessToken]);
+
   return (
     <View style={styles.container}>
-      {/* Tarjeta de Sueño */}
       <TouchableOpacity 
         style={{ flex: 1 }} 
-        onPress={onPressSleep} // Ahora llama a la función del padre
+        onPress={onPressSleep} 
         activeOpacity={0.7}
       >
         <View style={[styles.card, styles.sleepCard]}>
@@ -29,7 +68,7 @@ export const StatsBoard = ({ onPressSleep }) => {
           </View>
 
           <Text style={styles.valueText}>
-            7h <Text style={styles.valueSub}>20min</Text>
+            {sleepDisplay}
           </Text>
         </View>
       </TouchableOpacity>

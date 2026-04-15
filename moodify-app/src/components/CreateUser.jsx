@@ -81,7 +81,7 @@ export default function CreateUser({ onChangePage }) {
     }
 
     try {
-      const response = await fetch('http://moodify_backend.test/api/register', {
+      const response = await fetch(process.env.EXPO_PUBLIC_API_URL + 'register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(userData),
@@ -90,10 +90,7 @@ export default function CreateUser({ onChangePage }) {
       const data = await response.json();
       
       if (response.ok) {
-        // Si el status es 200-299, consideramos éxito
         setNotification({ message: 'message.correctRegister', type: "success" });
-        // Opcional: limpiar el formulario tras éxito
-        /* setUserData({ fullName: '', username: '', email: '', password: '', password_confirmation: '' }); */
       } else if (data.errors) {
         setError({
           username: data.errors.username ? data.errors.username[0] : '',
@@ -226,7 +223,6 @@ const styles = StyleSheet.create({
     width: '100%', 
     marginBottom: 15, 
     borderWidth: 1,
-    // Aseguramos que se vea bien
     minHeight: 50 
   },
   notifText: { fontWeight: '700', marginLeft: 10, fontSize: 13, flex: 1 }

@@ -1,71 +1,112 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-
 class UserController extends Controller
 {
-    /**
-     * Muestra una lista de todos los usuarios.
-     */
+    public function streakRegister(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $clientDate = $request->client_date ? now()->parse($request->client_date) : now();
+
+            if (!$user->streak_login) {
+                $user->streak += 1;
+                $user->points += 3;
+                $user->streak_login = $clientDate;
+                $user->save();
+                return response()->json(['user' => $user], 200);
+            }
+
+            $todayStr = $clientDate->format('Y-m-d');
+            $lastLogin = now()->parse($user->streak_login);
+            $lastLoginStr = $lastLogin->format('Y-m-d');
+
+            if ($todayStr === $lastLoginStr) {
+                return response()->json(['message' => 'Ya registrado hoy', 'user' => $user], 200);
+            }
+
+            $currentStart = $clientDate->copy()->startOfDay();
+            $lastStart = Carbon::parse($user->streak_login)->startOfDay();
+            $diff = $lastStart->diffInDays($currentStart);
+
+            if ($diff == 1) {
+                $user->last_streak_day = $user->streak_login;
+                $user->streak_login = $clientDate;
+                $user->streak += 1;
+                $user->points += 3;
+            } else if ($diff > 1) {
+                $daysLost = $diff - 1;
+                $cost = $daysLost * 6;
+
+                if ($request->recover && $user->points >= $cost) {
+                    $user->points -= $cost;
+                    $user->last_streak_day = $user->streak_login;
+                    $user->streak_login = $clientDate;
+                    $user->streak += 1;
+                } else {
+                    $user->streak = 1;
+                    $user->points += 3;
+                    $user->last_streak_day = null;
+                    $user->streak_login = $clientDate;
+                }
+            }
+
+            $user->save();
+            return response()->json(['message' => 'Registrado correctamente', 'user' => $user], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     public function index()
     {
-        // Recuperamos todos los registros de la tabla 'users'
-        $users = User::all();
-
-        // Opción A: Retornar una vista (Para aplicaciones web)
-        // return view('users.index', compact('users'));
-
-        // Opción B: Retornar JSON (Para APIs)
-        return response()->json($users);
+        return response()->json(User::all());
     }
 
-    public function streakRegister()
+    public function actionAlert(Request $request)
     {
-        $userId = auth()->user()->id;
-        $user = User::where('id', $userId)->first();
-
-        if ($user) {
-            if ($user->streak_login && $user->streak_login->isToday()) {
-                return response()->json(['message' => 'Ya has registrado tu progreso hoy'], 400);
-            }
-            $user->last_streak_day = $user->streak_login;
-            $user->streak_login = now();
-            $user->points += 3;
-            $user->streak += 1;
-            $user->save();
-            return response()->json([
-                'ok' => true,
-                'message' => 'Progreso registrado con éxito',
-                'user' => $user
-            ], 200);
-        } else {
-            return response()->json(['ok' => false, 'message' => 'Usuario no encontrado'], 404);
-        }
-    }
-
-    public function actionAlert()
-    {
-        $user = auth()->user();
+        $user = $request->user();
         $todayMoods = DB::table('mood_registers')
             ->where('user_id', $user->id)
-            ->whereDate('date', now()->today())
-            ->orderBy('created_at', 'desc')
+            ->whereDate('date', now()->toDateString())
             ->get();
 
-        if ($todayMoods->isNotEmpty()) {
-            return response()->json([
-                'ok' => true,
-                'exists' => true,
-                'all_moods' => $todayMoods,
-                'last_mood' => $todayMoods->first()->mood,
-                'message' => 'Has registrado ' . $todayMoods->count() . ' veces hoy'
-            ], 200);
-        }
+        return response()->json(['ok' => true, 'exists' => $todayMoods->isNotEmpty(), 'user' => $user]);
+    }
 
-        return response()->json(['ok' => true, 'exists' => false]);
+    public function saveSleepLog(Request $request)
+    {
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required',
+            'total_minutes' => 'required|integer',
+        ]);
+
+        DB::table('sleep_logs')->updateOrInsert(
+            ['user_id' => auth()->id(), 'date' => $validated['date']],
+            [
+                'start_time' => date('Y-m-d H:i:s', strtotime($validated['start_time'])),
+                'end_time' => date('Y-m-d H:i:s', strtotime($validated['end_time'])),
+                'total_minutes' => $validated['total_minutes'],
+            ]
+        );
+        return response()->json(['message' => 'Sueño guardado']);
+    }
+
+    public function fillInHours()
+    {
+        $exist = DB::table('sleep_logs')
+            ->where('user_id', auth()->id())
+            ->whereDate('date', now()->toDateString())
+            ->first();
+        return $exist ? response()->json($exist) : response()->json(null, 204);
     }
 }

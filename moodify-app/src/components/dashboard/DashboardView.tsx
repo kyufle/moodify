@@ -7,36 +7,35 @@ import { StreakCard } from './StreakCard';
 import { ActionAlertCard } from './ActionAlertCard';
 import { StatsBoard } from './StatsBoard'; 
 import { QuoteCard } from './QuoteCard';
-import { Sleep } from './Sleep'; // Importado desde tu carpeta actual
+import { Sleep } from './Sleep';
 import { StaticBottomNavBar } from '../StaticBottomNavBar';
 
 const DashboardView = () => {
-  // Estado para controlar qué vista mostrar
   const [showSleep, setShowSleep] = useState(false);
-
-  // Si showSleep es true, renderizamos el componente Sleep directamente
-  if (showSleep) {
-    return <Sleep onBack={() => setShowSleep(false)} />;
-  }
 
   return (
     <View style={{ flex: 1 }}>
-      <DashboardBackground>
-        <ScrollView 
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <DashboardHeader />
-          <StreakCard />
-          <ActionAlertCard />
-          {/* Pasamos la función para abrir Sleep */}
-          <StatsBoard onPressSleep={() => setShowSleep(true)} />
-          <QuoteCard />
-        </ScrollView>
-      </DashboardBackground>
+      {showSleep ? (
+        <Sleep onBack={() => setShowSleep(false)} />
+      ) : (
+        <>
+          <DashboardBackground>
+            <ScrollView 
+              style={styles.scrollView}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+              <DashboardHeader />
+              <StreakCard />
+              <ActionAlertCard />
+              <StatsBoard onPressSleep={() => setShowSleep(true)} />
+              <QuoteCard />
+            </ScrollView>
+          </DashboardBackground>
 
-      <StaticBottomNavBar activeTab="home" />
+          <StaticBottomNavBar activeTab="home" />
+        </>
+      )}
     </View>
   );
 };
