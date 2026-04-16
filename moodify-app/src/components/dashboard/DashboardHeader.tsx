@@ -10,11 +10,10 @@ export const DashboardHeader = () => {
   const { userValue, logout } = React.use(UserContext);
 
   if (userValue?.user == null)
-    return; // El usuario no está logueado
+    return;
 
   const user = userValue.user;
   console.log(user.image_path);
-//coge la ubicación de la región del dispositivo
   const currentDateFormatted = new Intl.DateTimeFormat(undefined, {
     day: '2-digit',
     month: 'long',
@@ -27,7 +26,7 @@ export const DashboardHeader = () => {
           
           
           <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-            <Feather name="log-out" size={18} color="#64748B" />
+            <Feather name="bell" size={18} color="#64748B" />
           </TouchableOpacity>
         </View>
       <View style={styles.headerRow}>

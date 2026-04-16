@@ -7,6 +7,7 @@ import { UserContext } from '../user-provider';
 
 import questionsData from '../../utils/stress.json'; 
 import { getJsonText, getRandomQuestions, processResults } from '../../utils/utils';
+import { StaticBottomNavBar } from '../StaticBottomNavBar';
 
 const { width } = Dimensions.get('window');
 
@@ -114,20 +115,20 @@ const Stress = ({ navigation }: any) => {
   const getMainLevel = (breakdown: any) => {
     if (!breakdown) return { name: "Pendiente", color: "#666" };
     const levels = [
-      { name: "Relajado", val: Number(breakdown.relajado) || 0, color: '#4CAF50' },
-      { name: "Leve", val: Number(breakdown.leve) || 0, color: '#FFEB3B' },
-      { name: "Moderado", val: Number(breakdown.moderado) || 0, color: '#FF9800' },
-      { name: "Alto", val: Number(breakdown.alto) || 0, color: '#F44336' },
+      { name: "Relajado", val: Number(breakdown.relajado) || 0, color: '#acdaad' },
+      { name: "Leve", val: Number(breakdown.leve) || 0, color: 'rgb(240, 235, 190)' },
+      { name: "Moderado", val: Number(breakdown.moderado) || 0, color: '#dacbac' },
+      { name: "Alto", val: Number(breakdown.alto) || 0, color: '#f0bebe' },
     ];
     return levels.sort((a, b) => b.val - a.val)[0];
   };
 
 
-  if (view === 'LOADING') return <View style={styles.containerCenter}><ActivityIndicator size="large" color="#4CAF50" /></View>;
+  if (view === 'LOADING') return <View style={styles.containerCenter}><ActivityIndicator size="large" color="#acdaad" /></View>;
 
   if (view === 'CALCULATING') return (
     <View style={styles.containerCenter}>
-      <ActivityIndicator size="large" color="#4CAF50" />
+      <ActivityIndicator size="large" color="#acdaad" />
       <Text style={{marginTop: 20}}>Analizando tus respuestas...</Text>
     </View>
   );
@@ -147,10 +148,10 @@ const Stress = ({ navigation }: any) => {
         <PieChart
           donut radius={110} innerRadius={85}
           data={[
-            { value: Number(data?.breakdown?.relajado) || 0.1, color: '#4CAF50' },
-            { value: Number(data?.breakdown?.leve) || 0.1, color: '#FFEB3B' },
-            { value: Number(data?.breakdown?.moderado) || 0.1, color: '#FF9800' },
-            { value: Number(data?.breakdown?.alto) || 0.1, color: '#F44336' },
+            { value: Number(data?.breakdown?.relajado) || 0.1, color: '#acdaad' },
+            { value: Number(data?.breakdown?.leve) || 0.1, color: 'rgb(240, 235, 190)' },
+            { value: Number(data?.breakdown?.moderado) || 0.1, color: '#dacbac' },
+            { value: Number(data?.breakdown?.alto) || 0.1, color: '#daacac' },
           ]}
           centerLabelComponent={() => (
             <View style={{alignItems:'center'}}>
@@ -170,6 +171,7 @@ const Stress = ({ navigation }: any) => {
         <TouchableOpacity style={styles.btnSecondaryOutline} onPress={startQuiz}>
           <Text style={styles.btnSecondaryText}>Repetir análisis</Text>
         </TouchableOpacity>
+        <StaticBottomNavBar activeTab="home" />
       </View>
     );
   }
@@ -206,11 +208,12 @@ const Stress = ({ navigation }: any) => {
             </TouchableOpacity>
           )}
         </ScrollView>
+        <StaticBottomNavBar activeTab="home" />
       </View>
     );
   }
 
-  return <View style={styles.containerCenter}><ActivityIndicator size="large" color="#4CAF50" /></View>;
+  return <View style={styles.containerCenter}><ActivityIndicator size="large" color="#acdaad" /></View>;
 };
 
 const styles = StyleSheet.create({
@@ -220,21 +223,21 @@ const styles = StyleSheet.create({
   storyHeader: { flexDirection: 'row', paddingTop: 60, paddingHorizontal: 20, marginBottom: 20 },
   storySegmentWrapper: { flex: 1, paddingHorizontal: 2 },
   storySegment: { height: 4, backgroundColor: '#F0F0F0', borderRadius: 2 },
-  storyActive: { backgroundColor: '#4CAF50' },
+  storyActive: { backgroundColor: '#acdaad' },
   quizContent: { paddingHorizontal: 25, paddingBottom: 40 },
   questionText: { fontSize: 26, fontWeight: 'bold', marginBottom: 40, color: '#1A1A1A', lineHeight: 32 },
   answersList: { gap: 15 },
   answerCard: { backgroundColor: '#F8F9FA', padding: 20, borderRadius: 18, borderWidth: 1, borderColor: '#F0F0F0' },
-  answerSelected: { borderColor: '#4CAF50', backgroundColor: '#F0F9F1' },
+  answerSelected: { borderColor: '#acdaad', backgroundColor: '#F0F9F1' },
   answerLabel: { fontSize: 17, color: '#444' },
   labelSelected: { color: '#2E7D32', fontWeight: 'bold' },
   levelContainer: { marginTop: 40, alignItems: 'center' },
   levelLabel: { fontSize: 16, color: '#888', marginBottom: 5 },
   levelValue: { fontSize: 36, fontWeight: '900' },
-  btnNext: { backgroundColor: '#4CAF50', paddingVertical: 18, borderRadius: 35, marginTop: 40, alignItems: 'center', elevation: 2 },
-  btnPrimary: { backgroundColor: '#4CAF50', paddingVertical: 18, paddingHorizontal: 60, borderRadius: 35, marginTop: 20 },
+  btnNext: { backgroundColor: '#90b890', paddingVertical: 18, borderRadius: 35, marginTop: 40, alignItems: 'center', elevation: 2 },
+  btnPrimary: { backgroundColor: '#acdaad', paddingVertical: 18, paddingHorizontal: 60, borderRadius: 35, marginTop: 20 },
   btnSecondaryOutline: { marginTop: 40, padding: 15 },
-  btnSecondaryText: { color: '#4CAF50', fontWeight: 'bold', fontSize: 15 },
+  btnSecondaryText: { color: '#90b890', fontWeight: 'bold', fontSize: 15 },
   btnText: { color: '#fff', fontWeight: 'bold', fontSize: 17 },
   btnCancel: { color: '#AAA', marginTop: 25, fontSize: 15 },
   title: { fontSize: 22, fontWeight: '700', color: '#333', marginBottom: 40 },
