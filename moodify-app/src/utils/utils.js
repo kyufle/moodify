@@ -1,3 +1,5 @@
+import i18n from 'i18next';
+import quotesData from './quotes.json';
 export const MOOD_CONFIG = {
   happy: {
     color: '#FFF9C4',
@@ -96,7 +98,6 @@ export const MOOD_CONFIG = {
     phrases: ["En el epicentro de la furia, el silencio es el único refugio capaz de evitar el desastre.", "Deja que la tormenta pase antes de tomar decisiones; la claridad nunca habita en la rabia.", "Aprender a observar tu ira sin actuar bajo su mando es una de las mayores victorias personales."]
   },
 
-  // --- ESTADOS FÍSICOS Y OTROS ---
   tired: {
     color: '#AED6F1',
     icon: 'battery',
@@ -173,4 +174,53 @@ export const avatarMap = {
   'avatar24': require('../../assets/images/avatar/avatar24.png'),
   'avatar25': require('../../assets/images/avatar/avatar25.png'),
   'avatar26': require('../../assets/images/avatar/avatar26.png'),
+};
+export const getRandomQuestions = (data, count = 10) => {
+  const actualData = Array.isArray(data) 
+    ? data 
+    : (data?.encuesta_estres_completa || []);
+
+  if (actualData.length === 0) {
+    console.error("getRandomQuestions: No se encontraron preguntas.");
+    return [];
+  }
+
+  const shuffled = [...actualData].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
+
+export const getJsonText = (textObject, lang) => {
+  if (!textObject) return "";
+  const shortLang = lang ? lang.split('-')[0] : 'es';
+  return textObject[shortLang] || textObject['es'] || "";
+};
+
+export const processResults = (answers) => {
+  const breakdown = { relajado: 0, leve: 0, moderado: 0, alto: 0 };
+  let total_score = 0;
+  
+  const points = { 
+    relajado: 0, 
+    leve: 1, 
+    moderado: 2, 
+    alto: 3 
+  };
+
+  answers.forEach(ans => {
+    const nivel = ans.nivel;
+    if (breakdown.hasOwnProperty(nivel)) {
+      breakdown[nivel]++;
+      total_score += points[nivel];
+    }
+  });
+
+  return { breakdown, total_score };
+};
+
+
+export const getRandomQuote = () => {
+  const currentLang = i18n.language?.split('-')[0] || 'en';
+  const phrases = quotesData[currentLang] || quotesData['en'];
+  const randomIndex = Math.floor(Math.random() * phrases.length);
+  return phrases[randomIndex];
 };

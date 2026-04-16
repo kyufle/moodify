@@ -15,3 +15,7 @@ Route::post('/streakRegister', [UserController::class, 'streakRegister'])->middl
 Route::post('/actionAlert',[UserController::class, 'actionAlert'])->middleware('auth:sanctum');
 Route::post('/saveSleepLog',[UserController::class, 'saveSleepLog'])->middleware('auth:sanctum');
 Route::post('/fillInHours',[UserController::class, 'fillInHours'])->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/getStatus', [App\Http\Controllers\StressController::class, 'getStatus']);
+    Route::post('/store', [App\Http\Controllers\StressController::class, 'store']);
+});

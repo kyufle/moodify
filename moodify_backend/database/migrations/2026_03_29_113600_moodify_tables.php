@@ -29,6 +29,14 @@ return new class extends Migration {
             $table->integer('total_minutes')->nullable();
         });
 
+        Schema::create('stress_tests', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->integer('total_score'); 
+            $table->json('breakdown'); 
+            $table->timestamps();
+        });
+
         Schema::create('mood_registers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

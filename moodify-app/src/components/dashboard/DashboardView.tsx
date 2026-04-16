@@ -8,34 +8,43 @@ import { ActionAlertCard } from './ActionAlertCard';
 import { StatsBoard } from './StatsBoard'; 
 import { QuoteCard } from './QuoteCard';
 import { Sleep } from './Sleep';
+import Stress from './Stress'; 
 import { StaticBottomNavBar } from '../StaticBottomNavBar';
 
 const DashboardView = () => {
   const [showSleep, setShowSleep] = useState(false);
+  const [showStress, setShowStress] = useState(false); 
+
+  if (showSleep) {
+    return <Sleep onBack={() => setShowSleep(false)} />;
+  }
+
+  if (showStress) {
+    return <Stress navigation={{ goBack: () => setShowStress(false) }} />;
+  }
 
   return (
     <View style={{ flex: 1 }}>
-      {showSleep ? (
-        <Sleep onBack={() => setShowSleep(false)} />
-      ) : (
-        <>
-          <DashboardBackground>
-            <ScrollView 
-              style={styles.scrollView}
-              contentContainerStyle={styles.scrollContent}
-              showsVerticalScrollIndicator={false}
-            >
-              <DashboardHeader />
-              <StreakCard />
-              <ActionAlertCard />
-              <StatsBoard onPressSleep={() => setShowSleep(true)} />
-              <QuoteCard />
-            </ScrollView>
-          </DashboardBackground>
+      <DashboardBackground>
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <DashboardHeader />
+          <StreakCard />
+          <ActionAlertCard />
+          
+          <StatsBoard 
+            onPressSleep={() => setShowSleep(true)} 
+            onPressStress={() => setShowStress(true)} 
+          />
+          
+          <QuoteCard />
+        </ScrollView>
+      </DashboardBackground>
 
-          <StaticBottomNavBar activeTab="home" />
-        </>
-      )}
+      <StaticBottomNavBar activeTab="home" />
     </View>
   );
 };
@@ -47,26 +56,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 110, 
   },
-  sectionDivider: {
-    paddingHorizontal: 20,
-    marginTop: 25,
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  sectionLabel: {
-    fontSize: 15,
-    fontWeight: '900',
-    color: '#1E293B',
-    letterSpacing: 0.5,
-  },
-  sectionDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#6366F1',
-  }
 });
 
 export default DashboardView;
