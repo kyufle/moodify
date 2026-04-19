@@ -14,9 +14,8 @@ import { AchievementsBar } from '@/components/profile/AchievementsBar';
 export default function ProfileScreen() {
 
   const { userValue, logout } = useContext(UserContext);
-  if (!userValue?.user)
-    return;
-  const user = userValue.user;
+  // Default to a dummy user so the UI is visible even if not logged in
+  const user = userValue?.user || { name: 'Usuario Prueba', email: 'prueba@moodify.com' };
 
   const router = useRouter();
 

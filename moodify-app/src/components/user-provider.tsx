@@ -11,6 +11,8 @@ export const UserContext = createContext<any>(null);
 export default function UserProvider({ children }: { children: ReactNode }) {
     const router = useRouter();
     const [userValue, setUserValue] = useState(defaultUserValue);
+    const [darkMode, setDarkMode] = useState(false);
+    
     const logout = () => {
         router.replace('/');
         setUserValue(defaultUserValue);
@@ -19,6 +21,8 @@ export default function UserProvider({ children }: { children: ReactNode }) {
         setUserValue,
         logout,
         userValue,
+        darkMode,
+        setDarkMode
     }}>
         {children}
     </UserContext>

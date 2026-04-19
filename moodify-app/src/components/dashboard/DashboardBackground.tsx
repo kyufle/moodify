@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
+import { UserContext } from '../user-provider';
 
 export const DashboardBackground = ({ children }: { children: React.ReactNode }) => {
+  const { darkMode } = useContext(UserContext);
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: darkMode ? '#0F172A' : '#F8FAFC' }]}>
       {/* Fondo estético desde el SVG proporcionado */}
       <Image 
-        source={require('@/assets/images/fondo_claro.svg')}
+        source={darkMode ? require('@/assets/images/fondo_oscuro.svg') : require('@/assets/images/fondo_claro.svg')}
         style={StyleSheet.absoluteFillObject}
         contentFit="cover"
       />

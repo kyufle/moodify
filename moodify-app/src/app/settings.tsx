@@ -4,25 +4,50 @@ import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { DashboardBackground } from '@/components/dashboard/DashboardBackground';
 import { UserContext } from '../components/user-provider';
+
 export default function SettingsScreen() {
   const router = useRouter();
   const [notifications, setNotifications] = React.useState(true);
-  const [darkMode, setDarkMode] = React.useState(false);
-  const { logout } = React.use(UserContext);
-  const SettingItem = ({ icon, label, type = 'chevron', value, onValueChange }: any) => (
-    <TouchableOpacity style={styles.item} disabled={type === 'switch'}>
+  const [language, setLanguage] = React.useState('Español');
+  const { logout, darkMode, setDarkMode } = React.useContext(UserContext);
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/profile');
+    }
+  };
+
+  const currentStyles = {
+    cardBg: darkMode ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+    textColor: darkMode ? '#F8FAFC' : '#334155',
+    subtextColor: darkMode ? '#94A3B8' : '#64748B',
+    titleColor: darkMode ? '#FFFFFF' : '#1E293B',
+    iconBg: darkMode ? '#334155' : '#F1F5F9',
+    dividerBg: darkMode ? '#334155' : '#F1F5F9',
+    navBg: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255, 255, 255, 0.5)',
+  };
+
+  const SettingItem = ({ icon, label, type = 'chevron', value, onValueChange, valueText, onPress }: any) => (
+    <TouchableOpacity style={styles.item} disabled={type === 'switch' && !onPress} onPress={onPress}>
       <View style={styles.itemLeft}>
-        <View style={styles.iconBox}>
-          <Feather name={icon} size={20} color="#64748B" />
+        <View style={[styles.iconBox, { backgroundColor: currentStyles.iconBg }]}>
+          <Feather name={icon} size={20} color={darkMode ? '#94A3B8' : '#64748B'} />
         </View>
-        <Text style={styles.itemLabel}>{label}</Text>
+        <Text style={[styles.itemLabel, { color: currentStyles.textColor }]}>{label}</Text>
       </View>
-      {type === 'chevron' && <Feather name="chevron-right" size={20} color="#94A3B8" />}
+      {type === 'chevron' && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          {valueText && <Text style={{ color: currentStyles.subtextColor, fontSize: 14 }}>{valueText}</Text>}
+          <Feather name="chevron-right" size={20} color={currentStyles.subtextColor} />
+        </View>
+      )}
       {type === 'switch' && (
         <Switch 
           value={value} 
           onValueChange={onValueChange}
-          trackColor={{ false: '#E2E8F0', true: '#6366F1' }}
+          trackColor={{ false: darkMode ? '#334155' : '#E2E8F0', true: '#6366F1' }}
         />
       )}
     </TouchableOpacity>
@@ -32,21 +57,21 @@ export default function SettingsScreen() {
     <View style={{ flex: 1 }}>
       <DashboardBackground>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Feather name="arrow-left" size={24} color="#1E293B" />
+          <TouchableOpacity onPress={handleBack} style={[styles.backButton, { backgroundColor: currentStyles.navBg }]}>
+            <Feather name="arrow-left" size={24} color={currentStyles.titleColor} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Ajustes</Text>
+          <Text style={[styles.headerTitle, { color: currentStyles.titleColor }]}>Ajustes</Text>
           <View style={{ width: 44 }} /> 
         </View>
 
         <ScrollView contentContainerStyle={styles.content}>
-          <View style={styles.mainCard}>
+          <View style={[styles.mainCard, { backgroundColor: currentStyles.cardBg }]}>
             <Text style={styles.sectionTitle}>Cuenta</Text>
-            <SettingItem icon="user" label="Información Personal" />
-            <SettingItem icon="lock" label="Contraseña y Seguridad" />
-            <SettingItem icon="eye-off" label="Privacidad" />
+            <SettingItem icon="user" label="Información Personal" onPress={() => router.push('/settings/personal')} />
+            <SettingItem icon="lock" label="Contraseña y Seguridad" onPress={() => router.push('/settings/security')} />
+            <SettingItem icon="eye-off" label="Privacidad" onPress={() => router.push('/settings/privacy')} />
             
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: currentStyles.dividerBg }]} />
             
             <Text style={styles.sectionTitle}>Preferencias</Text>
             <SettingItem 
@@ -63,16 +88,21 @@ export default function SettingsScreen() {
               value={darkMode} 
               onValueChange={setDarkMode} 
             />
-            <SettingItem icon="globe" label="Idioma" />
+            <SettingItem 
+              icon="globe" 
+              label="Idioma" 
+              valueText={language}
+              onPress={() => setLanguage(language === 'Español' ? 'English' : 'Español')}
+            />
 
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: currentStyles.dividerBg }]} />
             
             <Text style={styles.sectionTitle}>Soporte</Text>
-            <SettingItem icon="help-circle" label="Centro de Ayuda" />
-            <SettingItem icon="mail" label="Contactar Soporte" />
-            <SettingItem icon="file-text" label="Términos y Condiciones" />
+            <SettingItem icon="help-circle" label="Centro de Ayuda" onPress={() => router.push('/settings/help')} />
+            <SettingItem icon="mail" label="Contactar Soporte" onPress={() => router.push('/settings/support')} />
+            <SettingItem icon="file-text" label="Términos y Condiciones" onPress={() => router.push('/settings/terms')} />
 
-            <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+            <TouchableOpacity style={[styles.logoutButton, { borderTopColor: currentStyles.dividerBg }]} onPress={logout}>
               <Feather name="log-out" size={20} color="#EF4444" />
               <Text style={styles.logoutText}>Cerrar Sesión</Text>
             </TouchableOpacity>
@@ -98,21 +128,18 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#1E293B',
   },
   content: {
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
   mainCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: 32,
     padding: 10,
     shadowColor: '#000',
@@ -147,18 +174,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#F1F5F9',
     justifyContent: 'center',
     alignItems: 'center',
   },
   itemLabel: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#334155',
   },
   divider: {
     height: 1,
-    backgroundColor: '#F1F5F9',
     marginHorizontal: 15,
     marginVertical: 10,
   },
@@ -170,7 +194,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     gap: 10,
     borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
   },
   logoutText: {
     fontSize: 16,

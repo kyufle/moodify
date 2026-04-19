@@ -1,30 +1,44 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 const BADGES = [
-  { id: '1', icon: 'zap', label: 'Racha 7d', color: '#F59E0B' },
-  { id: '2', icon: 'heart', label: 'Zen', color: '#EF4444' },
-  { id: '3', icon: 'star', label: 'VIP', color: '#8B5CF6' },
+  { id: '1', icon: 'moon', label: 'Dormir 8h', color: '#8B5CF6' },
+  { id: '2', icon: 'zap', label: 'Racha 7d', color: '#F59E0B' },
+  { id: '3', icon: 'heart', label: 'Zen', color: '#EF4444' },
   { id: '4', icon: 'shield', label: 'Guardián', color: '#10B981' },
 ];
 
 export const AchievementsBar = () => {
+  const router = useRouter();
+
+  const handlePress = (badgeName: string) => {
+    if (badgeName === 'Dormir 8h') {
+      router.push('/calendar');
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Insignias</Text>
+      <Text style={styles.title}>Logros</Text>
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {BADGES.map(badge => (
-          <View key={badge.id} style={styles.badgeItem}>
+          <TouchableOpacity 
+            key={badge.id} 
+            style={styles.badgeItem}
+            onPress={() => handlePress(badge.label)}
+            activeOpacity={0.7}
+          >
             <View style={[styles.iconBox, { backgroundColor: badge.color + '20' }]}>
               <Feather name={badge.icon as any} size={20} color={badge.color} />
             </View>
             <Text style={styles.badgeLabel}>{badge.label}</Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
