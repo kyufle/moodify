@@ -3,7 +3,7 @@ import { createContext, ReactNode, useState } from "react";
 
 const defaultUserValue = {
     accessToken: null,
-    user: null
+    user: null,
 };
 
 export const UserContext = createContext<any>(null);

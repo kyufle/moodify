@@ -11,13 +11,15 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/moodifyLogo.png",
+        "backgroundImage": "./assets/images/moodifyLogo.png",
+        "monochromeImage": "./assets/images/moodifyLogo.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.kyufle.moodifyapp"
     },
     "web": {
       "output": "static",
@@ -30,7 +32,7 @@
         {
           "backgroundColor": "#208AEF",
           "android": {
-            "image": "./assets/images/splash-icon.png",
+            "image": "./assets/images/moodifyLogo.png",
             "imageWidth": 76
           }
         }
@@ -39,6 +41,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c15d56e3-b236-4bc3-be8f-64bf9533750b"
+      }
     }
   }
 }

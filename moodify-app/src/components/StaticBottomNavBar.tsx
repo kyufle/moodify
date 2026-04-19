@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   homeButtonInactive: {
-    backgroundColor: '#E2E8F0', // Gris claro si no está activo
+    backgroundColor: '#E2E8F0',
     shadowOpacity: 0.05,
     elevation: 2,
   }

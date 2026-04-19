@@ -1,9 +1,17 @@
 :root {
-  --font-display:
-    Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol, Noto Color Emoji;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-  --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
+  /* Use Nunito as the primary font here */
+  --font-display: 
+    'Nunito', Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, 
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --font-mono: 
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
+    'Liberation Mono', 'Courier New', monospace;
+
+  /* Nunito is naturally rounded, so it's a perfect fit here */
+  --font-rounded: 
+    'Nunito', 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', 
+    Meiryo, 'MS PGothic', sans-serif;
+
   --font-serif: Georgia, 'Times New Roman', serif;
 }

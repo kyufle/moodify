@@ -1,22 +1,37 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
+import { getRandomQuote } from '../../utils/utils';
 
 export const QuoteCard = () => {
+  const { t } = useTranslation();
+
+  const quote = useMemo(() => getRandomQuote(), []);
+
   return (
     <LinearGradient
       colors={['#1E293B', '#334155']}
       style={styles.container}
     >
-      <Feather name="message-square" size={24} color="rgba(255, 255, 255, 0.2)" style={styles.quoteIcon} />
+      <Feather 
+        name="message-square" 
+        size={24} 
+        color="rgba(255, 255, 255, 0.2)" 
+        style={styles.quoteIcon} 
+      />
+      
       <Text style={styles.quoteText}>
-        "El éxito no es el final, el fracaso no es fatídico: lo que cuenta es el valor para continuar."
+        "{quote.text}"
       </Text>
+
       <View style={styles.footer}>
-        <Text style={styles.author}>— Winston Churchill</Text>
+        <Text style={styles.author}>— {quote.author}</Text>
         <View style={styles.tag}>
-          <Text style={styles.tagText}>MOTIVACIÓN</Text>
+          <Text style={styles.tagText}>
+            {t('motivation', 'MOTIVACIÓN').toUpperCase()}
+          </Text>
         </View>
       </View>
     </LinearGradient>
