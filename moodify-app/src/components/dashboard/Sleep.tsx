@@ -34,7 +34,7 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
   useEffect(() => {
     async function putHours() {
       try {
-        const response = await fetch(process.env.EXPO_PUBLIC_API_URL+'fillInHours', {
+        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + 'fillInHours', {
           method: 'POST',
           headers: {
             'Authorization': 'Bearer ' + userValue.accessToken,
@@ -130,7 +130,7 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
         total_minutes: totalDiffMinutes,
       };
 
-      const response = await fetch(process.env.EXPO_PUBLIC_API_URL+'saveSleepLog', {
+      const response = await fetch(process.env.EXPO_PUBLIC_API_URL + 'saveSleepLog', {
         method: 'POST',
         headers: {
           'Authorization': 'Bearer ' + userValue.accessToken,
@@ -193,10 +193,14 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
   const endPos = getPos(endAngle);
   let diff = endAngle - startAngle;
   if (diff < 0) diff += 2 * Math.PI;
+  
   const totalDiffMinutes = Math.round((diff / (2 * Math.PI)) * 24 * 60);
   const hDiff = Math.floor(totalDiffMinutes / 60);
   const mDiff = totalDiffMinutes % 60;
-  const statusColor = (totalDiffMinutes / 60) < 8 ? '#934b5d' : '#87a98f';
+
+  // Lógica de color: Rojo si < 8h o >= 11h. Verde en el rango intermedio.
+  const hoursDecimal = totalDiffMinutes / 60;
+  const statusColor = (hoursDecimal < 8 || hoursDecimal >= 11) ? '#934b5d' : '#87a98f';
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -211,7 +215,7 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
               <View style={{ width: 32 }} />
             </View>
 
-            <View style={{justifyContent: 'space-around', alignItems: 'center' }}>
+            <View style={{ justifyContent: 'space-around', alignItems: 'center' }}>
               <View style={styles.timeInfoRow}>
                 <View style={styles.timeBox}>
                   <Feather name="moon" size={30} color="#6e75a4" />
@@ -297,7 +301,7 @@ const styles = StyleSheet.create({
   gestureOverlay: { position: 'absolute', width: HANDLER_RADIUS * 2, height: HANDLER_RADIUS * 2, backgroundColor: 'transparent' },
   summaryContainer: { alignItems: 'center', width: '100%', paddingHorizontal: 25 },
   summaryLabel: { color: '#888', fontSize: 20, marginBottom: 20 },
-  summaryValue: { color: 'white', fontSize: 36, fontWeight: 'bold', marginBottom: 15 },
+  summaryValue: { fontSize: 36, fontWeight: 'bold', marginBottom: 15 },
   saveButton: { backgroundColor: '#6e75a4', width: '60%', padding: 16, borderRadius: 18, alignItems: 'center' },
   saveButtonText: { color: 'white', fontSize: 20 },
 });

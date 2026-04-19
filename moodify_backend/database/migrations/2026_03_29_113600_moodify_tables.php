@@ -16,7 +16,6 @@ return new class extends Migration {
             $table->integer('points')->default(0);
             $table->integer('streak')->default(0);
             $table->timestamp('last_streak_day')->nullable();
-            $table->timestamp('streak_login')->nullable();
             $table->string('image_id')->nullable();
         });
 

@@ -15,16 +15,16 @@ class UserController extends Controller
             $user = $request->user();
             $clientDate = $request->client_date ? now()->parse($request->client_date) : now();
 
-            if (!$user->streak_login) {
+            if (!$user->last_streak_day) {
                 $user->streak += 1;
                 $user->points += 3;
-                $user->streak_login = $clientDate;
+                $user->last_streak_day = $clientDate;
                 $user->save();
                 return response()->json(['user' => $user], 200);
             }
 
             $todayStr = $clientDate->format('Y-m-d');
-            $lastLogin = now()->parse($user->streak_login);
+            $lastLogin = now()->parse($user->last_streak_day);
             $lastLoginStr = $lastLogin->format('Y-m-d');
 
             if ($todayStr === $lastLoginStr) {
@@ -32,12 +32,11 @@ class UserController extends Controller
             }
 
             $currentStart = $clientDate->copy()->startOfDay();
-            $lastStart = Carbon::parse($user->streak_login)->startOfDay();
+            $lastStart = Carbon::parse($user->last_streak_day)->startOfDay();
             $diff = $lastStart->diffInDays($currentStart);
 
             if ($diff == 1) {
-                $user->last_streak_day = $user->streak_login;
-                $user->streak_login = $clientDate;
+                $user->last_streak_day = $clientDate;
                 $user->streak += 1;
                 $user->points += 3;
             } else if ($diff > 1) {
@@ -46,14 +45,12 @@ class UserController extends Controller
 
                 if ($request->recover && $user->points >= $cost) {
                     $user->points -= $cost;
-                    $user->last_streak_day = $user->streak_login;
-                    $user->streak_login = $clientDate;
+                    $user->last_streak_day = $clientDate;
                     $user->streak += 1;
                 } else {
                     $user->streak = 1;
                     $user->points += 3;
-                    $user->last_streak_day = null;
-                    $user->streak_login = $clientDate;
+                    $user->last_streak_day = $clientDate;
                 }
             }
 

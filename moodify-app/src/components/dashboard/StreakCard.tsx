@@ -87,7 +87,7 @@ export const StreakCard = () => {
     const todayDate = new Date();
     let tIndex = todayDate.getDay() - 1;
     if (tIndex === -1) tIndex = 6;
-    const loginDateObj = user?.streak_login ? new Date(user.streak_login) : null;
+    const loginDateObj = user?.last_streak_day ? new Date(user.last_streak_day) : null;
 
     const isRegToday = !!(loginDateObj &&
       (new Date(loginDateObj).toLocaleDateString("en-CA") === todayDate.toLocaleDateString("en-CA")));
