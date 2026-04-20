@@ -26,7 +26,7 @@ export default function Login({ onChangePage }) {
 
         if (userData.password && userData.emailUsername) {
             try {
-                const response = await fetch('http://moodify_backend.test/api/login', {
+                const response = await fetch('http://localhost:8000/api/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

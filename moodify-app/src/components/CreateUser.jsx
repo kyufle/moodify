@@ -81,7 +81,7 @@ export default function CreateUser({ onChangePage }) {
     }
 
     try {
-      const response = await fetch('http://moodify_backend.test/api/register', {
+      const response = await fetch('http://localhost:8000/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(userData),
