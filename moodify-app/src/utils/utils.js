@@ -82,7 +82,7 @@ export const MOOD_CONFIG = {
   },
   calm: {
     color: '#D1F2EB',
-    icon: 'wind',
+    icon: require('../../assets/images/calm.svg'),
     phrases: {
       es: [
         "No pasa nada por bajar el ritmo; la calma es un estado necesario para sanar.",
@@ -108,7 +108,7 @@ export const MOOD_CONFIG = {
   },
   proud: {
     color: '#E1BEE7',
-    icon: 'award',
+    icon:  require('../../assets/images/proud.svg'),
     phrases: {
       es: [
         "Está bien reconocer que lo has hecho genial; darte crédito fortalece tu autoestima.",
@@ -134,7 +134,7 @@ export const MOOD_CONFIG = {
   },
   confident: {
     color: '#D4EFDF',
-    icon: 'shield',
+    icon: require('../../assets/images/confident.svg'),
     phrases: {
       es: [
         "Confía plenamente en tu capacidad, ya has superado situaciones difíciles anteriormente.",
@@ -160,7 +160,7 @@ export const MOOD_CONFIG = {
   },
   grateful: {
     color: '#A2D9CE',
-    icon: 'heart',
+    icon: require('../../assets/images/grateful.svg'),
     phrases: {
       es: [
         "Agradecer los pequeños detalles permite ver la abundancia donde otros ven carencia.",
@@ -186,7 +186,7 @@ export const MOOD_CONFIG = {
   },
   in_love: {
     color: '#F8BBD0',
-    icon: 'heart',
+    icon: require('../../assets/images/in_love.svg'),
     phrases: {
       es: [
         "Es un sentimiento hermoso, disfrútalo al máximo y sin miedos al futuro.",
@@ -212,7 +212,7 @@ export const MOOD_CONFIG = {
   },
   peaceful: {
     color: '#E8F8F5',
-    icon: 'feather',
+    icon: require('../../assets/images/peaceful.svg'),
     phrases: {
       es: [
         "No pasa nada por detener el mundo un momento, cerrar los ojos y simplemente respirar.",
