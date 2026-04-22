@@ -6,7 +6,7 @@ import { StyleSheet } from 'react-native';
 export default function DashboardScreen() {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <DashboardView />
+        <DashboardView />
     </SafeAreaView>
   );
 }

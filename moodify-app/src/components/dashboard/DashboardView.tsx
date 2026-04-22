@@ -1,19 +1,28 @@
-import React from 'react';
-import { ScrollView, StyleSheet, View, Text } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-// Importación de las partes del dashboard
 import { DashboardBackground } from './DashboardBackground';
 import { DashboardHeader } from './DashboardHeader';
 import { StreakCard } from './StreakCard';
 import { ActionAlertCard } from './ActionAlertCard';
-import { StatsBoard } from './StatsBoard';
-import { MoodTrackerCard } from './MoodTrackerCard';
+import { StatsBoard } from './StatsBoard'; 
 import { QuoteCard } from './QuoteCard';
-
-// Footer Barra de Nav Estática
+import { Sleep } from './Sleep';
+import Stress from './Stress'; 
 import { StaticBottomNavBar } from '../StaticBottomNavBar';
 
-export const DashboardView = () => {
+const DashboardView = () => {
+  const [showSleep, setShowSleep] = useState(false);
+  const [showStress, setShowStress] = useState(false); 
+
+  if (showSleep) {
+    return <Sleep onBack={() => setShowSleep(false)} />;
+  }
+
+  if (showStress) {
+    return <Stress navigation={{ goBack: () => setShowStress(false) }} />;
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <DashboardBackground>
@@ -23,25 +32,15 @@ export const DashboardView = () => {
           showsVerticalScrollIndicator={false}
         >
           <DashboardHeader />
-          
-          <MoodTrackerCard />
-          
-          <View style={styles.sectionDivider}>
-            <View style={styles.sectionDot} />
-            <Text style={styles.sectionLabel}>Tu Actividad</Text>
-          </View>
-          
-          <ActionAlertCard />
           <StreakCard />
-          <StatsBoard />
+          <ActionAlertCard />
           
-          <View style={styles.sectionDivider}>
-            <View style={styles.sectionDot} />
-            <Text style={styles.sectionLabel}>Inspiración</Text>
-          </View>
+          <StatsBoard 
+            onPressSleep={() => setShowSleep(true)} 
+            onPressStress={() => setShowStress(true)} 
+          />
           
           <QuoteCard />
-          
         </ScrollView>
       </DashboardBackground>
 
@@ -57,26 +56,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 110, 
   },
-  sectionDivider: {
-    paddingHorizontal: 20,
-    marginTop: 25,
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  sectionLabel: {
-    fontSize: 15,
-    fontWeight: '900',
-    color: '#1E293B',
-    letterSpacing: 0.5,
-  },
-  sectionDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#6366F1',
-  }
 });
 
 export default DashboardView;

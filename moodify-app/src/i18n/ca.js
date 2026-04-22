@@ -13,9 +13,16 @@ const ca = {
   'message': {
     'fieldRequiredMessageFull': 'A un pas! Sembla que falta algun camp per omplir per poder continuar.',
     'fieldRequired': 'Ups! Sembla que has oblidat completar aquest camp.',
+    'fieldError': 'Quasi ho tens! Revisa els detalls marcats en vermell per continuar.',
+    'correctRegister': 'Ja gairebé ets part de Moodify! 🌈 Només un pas més: verifica el teu compte des del correu que t’acabem d’enviar.',
+    'correctLogin': 'Benvingut/da a casa. Tot està tal com ho vas deixar.',
+    'incorrectCredentials': 'Credencials incorrectes',
+    'notVerified': 'Encara no has verificat el compte',
     'register': {
       'emailFormatInvalid': 'El format del correu electrònic no és vàlid.',
+      'accountAlreadyExistEmail': 'Ja existeix un compte amb aquest correu. Prova amb un altre.',
       'accountAlreadyExistUsername': 'Aquest nom d’usuari ja està en ús. Prova amb un altre.',
+      'passwordDontWork': 'La contrasenya ha de tenir almenys 8 caràcters, una lletra i un símbol (ex: !@#$).'
     },
   },
   'loginRegister': {

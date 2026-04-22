@@ -15,13 +15,8 @@ export const CalendarView = () => {
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
         >
-          {/* El cubo blanco grande principal */}
-          <View style={styles.calendarCard}>
-            <CalendarHeader />
-            <CalendarGrid />
-          </View>
-
-          {/* Tarjetas de info colocadas debajo */}
+          <CalendarHeader />
+          <CalendarGrid />
           <InfoCards />
         </ScrollView>
       </DashboardBackground>
@@ -36,17 +31,4 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 10,
   },
-  calendarCard: {
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 16,
-    borderRadius: 35,
-    shadowColor: '#8a62a6',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 15,
-    elevation: 4,
-    marginBottom: 20,
-    // SafeArea fix for clipping inside the white card
-    overflow: 'hidden',
-  }
 });

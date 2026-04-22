@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -24,6 +25,15 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('test'),
             'type_user' => 'admin',
             'username' => 'valeria',
+            'image_id' => 'avatar26'
         ]);
+        DB::table('mood_registers')->insert([
+            'user_id' => 1,
+            'mood' => 'sad',
+            'date' => now()->format('Y-m-d'),
+            'daily_text' => 'He roto un jarrón',
+            'created_at' => now()->startOfDay()->addHours(19),
+        ]);
+        
     }
 }

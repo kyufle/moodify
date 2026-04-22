@@ -16,7 +16,24 @@ return new class extends Migration {
             $table->integer('points')->default(0);
             $table->integer('streak')->default(0);
             $table->timestamp('last_streak_day')->nullable();
-            $table->timestamp('streak_login')->nullable();
+            $table->string('image_id')->nullable();
+        });
+
+        Schema::create('sleep_logs', function (Blueprint $table){
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade')->nullable();
+            $table->date('date')->nullable();
+            $table->dateTime('start_time')->nullable();
+            $table->dateTime('end_time')->nullable();
+            $table->integer('total_minutes')->nullable();
+        });
+
+        Schema::create('stress_tests', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->integer('total_score'); 
+            $table->json('breakdown'); 
+            $table->timestamps();
         });
 
         Schema::create('mood_registers', function (Blueprint $table) {
@@ -37,7 +54,7 @@ return new class extends Migration {
                 'scared',
                 'anxious',
                 'annoyed',
-                'frustared',
+                'frustrated',
                 'embarrassed',
                 'lonely',
                 'worried',
@@ -53,20 +70,21 @@ return new class extends Migration {
             ]);
             $table->timestamp('date')->nullable();
             $table->text('daily_text')->nullable();
-        });
 
-        Schema::create('todo_lists', function (Blueprint $table){
+            $table->timestamps(); 
+        });
+        Schema::create('todo_lists', function (Blueprint $table) {
             $table->id();
-            $table->string('title',100);
+            $table->string('title', 100);
             $table->string('time_quantity', 100);
             $table->string('times_for_week', 100);
             $table->boolean('completed')->default(false);
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
         });
 
-        Schema::create('publications', function (Blueprint $table){
+        Schema::create('publications', function (Blueprint $table) {
             $table->id();
-            $table->string('title',100);
+            $table->string('title', 100);
             $table->text('text_publications');
             $table->timestamp('date');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
