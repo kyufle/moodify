@@ -36,6 +36,32 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        Schema::create('conversations', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->enum('type',['ai','p2p']); 
+            $table->string('label')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('messages_ai', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('conversations_id')->constrained()->onDelete('cascade');
+            $table->enum('role',['user', 'assistant']); 
+            $table->longText('content');
+            $table->string('mood_detected')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('messages_p2p', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('conversations_id')->constrained()->onDelete('cascade');
+             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
+            $table->text('content')->nullable(); 
+            $table->timestamp('read_at')->nullable(); 
+            $table->timestamps();
+        });
+
         Schema::create('mood_registers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
