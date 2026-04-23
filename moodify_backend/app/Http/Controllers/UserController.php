@@ -13,7 +13,8 @@ class UserController extends Controller
     {
         try {
             $user = $request->user();
-            $clientDate = $request->client_date ? now()->parse($request->client_date) : now();
+            $tz = 'Europe/Madrid';
+            $clientDate = $request->client_date ? now()->parse($request->client_date)->timezone($tz) : now()->timezone($tz);
 
             if (!$user->last_streak_day) {
                 $user->streak += 1;
@@ -24,15 +25,15 @@ class UserController extends Controller
             }
 
             $todayStr = $clientDate->format('Y-m-d');
-            $lastLogin = now()->parse($user->last_streak_day);
+            $lastLogin = now()->parse($user->last_streak_day)->timezone($tz);
             $lastLoginStr = $lastLogin->format('Y-m-d');
 
             if ($todayStr === $lastLoginStr) {
-                return response()->json(['message' => 'Ya registrado hoy', 'user' => $user], 200);
+                return response()->json(['ok' => false, 'message' => 'Ya registrado hoy', 'user' => $user], 200);
             }
 
             $currentStart = $clientDate->copy()->startOfDay();
-            $lastStart = Carbon::parse($user->last_streak_day)->startOfDay();
+            $lastStart = Carbon::parse($user->last_streak_day)->timezone($tz)->startOfDay();
             $diff = $lastStart->diffInDays($currentStart);
 
             if ($diff == 1) {
@@ -55,10 +56,10 @@ class UserController extends Controller
             }
 
             $user->save();
-            return response()->json(['message' => 'Registrado correctamente', 'user' => $user], 200);
+            return response()->json(['ok' => true, 'message' => 'Registrado correctamente', 'user' => $user], 200);
 
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
         }
     }
 

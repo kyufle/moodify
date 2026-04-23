@@ -30,7 +30,7 @@ export const StreakCard = () => {
       const text = await response.text();
       const data = text ? JSON.parse(text) : {};
 
-      if (response.ok) {
+      if (data.ok) {
         setUserValue({ ...userValue, user: data.user });
       } else {
         Alert.alert("Atención", data.message || "Error al registrar la racha");
