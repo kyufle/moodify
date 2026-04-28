@@ -2,6 +2,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MoodRegisterController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,4 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/get-today-timeline', [MoodRegisterController::class, 'getTodayTimeline']);
     Route::get('/get-monthly-stats', [MoodRegisterController::class, 'getMonthlyStats']);
     Route::get('/getDashboardInfo',[MoodRegisterController::class, 'getDashboardInfo']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/chat', [ChatController::class, 'store']);
 });

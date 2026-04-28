@@ -4,18 +4,14 @@ import {
   TextInput, Image, Dimensions, ActivityIndicator, Alert 
 } from 'react-native';
 import { MOOD_CONFIG } from '../../utils/utils';
-// Importamos el contexto (named export)
 import { UserContext } from '../../components/user-provider'; 
 
 const { width } = Dimensions.get('window');
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
 
 export const MoodCalendar = () => {
-  // --- ACCESO AL CONTEXTO ---
   const userContext = useContext(UserContext);
   
-  // Si el contexto no está disponible o el Provider no envuelve a este componente,
-  // evitamos que la app explote usando encadenamiento opcional
   const userValue = userContext?.userValue;
   const token = userValue?.accessToken;
 
