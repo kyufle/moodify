@@ -30,4 +30,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chat', [ChatController::class, 'store']);
+    Route::get('/conversations', [ChatController::class, 'index']);
+    Route::post('/messages', [ChatController::class, 'storeP2P']);
+    Route::get('/messages/user/{recipientId}', [ChatController::class, 'getMessagesByUserId']);
+    Route::post('/messages/read/{senderId}', [ChatController::class, 'markAsRead']);
+    Route::get('/users/search', [ChatController::class, 'searchUsers']);
+    Route::post('/users/follow', [ChatController::class, 'toggleFollow']);
 });

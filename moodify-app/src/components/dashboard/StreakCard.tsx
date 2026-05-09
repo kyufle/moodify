@@ -1,20 +1,20 @@
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { Image } from 'expo-image';
 import { Feather } from '@expo/vector-icons';
 import { ThemedText } from '../themed-text';
 import { UserContext } from '../user-provider';
 import React, { useState, useMemo } from 'react';
+import DiamanteRacha from '@/assets/images/diamante-racha.svg'
 
 export const StreakCard = () => {
   const [loading, setLoading] = useState(false);
-  const { userValue, setUserValue } = React.use(UserContext);
+  const { userValue, setUserValue } = React.useContext(UserContext);
 
   const user = userValue?.user;
 
   const handleStreak = async (recover = false) => {
     setLoading(true);
     try {
-      const response = await fetch(process.env.EXPO_PUBLIC_API_URL+'streakRegister', {
+      const response = await fetch(process.env.EXPO_PUBLIC_API_URL + 'streakRegister', {
         method: 'POST',
         headers: {
           'Authorization': 'Bearer ' + userValue.accessToken,
@@ -118,7 +118,7 @@ export const StreakCard = () => {
         <>
           <View style={styles.pointsBadge}>
             <ThemedText style={styles.pointsText}>{user.points}</ThemedText>
-            <Image source={require('@/assets/images/diamante-racha.svg')} style={styles.diamondIcon} contentFit="contain" />
+            <DiamanteRacha style={styles.diamondIcon} />
           </View>
 
           <Text style={styles.title}>{user.streak} {user.streak === 1 ? 'día' : 'días'} en racha!</Text>
@@ -126,14 +126,13 @@ export const StreakCard = () => {
           <View style={styles.weekContainer}>
             {weekData.days.map((day, index) => (
               <View key={index} style={[styles.dayItem, day.isToday && styles.dayItemToday]}>
-                <Image
-                  source={require('@/assets/images/diamante-racha.svg')}
-                  style={[
+                <DiamanteRacha style={[
                     styles.diamondIcon,
-                    { opacity: day.recorded ? 1 : 0.15, transform: [{ scale: day.recorded ? 1.1 : 0.9 }] }
-                  ]}
-                  contentFit="contain"
-                />
+                    { 
+                      opacity: day.recorded ? 1 : 0.15, 
+                      transform: [{ scale: day.recorded ? 1.1 : 0.9 }] 
+                    }
+                  ]} />
                 <Text style={[
                   styles.dayLabel,
                   day.isToday && styles.dayLabelToday,

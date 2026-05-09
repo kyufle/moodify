@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Conversation extends Model
 {
@@ -11,24 +13,64 @@ class Conversation extends Model
 
     protected $fillable = [
         'user_id',
+        'recipient_id',
         'type',
-        'label'
+        'label',
+        'theme_color'
     ];
 
-    // Relación: Una conversación pertenece a un usuario
-    public function user()
+    protected $appends = [
+        'last_message', 
+        'last_message_sender_id', 
+        'last_message_at', 
+        'unread_count'
+    ];
+
+    public function getLastMessageAttribute()
     {
-        return $this->belongsTo(User::class);
+        $last = $this->messagesP2P()->latest()->first();
+        return $last ? $last->content : 'Toca para chatear';
     }
 
-    // Relación: Una conversación tiene muchos mensajes de IA
-    public function messagesAi()
+    public function getLastMessageSenderIdAttribute()
+    {
+        $last = $this->messagesP2P()->latest()->first();
+        return $last ? $last->sender_id : null;
+    }
+
+    public function getLastMessageAtAttribute()
+    {
+        $last = $this->messagesP2P()->latest()->first();
+        return $last ? $last->created_at : null;
+    }
+
+    public function getUnreadCountAttribute()
+    {
+        $myId = auth()->id();
+        if (!$myId) return 0;
+
+        return $this->messagesP2P()
+            ->where('sender_id', '!=', $myId)
+            ->whereNull('read_at')
+            ->count();
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function recipient(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'recipient_id');
+    }
+
+    public function messagesAi(): HasMany
     {
         return $this->hasMany(MessageAi::class, 'conversations_id');
     }
 
-    // Relación: Una conversación tiene muchos mensajes entre humanos
-    public function messagesP2P()
+    public function messagesP2P(): HasMany
     {
         return $this->hasMany(MessageP2P::class, 'conversations_id');
     }

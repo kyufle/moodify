@@ -38,6 +38,45 @@ const es = {
       'login': 'Inicia sesión',
       'userOrEmail': 'Usuario o email',
       'dontHaveAccount': '¿No tienes cuenta?',
-  }
+  },
+  'calendarGrid':{
+    howAreYou: '¿Cómo estás?',
+    youFeel: 'Te sientes',
+    todaysNote: 'Nota de hoy...',
+    saveStatus: 'Guardar estado',
+    summaryMonth: 'Resumen del mes',
+    viewHistory: 'Ver historial',
+    todaysactivity: 'Actividad de hoy'
+
+  },
+  'moodNames': {
+  'happy': 'Feliz',
+  'glad': 'Bien',
+  'excited': 'Emocionad@',
+  'calm': 'Tranquil@',
+  'proud': 'Orgullos@',
+  'confident': 'Segur@',
+  'grateful': 'Agradecid@',
+  'in_love': 'Enamorad@',
+  'peaceful': 'En paz',
+  'sad': 'Triste',
+  'angry': 'Enfadad@',
+  'scared': 'Asustad@',
+  'anxious': 'Ansios@',
+  'annoyed': 'Molest@',
+  'frustrated': 'Frustrad@',
+  'embarrassed': 'Avergonzad@',
+  'lonely': 'Sol@',
+  'worried': 'Preocupad@',
+  'furious': 'Furios@',
+  'tired': 'Cansad@',
+  'sleepy': 'Somnolient@',
+  'bored': 'Aburrid@',
+  'confused': 'Confundid@',
+  'surprised': 'Sorprendid@',
+  'serious': 'Seri@',
+  'shy': 'Tímid@',
+  'hungry': 'Hambrient@'
+}
 }
 export default es;

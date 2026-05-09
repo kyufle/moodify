@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { UserContext } from '../user-provider';
 import { MOOD_CONFIG } from '../../utils/utils';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export const ActionAlertCard = () => {
+  const { t, i18n } = useTranslation();
   const { userValue } = useContext(UserContext);
   const token = userValue?.accessToken;
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
@@ -12,12 +14,10 @@ export const ActionAlertCard = () => {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // --- LOS FETCH PARA MIRAR LA BASE DE DATOS ---
   useEffect(() => {
     const fetchData = async () => {
       if (!token) return;
       try {
-        // Miramos el timeline de hoy para ver si hay registros
         const resHis = await fetch(`${API_BASE_URL}/get-today-timeline`, {
           headers: {
             'Content-Type': 'application/json',
@@ -36,61 +36,62 @@ export const ActionAlertCard = () => {
     fetchData();
   }, [token]);
 
+  const getSafePhrase = (config: any) => {
+    if (!config) return "";
+    const lang = i18n.language?.split('-')[0] || 'es';
+    const phrasesArray = config.phrases[lang] || config.phrases['es'];
+    return phrasesArray ? phrasesArray[0] : "";
+  };
+
   if (!userValue?.user || loading) return null;
 
-  // Lógica de detección igual a la del CalendarGrid
   const lastEntry = history.length > 0 ? history[0] : null; 
   const config = lastEntry ? MOOD_CONFIG[lastEntry.mood as keyof typeof MOOD_CONFIG] : null;
 
-  // CASO 1: NO HAY REGISTRO HOY (Gris)
+  const ConfusedIcon = MOOD_CONFIG.confused.icon;
   if (!lastEntry || !config) {
     return (
       <View style={[styles.card, { backgroundColor: '#D6D6D6', marginHorizontal: 20, marginTop: 20 }]}>
         <View style={styles.textColumn}>
           <Text style={[styles.description, { fontWeight: '700', color: '#333' }]}>
-            Ups, vaya todavía no has registrado cómo te sientes hoy...
+            {t('calendarGrid.noRegistryToday') || 'Ups, todavía no has registrado cómo te sientes hoy...'}
           </Text>
           <TouchableOpacity 
             style={[styles.actionButton, { marginTop: 15 }]} 
             onPress={() => router.push('/calendar')}
           >
-            <Text style={styles.actionButtonText}>Regístralo</Text>
+            <Text style={styles.actionButtonText}>{t('calendarGrid.registerNow') || 'Regístralo'}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.graphicContainer}>
-          <Image
-            source={MOOD_CONFIG.confused.icon}
-            style={styles.moodIconGris}
-          />
+          <ConfusedIcon style={styles.moodIconGris} />
         </View>
       </View>
     );
   }
+   const ConfigIcon = config.icon;
 
-  // CASO 2: HAY REGISTRO (Color y Frase de Utils)
   return (
     <View style={[styles.card, { backgroundColor: config.color, marginHorizontal: 20, marginTop: 20 }]}>
       <View style={styles.textColumn}>
-        <Text style={styles.subtitle}>¿Cómo te sientes ahora?</Text>
+        <Text style={styles.subtitle}>{t('calendarGrid.howFeelNow') || '¿Cómo te sientes ahora?'}</Text>
         <Text style={styles.title}>
-          {lastEntry.mood.charAt(0).toUpperCase() + lastEntry.mood.slice(1)}
+          {t(`moodNames.${lastEntry.mood}`)}
         </Text>
         <Text style={styles.description}>
-          {config.phrases.es[0]}
+          {getSafePhrase(config)}
         </Text>
         <TouchableOpacity 
           style={[styles.actionButton, { marginTop: 15, backgroundColor: 'rgba(0,0,0,0.1)' }]} 
           onPress={() => router.push('/calendar')}
         >
-          <Text style={[styles.actionButtonText, { color: '#000' }]}>Ver historial</Text>
+          <Text style={[styles.actionButtonText, { color: '#000' }]}>{t('calendarGrid.viewHistory') || 'Ver historial'}</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.graphicContainer}>
-        <Image
-          source={config.icon}
-          style={styles.moodIconColor}
-        />
+        <ConfigIcon style={styles.moodIconColor}
+        />          
       </View>
     </View>
   );
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
   },
   textColumn: {
     flex: 1,
-    paddingRight: 80,
+    paddingRight: 60,
     zIndex: 2,
   },
   subtitle: {
@@ -144,18 +145,18 @@ const styles = StyleSheet.create({
     height: 100,
     resizeMode: 'contain',
     position: 'absolute',
-    right: -10,
+    right: -15,
     bottom: 10,
-    opacity: 0.5 
+    opacity: 0.4 
   },
   moodIconGris: {
     width: 100,
     height: 100,
     resizeMode: 'contain',
     position: 'absolute',
-    right: -10,
+    right: -15,
     bottom: 10,
-    opacity: 0.2,
+    opacity: 0.15,
     tintColor: '#000'
   },
   actionButton: { 

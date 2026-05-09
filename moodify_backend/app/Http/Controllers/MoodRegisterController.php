@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\MoodRegister; // Importación correcta
+use App\Models\MoodRegister;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -21,7 +21,6 @@ class MoodRegisterController extends Controller
                 'date' => 'nullable|date',
             ]);
 
-            // Usamos el modelo MoodRegister para el insert
             $register = MoodRegister::create([
                 'user_id' => $request->user()->id,
                 'mood' => $validated['mood'],
@@ -35,7 +34,6 @@ class MoodRegisterController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            // Devuelve el error específico para debug en la pestaña Network
             return response()->json([
                 'ok' => false,
                 'error' => $e->getMessage()
@@ -50,7 +48,6 @@ class MoodRegisterController extends Controller
     {
         $user = $request->user();
 
-        // Obtenemos los registros del mes actual
         $registers = DB::table('mood_registers')
             ->where('user_id', $user->id)
             ->whereMonth('date', now()->month)
@@ -59,7 +56,6 @@ class MoodRegisterController extends Controller
 
         $calendarData = [];
 
-        // Agrupamos por fecha
         foreach ($registers as $reg) {
             $day = Carbon::parse($reg->date)->format('Y-m-d');
 
@@ -72,10 +68,8 @@ class MoodRegisterController extends Controller
         $finalGrid = [];
         foreach ($calendarData as $date => $moods) {
             if ($date === now()->toDateString()) {
-                // Para hoy, mostrar el último registrado
                 $finalGrid[$date] = end($moods);
             } else {
-                // Para días pasados, calcular la moda (el más repetido)
                 $counts = array_count_values($moods);
                 arsort($counts);
                 $finalGrid[$date] = key($counts);
@@ -112,7 +106,6 @@ class MoodRegisterController extends Controller
     {
         $user = $request->user();
 
-        // Contamos cuántas veces aparece cada mood en el mes actual
         $stats = DB::table('mood_registers')
             ->where('user_id', $user->id)
             ->whereMonth('date', now()->month)
@@ -129,14 +122,12 @@ class MoodRegisterController extends Controller
         $user = $request->user();
         $today = now()->toDateString();
 
-        // 1. Último mood registrado hoy
         $lastMood = DB::table('mood_registers')
             ->where('user_id', $user->id)
             ->whereDate('date', $today)
             ->orderBy('created_at', 'desc')
             ->first();
 
-        // 2. Registro de sueño de hoy
         $sleepLog = DB::table('sleep_logs')
             ->where('user_id', $user->id)
             ->whereDate('date', $today)

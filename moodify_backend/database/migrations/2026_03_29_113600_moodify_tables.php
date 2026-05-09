@@ -17,9 +17,10 @@ return new class extends Migration {
             $table->integer('streak')->default(0);
             $table->timestamp('last_streak_day')->nullable();
             $table->string('image_id')->nullable();
+            $table->timestamp('last_seen_at')->nullable();
         });
 
-        Schema::create('sleep_logs', function (Blueprint $table){
+        Schema::create('sleep_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->nullable();
             $table->date('date')->nullable();
@@ -31,23 +32,30 @@ return new class extends Migration {
         Schema::create('stress_tests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('total_score'); 
-            $table->json('breakdown'); 
+            $table->integer('total_score');
+            $table->json('breakdown');
             $table->timestamps();
         });
 
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('type',['ai','p2p']); 
+            $table->enum('type', ['ai', 'p2p']);
             $table->string('label')->nullable();
+            $table->foreignId('recipient_id')->nullable()->constrained('users');
+
+            $table->string('theme_color')->default('#6366F1');
+            $table->string('background_preview')->nullable();
+
+            $table->boolean('is_blocked')->default(false);
+            $table->foreignId('blocked_by')->nullable()->constrained('users');
             $table->timestamps();
         });
 
         Schema::create('messages_ai', function (Blueprint $table) {
             $table->id();
             $table->foreignId('conversations_id')->constrained()->onDelete('cascade');
-            $table->enum('role',['user', 'assistant']); 
+            $table->enum('role', ['user', 'assistant']);
             $table->longText('content');
             $table->string('mood_detected')->nullable();
             $table->timestamps();
@@ -56,9 +64,9 @@ return new class extends Migration {
         Schema::create('messages_p2p', function (Blueprint $table) {
             $table->id();
             $table->foreignId('conversations_id')->constrained()->onDelete('cascade');
-             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
-            $table->text('content')->nullable(); 
-            $table->timestamp('read_at')->nullable(); 
+            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
+            $table->text('content')->nullable();
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });
 
@@ -97,7 +105,7 @@ return new class extends Migration {
             $table->timestamp('date')->nullable();
             $table->text('daily_text')->nullable();
 
-            $table->timestamps(); 
+            $table->timestamps();
         });
         Schema::create('todo_lists', function (Blueprint $table) {
             $table->id();
