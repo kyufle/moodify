@@ -27,6 +27,25 @@ class DatabaseSeeder extends Seeder
             'username' => 'valeria',
             'image_id' => 'avatar26'
         ]);
+
+        User::factory()->create([
+            'name' => 'Ruth',
+            'email' => 'ruth@gmail.com',
+            'password' => Hash::make('test'),
+            'type_user' => 'admin',
+            'username' => 'ruth',
+            'image_id' => 'avatar26'
+        ]);
+
+         User::factory()->create([
+            'name' => 'pablo',
+            'email' => 'pablo@gmail.com',
+            'password' => Hash::make('test'),
+            'type_user' => 'admin',
+            'username' => 'pablo',
+            'image_id' => 'avatar26'
+        ]);
+
         DB::table('mood_registers')->insert([
             'user_id' => 1,
             'mood' => 'sad',

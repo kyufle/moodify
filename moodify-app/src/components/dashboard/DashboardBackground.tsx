@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Image } from 'expo-image';
+import { View, StyleSheet, Image } from 'react-native';
 
 export const DashboardBackground = ({ children }: { children: React.ReactNode }) => {
   return (

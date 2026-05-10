@@ -4,10 +4,11 @@ import { Feather } from '@expo/vector-icons';
 import { MOOD_CONFIG } from '../../utils/utils';
 import { UserContext } from '../user-provider';
 import { ThemedText } from '../themed-text';
+import { useTranslation } from 'react-i18next';
 
-// --- SUB-COMPONENTE: RESUMEN MENSUAL ---
 const MonthlySummary = ({ stats }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { t } = useTranslation();
 
   if (!stats || stats.length === 0) return null;
 
@@ -23,7 +24,9 @@ const MonthlySummary = ({ stats }) => {
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Feather name="pie-chart" size={18} color="#6366F1" style={{ marginRight: 10 }} />
-          <Text style={styles.collapsibleTitle}>Resumen del mes ({totalRegisters})</Text>
+          <Text style={styles.collapsibleTitle}>
+            {t('calendarGrid.summaryMonth') || 'Resumen del mes'} ({totalRegisters})
+          </Text>
         </View>
         <Feather name={isExpanded ? "chevron-up" : "chevron-down"} size={20} color="#64748B" />
       </TouchableOpacity>
@@ -41,7 +44,9 @@ const MonthlySummary = ({ stats }) => {
                     source={config.icon} 
                     style={[styles.miniIcon, { backgroundColor: config.color }]} 
                   />
-                  <ThemedText style={styles.summaryMoodName}>{item.mood}</ThemedText>
+                  <ThemedText style={styles.summaryMoodName} numberOfLines={1}>
+                    {t(`moodNames.${item.mood}`)}
+                  </ThemedText>
                 </View>
                 <View style={styles.barWrapper}>
                   <View style={styles.barBackground}>
@@ -163,23 +168,24 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   summaryLabel: {
-    width: 110,
-    flexDirection: 'row',
+    width: 120,           
+    flexDirection: 'row', 
     alignItems: 'center',
+    marginRight: 10,
   },
   miniIcon: {
-    width: 28,
-    height: 28,
-    marginRight: 10,
+    width: 24,             
+    height: 24,
+    marginRight: 8,
     borderRadius: 6,
     resizeMode: 'contain',
-    padding: 5
   },
   summaryMoodName: {
-    fontSize: 13,
+    fontSize: 12,          
     fontWeight: '700',
     color: '#64748B',
-    textTransform: 'capitalize'
+    textTransform: 'capitalize',
+    flex: 1,                
   },
   barWrapper: {
     flex: 1,
@@ -188,44 +194,21 @@ const styles = StyleSheet.create({
   },
   barBackground: {
     flex: 1,
-    height: 12,
+    height: 8,              
     backgroundColor: '#F1F5F9',
-    borderRadius: 6,
+    borderRadius: 4,
     overflow: 'hidden',
   },
   barFill: {
     height: '100%',
-    borderRadius: 6,
+    borderRadius: 4,
   },
   barCount: {
     marginLeft: 10,
     fontSize: 11,
     fontWeight: '700',
     color: '#64748B',
-    width: 25,
-  },
-  recommendCard: {
-    flexDirection: 'row',
-    backgroundColor: '#FEF3C7',
-    padding: 16,
-    borderRadius: 20,
-    alignItems: 'center',
-    gap: 12,
-    borderWidth: 1,
-    borderColor: '#FDE68A',
-  },
-  recommendIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#FFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  recommendText: {
-    fontSize: 13,
-    color: '#92400E',
-    fontWeight: '600',
-    lineHeight: 18,
+    width: 20,              
+    textAlign: 'right',
   }
 });

@@ -1,10 +1,37 @@
 import i18n from 'i18next';
 import quotesData from './quotes.json';
+import Happy from '../../assets/images/happy.svg';
+import Glad from '../../assets/images/glad.svg';
+import Excited from '../../assets/images/excited.svg';
+import Calm from '../../assets/images/calm.svg';
+import Proud from '../../assets/images/proud.svg';
+import Confident from '../../assets/images/confident.svg';
+import Grateful from '../../assets/images/grateful.svg';
+import In_love from '../../assets/images/in_love.svg';
+import Peaceful from '../../assets/images/peaceful.svg';
+import Sad from '../../assets/images/sad.svg';
+import Angry from '../../assets/images/angry.svg';
+import Scared from '../../assets/images/scared.svg';
+import Anxious from '../../assets/images/anxious.svg';
+import Annoyed from '../../assets/images/annoyed.svg';
+import Frustrated from '../../assets/images/frustrated.svg';
+import Embarrassed from '../../assets/images/embarrassed.svg';
+import Lonely from '../../assets/images/lonely.svg';
+import Worried from '../../assets/images/worried.svg';
+import Furious from '../../assets/images/furious.svg';
+import Tired from '../../assets/images/tired.svg';
+import Sleepy from '../../assets/images/sleepy.svg';
+import Bored from '../../assets/images/bored.svg';
+import Confused from '../../assets/images/confused.svg';
+import Surprised from '../../assets/images/surprised.svg';
+import Serious from '../../assets/images/serious.svg';
+import Shy from '../../assets/images/shy.svg';
+import Hungry from '../../assets/images/hungry.svg';
 
 export const MOOD_CONFIG = {
   happy: {
     color: '#FFF9C4',
-    icon: require('../../assets/images/happy.svg'),
+    icon: Happy,
     phrases: {
       es: [
         "Disfruta este momento de plenitud, te mereces sentir esta alegría que inunda tu día.",
@@ -30,7 +57,7 @@ export const MOOD_CONFIG = {
   },
   glad: {
     color: '#F9E79F',
-    icon: require('../../assets/images/glad.svg'),
+    icon: Glad,
     phrases: {
       es: [
         "Estar bien es más que suficiente; valora esta tranquilidad que te permite respirar hondo.",
@@ -56,7 +83,7 @@ export const MOOD_CONFIG = {
   },
   excited: {
     color: '#FAD7A0',
-    icon: require('../../assets/images/excited.svg'),
+    icon: Excited,
     phrases: {
       es: [
         "Es emocionante sentir estas ganas de comerte el mundo, deja que esa fuerza te impulse.",
@@ -82,7 +109,7 @@ export const MOOD_CONFIG = {
   },
   calm: {
     color: '#D1F2EB',
-    icon: require('../../assets/images/calm.svg'),
+    icon: Calm,
     phrases: {
       es: [
         "No pasa nada por bajar el ritmo; la calma es un estado necesario para sanar.",
@@ -108,7 +135,7 @@ export const MOOD_CONFIG = {
   },
   proud: {
     color: '#E1BEE7',
-    icon:  require('../../assets/images/proud.svg'),
+    icon: Proud,
     phrases: {
       es: [
         "Está bien reconocer que lo has hecho genial; darte crédito fortalece tu autoestima.",
@@ -134,7 +161,7 @@ export const MOOD_CONFIG = {
   },
   confident: {
     color: '#D4EFDF',
-    icon: require('../../assets/images/confident.svg'),
+    icon: Confident,
     phrases: {
       es: [
         "Confía plenamente en tu capacidad, ya has superado situaciones difíciles anteriormente.",
@@ -160,7 +187,7 @@ export const MOOD_CONFIG = {
   },
   grateful: {
     color: '#A2D9CE',
-    icon: require('../../assets/images/grateful.svg'),
+    icon: Grateful,
     phrases: {
       es: [
         "Agradecer los pequeños detalles permite ver la abundancia donde otros ven carencia.",
@@ -186,7 +213,7 @@ export const MOOD_CONFIG = {
   },
   in_love: {
     color: '#F8BBD0',
-    icon: require('../../assets/images/in_love.svg'),
+    icon: In_love,
     phrases: {
       es: [
         "Es un sentimiento hermoso, disfrútalo al máximo y sin miedos al futuro.",
@@ -212,7 +239,7 @@ export const MOOD_CONFIG = {
   },
   peaceful: {
     color: '#E8F8F5',
-    icon: require('../../assets/images/peaceful.svg'),
+    icon: Peaceful,
     phrases: {
       es: [
         "No pasa nada por detener el mundo un momento, cerrar los ojos y simplemente respirar.",
@@ -238,7 +265,7 @@ export const MOOD_CONFIG = {
   },
   sad: {
     color: '#D6EAF8',
-    icon: require('../../assets/images/sad.svg'),
+    icon: Sad,
     phrases: {
       es: [
         "No pasa nada por estar triste; a veces el alma necesita lluvia para entender qué pasa.",
@@ -264,7 +291,7 @@ export const MOOD_CONFIG = {
   },
   angry: {
     color: '#FADBD8',
-    icon: require('../../assets/images/angry.svg'),
+    icon: Angry,
     phrases: {
       es: [
         "Es normal estar enfadado cuando sientes injusticia; no te juzgues por tus sentimientos.",
@@ -290,7 +317,7 @@ export const MOOD_CONFIG = {
   },
   scared: {
     color: '#EBEDEF',
-    icon: 'eye-off',
+    icon: Scared,
     phrases: {
       es: [
         "Tener miedo es humano y natural ante la incertidumbre; no significa que seas débil.",
@@ -316,7 +343,7 @@ export const MOOD_CONFIG = {
   },
   anxious: {
     color: '#E8DAEF',
-    icon: 'activity',
+    icon: Anxious,
     phrases: {
       es: [
         "No pasa nada por sentir que todo va rápido; cierra los ojos y respira muy hondo.",
@@ -342,7 +369,7 @@ export const MOOD_CONFIG = {
   },
   annoyed: {
     color: '#FEF5E7',
-    icon: 'slash',
+    icon: Annoyed,
     phrases: {
       es: [
         "No pasa nada por estar molesto; a veces las pequeñas cosas se acumulan y agotan.",
@@ -368,7 +395,7 @@ export const MOOD_CONFIG = {
   },
   frustrated: {
     color: '#F5CBA7',
-    icon: 'target',
+    icon: Frustrated,
     phrases: {
       es: [
         "No pasa nada si las cosas no han salido hoy; los contratiempos son parte del aprendizaje.",
@@ -394,7 +421,7 @@ export const MOOD_CONFIG = {
   },
   embarrassed: {
     color: '#FDEDEC',
-    icon: require('../../assets/images/embarrassed.svg'),
+    icon: Embarrassed,
     phrases: {
       es: [
         "No pasa nada por equivocarse en público; la perfección es un mito que nos aleja de la realidad.",
@@ -420,7 +447,7 @@ export const MOOD_CONFIG = {
   },
   lonely: {
     color: '#D5DBDB',
-    icon: 'user-minus',
+    icon: Lonely,
     phrases: {
       es: [
         "No pasa nada por sentirte solo; es una invitación a escucharte y conocerte mejor.",
@@ -446,7 +473,7 @@ export const MOOD_CONFIG = {
   },
   worried: {
     color: '#F2F4F4',
-    icon: 'help-circle',
+    icon: Worried,
     phrases: {
       es: [
         "No pasa nada por estar preocupado; solo significa que te importa lo que sucede.",
@@ -472,7 +499,7 @@ export const MOOD_CONFIG = {
   },
   furious: {
     color: '#F1948A',
-    icon: 'alert-triangle',
+    icon: Furious,
     phrases: {
       es: [
         "No pasa nada por sentir esta explosión de rabia, pero date el espacio para no dañarte.",
@@ -498,7 +525,7 @@ export const MOOD_CONFIG = {
   },
   tired: {
     color: '#AED6F1',
-    icon: 'battery',
+    icon: Tired,
     phrases: {
       es: [
         "No pasa nada por estar agotado; has hecho un gran esfuerzo y tu cuerpo necesita recuperarse.",
@@ -524,7 +551,7 @@ export const MOOD_CONFIG = {
   },
   sleepy: {
     color: '#d0bddfc4',
-    icon: require('../../assets/images/sleepy.svg'),
+    icon: Sleepy,
     phrases: {
       es: [
         "No pasa nada por querer desconectar y dormir; el sueño es el gran restaurador del espíritu.",
@@ -550,7 +577,7 @@ export const MOOD_CONFIG = {
   },
   bored: {
     color: '#F4F6F7',
-    icon: 'coffee',
+    icon: Bored,
     phrases: {
       es: [
         "No pasa nada por no tener nada que hacer; en estos vacíos nace la creatividad.",
@@ -576,7 +603,7 @@ export const MOOD_CONFIG = {
   },
   confused: {
     color: '#e0e7c2',
-    icon: require('../../assets/images/confused.svg'),
+    icon: Confused,
     phrases: {
       es: [
         "No pasa nada por no tener todas las respuestas; la duda es el motor del crecimiento.",
@@ -602,7 +629,7 @@ export const MOOD_CONFIG = {
   },
   surprised: {
     color: '#FCF3CF',
-    icon: 'gift',
+    icon: Surprised,
     phrases: {
       es: [
         "No pasa nada por quedarte en shock; lo inesperado genera un impacto fuerte en la psique.",
@@ -628,7 +655,7 @@ export const MOOD_CONFIG = {
   },
   serious: {
     color: '#D5D8DC',
-    icon: 'user-check',
+    icon: Serious,
     phrases: {
       es: [
         "No pasa nada por estar serio hoy; hay momentos que requieren toda nuestra atención.",
@@ -654,7 +681,7 @@ export const MOOD_CONFIG = {
   },
   shy: {
     color: '#FBEEE6',
-    icon: 'user',
+    icon: Shy,
     phrases: {
       es: [
         "No pasa nada por no querer ser el centro de atención; cada uno tiene su propio ritmo.",
@@ -680,7 +707,7 @@ export const MOOD_CONFIG = {
   },
   hungry: {
     color: '#FAD7A0',
-    icon: 'shopping-cart',
+    icon: Hungry,
     phrases: {
       es: [
         "No pasa nada por tener mucha hambre; tu cuerpo te pide la energía que necesita.",
