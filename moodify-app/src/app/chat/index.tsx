@@ -5,28 +5,21 @@ import {
 } from 'react-native';
 import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+// Importamos SafeAreaView y useSafeAreaInsets para control total
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ChatCustomizer } from './ChatCustomizer';
 
-// --- CAMBIO PARA EXPO GO ---
-// Creamos un reemplazo seguro para AsyncStorage que no rompa la app
 const SafeStorage = {
-  getItem: async (key: string) => {
-    try {
-      // Intentamos usar el global si existe, si no devolvemos null
-      return null; 
-    } catch (e) { return null; }
-  },
-  setItem: async (key: string, value: string) => {
-    try {
-      return;
-    } catch (e) { console.error(e); }
-  }
+  data: {} as Record<string, string>,
+  getItem: async (key: string) => SafeStorage.data[key] || null,
+  setItem: async (key: string, value: string) => { SafeStorage.data[key] = value; }
 };
-// ---------------------------
+
+export { SafeStorage };
 
 import { StaticBottomNavBar } from '@/components/StaticBottomNavBar';
 import { ChatListCard } from '@/components/chat/ChatListCard';
-import { UserContext } from '@/components/user-provider';
+import { getUserThemeFromContext, UserContext } from '@/components/user-provider';
 import { avatarMap } from '@/utils/utils'; 
 
 interface SearchUser {
@@ -39,25 +32,22 @@ interface SearchUser {
 
 export default function ChatMainList() {
   const router = useRouter();
-  const { userValue } = useContext(UserContext);
+  const insets = useSafeAreaInsets(); // Obtenemos los bordes seguros del dispositivo
+  const { userValue, setUserValue } = useContext(UserContext);
   const token = userValue?.accessToken;
-  const userId = userValue?.user?.id; 
+  const userId = userValue?.user?.id;
 
   const [conversations, setConversations] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
   const [searchHistory, setSearchHistory] = useState<SearchUser[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [customizerVisible, setCustomizerVisible] = useState(false);
   const [isFullSearchView, setIsFullSearchView] = useState(false); 
   const [loadingConv, setLoadingConv] = useState(true);
 
   const STORAGE_KEY = `chat_search_history_${userId}`;
 
-  /**
-   * Determina si un usuario está online.
-   * Aumentamos el margen a 90 segundos para evitar que el estado
-   * desaparezca por pequeñas desincronizaciones de reloj o lag de red.
-   */
   const checkIfOnline = (lastSeenAt: string | null) => {
     if (!lastSeenAt) return false;
     const lastSeen = new Date(lastSeenAt).getTime();
@@ -109,7 +99,6 @@ export default function ChatMainList() {
 
   const loadSearchHistory = async () => {
     if (!userId) return;
-    // Usamos SafeStorage en lugar de AsyncStorage
     const saved = await SafeStorage.getItem(STORAGE_KEY);
     if (saved) setSearchHistory(JSON.parse(saved));
   };
@@ -197,21 +186,32 @@ export default function ChatMainList() {
 
   if (loadingConv) {
     return (
-      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#128C7E" />
         <Text style={{ marginTop: 10, color: '#64748B' }}>Cargando chats...</Text>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    // SafeAreaView aplicado con estilo para no forzar toda la pantalla si no es necesario
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       {!isFullSearchView && (
         <View style={styles.header}>
           <Text style={styles.whatsappTitle}>WhatsApp</Text>
           <View style={styles.headerIcons}>
-            <Feather name="camera" size={24} color="black" />
-            <Feather name="more-vertical" size={24} color="black" style={{ marginLeft: 20 }} />
+            <TouchableOpacity style={{ padding: 5 }}>
+                <Feather name="camera" size={24} color="black" />
+            </TouchableOpacity>
+            
+            {/* BOTÓN CORREGIDO: hitSlop y padding para fácil acceso en móvil */}
+            <TouchableOpacity 
+                onPress={() => setCustomizerVisible(true)}
+                style={{ marginLeft: 15, padding: 5 }}
+                hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            >
+              <Feather name="more-vertical" size={24} color="black" />
+            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -252,6 +252,7 @@ export default function ChatMainList() {
           <FlatList
             data={conversations}
             keyExtractor={(item) => `chat-${item.id}`}
+            contentContainerStyle={{ paddingBottom: 100 }} // Espacio para que el último chat no quede detrás del nav
             renderItem={({ item }) => {
               const chatPartner = String(item.user_id) === String(userId) ? item.recipient : item.user;
               const senderId = item.last_message_sender_id || item.sender_id;
@@ -278,7 +279,6 @@ export default function ChatMainList() {
               const avatarSource = chatPartner?.image_id && avatarMap[chatPartner.image_id as keyof typeof avatarMap]
                 ? avatarMap[chatPartner.image_id as keyof typeof avatarMap]
                 : { uri: 'https://via.placeholder.com/150' };
-              console.log(avatarSource);
               
               return (
                 <View style={styles.chatRowContainer}>
@@ -298,7 +298,6 @@ export default function ChatMainList() {
                     } as any)}
                   />
                   
-                  {/* Indicador verde (Online o Escribiendo) */}
                   <View style={[
                     styles.statusIndicator, 
                     { backgroundColor: (isPartnerOnline || isTyping) ? '#10B981' : '#94A3B8' }
@@ -327,14 +326,36 @@ export default function ChatMainList() {
         </TouchableOpacity>
       )}
 
+      {/* Navegación inferior fija */}
       {!isFullSearchView && <StaticBottomNavBar activeTab="chat" />}
+      
+      <ChatCustomizer 
+        currentTheme={getUserThemeFromContext(userValue)}
+        visible={customizerVisible} 
+        onClose={() => setCustomizerVisible(false)} 
+        onSave={(responseData: any) => {          
+          setUserValue({ accessToken: userValue.accessToken, user: responseData.theme });
+          setCustomizerVisible(false);
+        }}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', padding: 16 },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#FFF' 
+  },
+  header: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#FFF',
+    zIndex: 10 
+  },
   whatsappTitle: { fontSize: 22, fontWeight: '700', color: '#128C7E' },
   headerIcons: { flexDirection: 'row', alignItems: 'center' },
   searchBarContainer: { paddingHorizontal: 16, marginBottom: 10 },
@@ -387,6 +408,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    zIndex: 9999
+    zIndex: 5 // Reducido para no bloquear elementos del header
   },
 });

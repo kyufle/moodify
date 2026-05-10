@@ -11,13 +11,14 @@ class Conversation extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'recipient_id',
-        'type',
-        'label',
-        'theme_color'
-    ];
+protected $fillable = [
+    'user_id',
+    'recipient_id',
+    'type',
+    'label',
+    'is_blocked',
+    'blocked_by'
+];
 
     protected $appends = [
         'last_message', 

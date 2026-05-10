@@ -36,4 +36,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/messages/read/{senderId}', [ChatController::class, 'markAsRead']);
     Route::get('/users/search', [ChatController::class, 'searchUsers']);
     Route::post('/users/follow', [ChatController::class, 'toggleFollow']);
+    Route::post('/chat-themes', [UserController::class, 'updateTheme']);
 });

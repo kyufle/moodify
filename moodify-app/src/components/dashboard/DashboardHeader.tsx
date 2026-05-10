@@ -4,10 +4,11 @@ import { Feather } from '@expo/vector-icons';
 import { UserContext } from '../user-provider';
 import { ThemedText } from '../themed-text';
 import { avatarMap } from '../../utils/utils';
+import { useTranslation } from 'react-i18next';
 
 export const DashboardHeader = () => {
   const { userValue, logout } = React.use(UserContext);
-
+  const {t} = useTranslation();
   if (userValue?.user == null)
     return;
 
@@ -39,7 +40,7 @@ export const DashboardHeader = () => {
             />
           </View>
           <View style={styles.textContainer}>
-            <ThemedText style={styles.welcomeText}>Bienvenid@ de vuelta</ThemedText>
+            <ThemedText style={styles.welcomeText}>{t('dashboard.welcome')}</ThemedText>
             <ThemedText style={styles.nameText}>{user.name}</ThemedText>
           </View>
           

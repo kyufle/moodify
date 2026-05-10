@@ -151,9 +151,9 @@ export default function BloomChatScreen() {
                 </View>
               </View>
 
-              <TouchableOpacity onPress={() => setIsSettingsVisible(true)} style={styles.settingsButton}>
+              {/* <TouchableOpacity onPress={() => setIsSettingsVisible(true)} style={styles.settingsButton}>
                 <Feather name="more-vertical" size={24} color={chatTheme} />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
 
             <View style={styles.chatContainer}>

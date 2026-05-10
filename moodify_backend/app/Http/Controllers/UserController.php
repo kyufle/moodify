@@ -107,4 +107,26 @@ class UserController extends Controller
             ->first();
         return $exist ? response()->json($exist) : response()->json(null, 204);
     }
+    public function updateTheme(Request $request)
+    {
+        $request->validate([
+            'bgName' => 'nullable|string',
+            'myMsgColor' => 'required|string|max:7',
+            'otherMsgColor' => 'required|string|max:7',
+            'textColorOwn' => 'required|string|max:7',
+            'textColorOther' => 'required|string|max:7',
+        ]);
+        $user = $request->user();
+        
+        $user->update([
+            'bg_image' => $request->bgName,
+            'my_msg_color' => $request->myMsgColor,
+            'other_msg_color' => $request->otherMsgColor,
+            'text_colorOwn' => $request->textColorOwn,
+            'text_colorOther' => $request->textColorOther,
+        ]);
+
+        return response()->json(['status' => 'success', 'theme' => $user]);
+    }
+
 }

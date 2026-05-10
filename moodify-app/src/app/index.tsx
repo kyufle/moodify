@@ -45,7 +45,6 @@ export default function HomeScreen() {
               >
                 <ThemedText style={styles.welcomeButtonText}>{t('firstPage.button')}</ThemedText>
                 <View style={styles.arrowIconContainer}>
-                  {/* Corregido: En RNEUI se recomienda usar el componente de esta forma */}
                   <Icon 
                     name="arrow-right" 
                     type="material-community" 

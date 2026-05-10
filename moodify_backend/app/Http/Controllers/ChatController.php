@@ -59,21 +59,24 @@ public function index()
         }
     }
 
-    public function getMessagesByUserId($recipientId)
+public function getMessagesByUserId($recipientId)
 {
     try {
         $authUserId = Auth::id();
         $recipientId = (int)$recipientId;
 
+        // Actualizar última conexión
         User::where('id', $authUserId)->update(['last_seen_at' => now()]);
 
         $recipient = User::find($recipientId);
         $isOnline = false;
-        
         if ($recipient && $recipient->last_seen_at) {
             $isOnline = $recipient->last_seen_at->diffInSeconds(now()) < 30;
         }
 
+        // --- SOLUCIÓN AL UNDEFINED ---
+        // Buscamos la conversación, y si no existe (chat nuevo), la creamos al momento.
+        // Así el frontend siempre recibe un ID válido en 'data.conversation.id'
         $conversation = Conversation::where('type', 'p2p')
             ->where(function($query) use ($authUserId, $recipientId) {
                 $query->where(function($q) use ($authUserId, $recipientId) {
@@ -85,9 +88,11 @@ public function index()
             ->first();
 
         if (!$conversation) {
-            return response()->json([
-                'messages' => [],
-                'recipient_online' => $isOnline
+            $conversation = Conversation::create([
+                'user_id' => $authUserId,
+                'recipient_id' => $recipientId,
+                'type' => 'p2p',
+                'label' => 'Chat Privado'
             ]);
         }
 
@@ -97,11 +102,11 @@ public function index()
 
         return response()->json([
             'messages' => $messages,
-            'recipient_online' => $isOnline
+            'recipient_online' => $isOnline,
+            'conversation' => $conversation // Ahora esto NUNCA será null ni undefined
         ]);
 
     } catch (\Exception $e) {
-        \Log::error("Error en chat: " . $e->getMessage());
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
@@ -234,5 +239,4 @@ public function markAsRead($senderId)
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
-
 }

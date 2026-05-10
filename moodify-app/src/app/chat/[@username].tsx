@@ -2,19 +2,19 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { 
   View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, 
   KeyboardAvoidingView, Platform, SafeAreaView, ActivityIndicator, 
-  AppState, AppStateStatus, Image 
+  AppState, AppStateStatus, Image, ImageBackground
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import { UserContext } from '@/components/user-provider';
+import { getUserThemeFromContext, UserContext } from '@/components/user-provider';
 import { MessageBubble } from '@/components/chat/MessageBubble';
 import { avatarMap } from '@/utils/utils';
+import { SafeStorage } from './index'; 
+import { ALL_BACKGROUNDS } from './ChatCustomizer';
 
-// --- FUNCIONES DE UTILIDAD PARA FECHAS (FUERA DEL COMPONENTE) ---
 const getDayLabel = (dateString: string) => {
   const date = new Date(dateString);
   const now = new Date();
-  
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
@@ -42,26 +42,40 @@ export default function PersonalChatScreen() {
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [loadingInitial, setLoadingInitial] = useState(true);
-  const [isOnline, setIsOnline] = useState(false); // Estado para el "En línea"
+  const [isOnline, setIsOnline] = useState(false);
+
+  const chatTheme = getUserThemeFromContext(userValue);
+  const chatThemeBackgroundSource = ALL_BACKGROUNDS.find((background) => background.id === chatTheme.bgName)?.source
 
   const flatListRef = useRef<FlatList>(null);
   const appState = useRef(AppState.currentState);
+
+  const scrollToBottom = () => {
+    if (messages.length > 0) {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }
+  };
 
   const avatarSource = imageKey && avatarMap[imageKey as keyof typeof avatarMap]
     ? avatarMap[imageKey as keyof typeof avatarMap]
     : { uri: 'https://via.placeholder.com/150' };
 
-  const markAsRead = async () => {
-    if (!token || !recipientId) return;
-    try {
-      await fetch(`${process.env.EXPO_PUBLIC_API_URL}messages/read/${recipientId}`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-      });
-    } catch (e) { console.error("Error markAsRead:", e); }
-  };
+  // 1. CARGAR TEMA
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const saved = await SafeStorage.getItem('custom_chat_theme'); // todo Cargarlo de BBDD
+        if (saved) setChatTheme(JSON.parse(saved));
+      } catch (e) {
+        console.error("Error tema:", e);
+      }
+    };
+    loadTheme();
+  }, []);
 
+  // 2. FUNCIÓN FETCH MEJORADA
   const fetchMessages = async () => {
+    if (!token || !recipientId) return;
     try {
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}messages/user/${recipientId}`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
@@ -83,8 +97,51 @@ export default function PersonalChatScreen() {
         });
         setMessages(formatted);
       }
-    } catch (e) { console.error("Error en fetch:", e); }
+    } catch (e) { 
+      console.error("Error fetch:", e); 
+    } finally {
+      setLoadingInitial(false); // Aseguramos que quite el loading siempre
+    }
   };
+
+  const markAsRead = async () => {
+    if (!token || !recipientId) return;
+    try {
+      await fetch(`${process.env.EXPO_PUBLIC_API_URL}messages/read/${recipientId}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+      });
+    } catch (e) { console.error("Error markAsRead:", e); }
+  };
+
+  // 3. EFECTO DE CARGA Y ACTUALIZACIÓN
+  useEffect(() => {
+    if (!token || !recipientId) return;
+
+    // Carga inicial
+    fetchMessages();
+    markAsRead();
+
+    // Intervalo de actualización
+    const intervalId = setInterval(() => {
+        fetchMessages();
+        markAsRead(); 
+    }, 5000);
+
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+        fetchMessages();
+        markAsRead();
+      }
+      appState.current = nextAppState;
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => {
+      clearInterval(intervalId);
+      subscription.remove();
+    };
+  }, [recipientId, token]); // Eliminado myId de aquí para evitar re-renders infinitos
 
   const handleSend = async () => {
     if (!inputText.trim() || isSending) return;
@@ -106,38 +163,6 @@ export default function PersonalChatScreen() {
     } catch (error) { console.error(error); } finally { setIsSending(false); }
   };
 
-  useEffect(() => {
-    if (!token || !recipientId) return;
-
-    const loadData = async () => {
-      await fetchMessages();
-      await markAsRead(); 
-      setLoadingInitial(false);
-    };
-
-    loadData();
-
-    let intervalId = setInterval(() => {
-        fetchMessages();
-        markAsRead(); 
-    }, 5000);
-
-    const handleAppStateChange = (nextAppState: AppStateStatus) => {
-      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-        fetchMessages();
-        markAsRead();
-      }
-      appState.current = nextAppState;
-    };
-
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
-
-    return () => {
-      clearInterval(intervalId);
-      subscription.remove();
-    };
-  }, [recipientId, token, myId]);
-
   const renderItem = ({ item, index }: { item: any, index: number }) => {
     const showDateSeparator = index === 0 || 
       new Date(messages[index].fullDate).toDateString() !== new Date(messages[index - 1].fullDate).toDateString();
@@ -153,55 +178,52 @@ export default function PersonalChatScreen() {
             <View style={styles.dateLine} />
           </View>
         )}
-        <MessageBubble text={item.text} isAI={item.isAI} time={item.time} status={item.status} />
+        <MessageBubble 
+          text={item.text} 
+          isAI={item.isAI} 
+          time={item.time} 
+          status={item.status} 
+          myBubbleColor={chatTheme.myMsgColor}
+          otherBubbleColor={chatTheme.otherMsgColor}
+          myTextColor={chatTheme.textColorOwn}
+          otherTextColor={chatTheme.textColorOther}
+        />
       </View>
     );
   };
 
-  if (loadingInitial && !token) {
+  // Pantalla de carga mientras no hay token o carga inicial activa
+  if (loadingInitial) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F8FAFC' }}>
         <ActivityIndicator size="large" color="#6366F1" />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF' }}>
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
         style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 25}
       >
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={() => router.back()} style={{ padding: 5 }}>
               <Feather name="arrow-left" size={24} color="#1E293B" />
             </TouchableOpacity>
-            
-            <Image 
-              source={avatarSource} 
-              style={styles.avatar}
-            />
-
+            <Image source={avatarSource} style={styles.avatar} />
             <View style={{ marginLeft: 10 }}>
               <Text style={styles.headerTitle}>{username}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={[
-                  styles.statusDot, 
-                  { backgroundColor: isOnline ? '#10B981' : '#94A3B8' }
-                ]} />
-                <Text style={{ 
-                  fontSize: 12, 
-                  color: isOnline ? '#10B981' : '#64748B',
-                  fontWeight: isOnline ? '600' : '400'
-                }}>
+                <View style={[styles.statusDot, { backgroundColor: isOnline ? '#10B981' : '#94A3B8' }]} />
+                <Text style={{ fontSize: 12, color: isOnline ? '#10B981' : '#64748B', fontWeight: isOnline ? '600' : '400' }}>
                   {isOnline ? 'en línea' : 'desconectado'}
                 </Text>
               </View>
             </View>
           </View>
-
           <View style={styles.headerIcons}>
             <TouchableOpacity style={{ padding: 5 }}>
               <Feather name="more-vertical" size={22} color="#64748B" />
@@ -209,14 +231,16 @@ export default function PersonalChatScreen() {
           </View>
         </View>
 
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={{ padding: 15 }}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-        />
+        <ImageBackground source={chatThemeBackgroundSource} style={{ flex: 1 }}>
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={{ padding: 15, paddingBottom: 20 }}
+            onContentSizeChange={() => scrollToBottom()}
+          />
+        </ImageBackground>
 
         <View style={styles.inputContainer}>
           <TextInput
@@ -225,8 +249,13 @@ export default function PersonalChatScreen() {
             onChangeText={setInputText}
             placeholder="Escribe un mensaje..."
             multiline
+            onFocus={() => setTimeout(scrollToBottom, 200)}
           />
-          <TouchableOpacity onPress={handleSend} style={styles.sendButton} disabled={isSending}>
+          <TouchableOpacity 
+            onPress={handleSend} 
+            style={[styles.sendButton, { backgroundColor: chatTheme.myMsgColor }]} 
+            disabled={isSending}
+          >
             {isSending ? <ActivityIndicator color="white" size="small" /> : <Feather name="send" size={20} color="white" />}
           </TouchableOpacity>
         </View>
@@ -236,84 +265,17 @@ export default function PersonalChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'space-between',
-    padding: 10, 
-    backgroundColor: '#FFF', 
-    borderBottomWidth: 1, 
-    borderBottomColor: '#E2E8F0' 
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerIcons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginLeft: 10,
-    backgroundColor: '#F1F5F9'
-  },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10, paddingVertical: 8, backgroundColor: '#FFF', borderBottomWidth: 1, borderBottomColor: '#E2E8F0' },
+  headerLeft: { flexDirection: 'row', alignItems: 'center' },
+  headerIcons: { flexDirection: 'row', alignItems: 'center' },
+  avatar: { width: 40, height: 40, borderRadius: 20, marginLeft: 5, backgroundColor: '#F1F5F9' },
   headerTitle: { fontSize: 16, fontWeight: 'bold', color: '#1E293B' },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 5,
-  },
-  inputContainer: { 
-    flexDirection: 'row', 
-    padding: 12, 
-    backgroundColor: '#FFF', 
-    borderTopWidth: 1, 
-    borderTopColor: '#E2E8F0', 
-    alignItems: 'center' 
-  },
-  input: { 
-    flex: 1, 
-    backgroundColor: '#F1F5F9', 
-    borderRadius: 20, 
-    paddingHorizontal: 15, 
-    paddingVertical: 8, 
-    maxHeight: 100 
-  },
-  sendButton: { 
-    backgroundColor: '#6366F1', 
-    width: 44, 
-    height: 44, 
-    borderRadius: 22, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    marginLeft: 10 
-  },
-  dateSeparator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 20,
-    justifyContent: 'center'
-  },
-  dateLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#E2E8F0',
-    marginHorizontal: 10
-  },
-  dateBadge: {
-    backgroundColor: '#E2E8F0',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  dateText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#64748B',
-    textTransform: 'uppercase'
-  }
+  statusDot: { width: 8, height: 8, borderRadius: 4, marginRight: 5 },
+  inputContainer: { flexDirection: 'row', padding: 10, backgroundColor: '#FFF', borderTopWidth: 1, borderTopColor: '#E2E8F0', alignItems: 'center' },
+  input: { flex: 1, backgroundColor: '#F1F5F9', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, maxHeight: 100, color: '#000' },
+  sendButton: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginLeft: 10 },
+  dateSeparator: { flexDirection: 'row', alignItems: 'center', marginVertical: 20, justifyContent: 'center' },
+  dateLine: { flex: 1, height: 1, backgroundColor: '#E2E8F0', marginHorizontal: 10 },
+  dateBadge: { backgroundColor: '#E2E8F0', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 },
+  dateText: { fontSize: 11, fontWeight: '700', color: '#64748B', textTransform: 'uppercase' }
 });

@@ -18,6 +18,12 @@ return new class extends Migration {
             $table->timestamp('last_streak_day')->nullable();
             $table->string('image_id')->nullable();
             $table->timestamp('last_seen_at')->nullable();
+            $table->string('theme_color')->default('#6366F1');
+            $table->string('bg_image')->nullable();
+            $table->string('my_msg_color')->default('#6366F1');
+            $table->string('other_msg_color')->default('#F1F5F9');
+            $table->string('text_colorOwn')->default('#FFFFFF');
+            $table->string('text_colorOther')->default('#FFFFFF');
         });
 
         Schema::create('sleep_logs', function (Blueprint $table) {
@@ -43,10 +49,6 @@ return new class extends Migration {
             $table->enum('type', ['ai', 'p2p']);
             $table->string('label')->nullable();
             $table->foreignId('recipient_id')->nullable()->constrained('users');
-
-            $table->string('theme_color')->default('#6366F1');
-            $table->string('background_preview')->nullable();
-
             $table->boolean('is_blocked')->default(false);
             $table->foreignId('blocked_by')->nullable()->constrained('users');
             $table->timestamps();

@@ -6,18 +6,40 @@ interface MessageBubbleProps {
   text: string;
   isAI: boolean;
   time: string;
-  status?: 'pending' | 'sent' | 'read'; 
+  status?: 'pending' | 'sent' | 'read';
+  myBubbleColor?: string;
+  otherBubbleColor?: string;
+  myTextColor?: string;
+  otherTextColor?: string;
 }
 
-export const MessageBubble = ({ text, isAI, time, status }: MessageBubbleProps) => {
+export const MessageBubble = ({ 
+  text, 
+  isAI, 
+  time, 
+  status,
+  myBubbleColor,
+  otherBubbleColor,
+  myTextColor,
+  otherTextColor 
+}: MessageBubbleProps) => {
+
+  // Determinamos los colores finales. Si no vienen por props, usamos los del StyleSheet.
+  const finalBubbleColor = isAI ? (otherBubbleColor || '#FFFFFF') : (myBubbleColor || '#6366F1');
+  const finalTextColor = isAI ? (otherTextColor || '#1E293B') : (myTextColor || '#FFFFFF');
+
   return (
     <View style={[
       styles.container, 
-      isAI ? styles.aiContainer : styles.meContainer
+      isAI ? styles.aiContainer : styles.meContainer,
+      // Sobrescribimos el color de fondo con el elegido por el usuario
+      { backgroundColor: finalBubbleColor }
     ]}>
       <Text style={[
         styles.text, 
-        isAI ? styles.aiText : styles.meText
+        isAI ? styles.aiText : styles.meText,
+        // Sobrescribimos el color del texto con el elegido por el usuario
+        { color: finalTextColor }
       ]}>
         {text}
       </Text>
@@ -25,18 +47,20 @@ export const MessageBubble = ({ text, isAI, time, status }: MessageBubbleProps) 
       <View style={styles.footer}>
         <Text style={[
           styles.time, 
-          isAI ? styles.aiTime : styles.meTime
+          isAI ? styles.aiTime : styles.meTime,
+          // La hora hereda el color del texto pero con opacidad para que no resalte tanto
+          { color: finalTextColor, opacity: 0.6 }
         ]}>
           {time}
         </Text>
         
-      
         {!isAI && (
           <View style={styles.tickContainer}>
             {status === 'read' ? (
               <Ionicons name="checkmark-done" size={15} color="#34B7F1" />
             ) : (
-              <Ionicons name="checkmark" size={15} color="#E2E8F0" />
+              // El check también se adapta al color del texto si no está leído
+              <Ionicons name="checkmark" size={15} color={finalTextColor} style={{ opacity: 0.5 }} />
             )}
           </View>
         )}
@@ -60,12 +84,10 @@ const styles = StyleSheet.create({
   },
   aiContainer: {
     alignSelf: 'flex-start',
-    backgroundColor: '#FFFFFF',
     borderBottomLeftRadius: 4,
   },
   meContainer: {
     alignSelf: 'flex-end',
-    backgroundColor: '#6366F1',
     borderBottomRightRadius: 4,
   },
   text: {
