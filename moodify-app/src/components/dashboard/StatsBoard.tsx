@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { UserContext } from '../user-provider';
+import { useTranslation } from 'react-i18next';
 
 interface StatsBoardProps {
   onPressSleep: () => void;
@@ -11,9 +12,9 @@ interface StatsBoardProps {
 
 export const StatsBoard: React.FC<StatsBoardProps> = ({ onPressSleep, onPressStress }) => {
   const { userValue } = useContext(UserContext);
-  const [sleepDisplay, setSleepDisplay] = useState<string>('Cargando...');
-  const [stressLevel, setStressLevel] = useState<string>('...');
-
+  const [sleepDisplay, setSleepDisplay] = useState<string>(('dashboard.weDontKnow'));
+  const [stressLevel, setStressLevel] = useState<string>('dashboard.takeTest');
+  const {t} = useTranslation();
   useEffect(() => {
   async function fetchStats() {
     if (!userValue?.user || !userValue?.accessToken) return;
@@ -37,7 +38,7 @@ export const StatsBoard: React.FC<StatsBoardProps> = ({ onPressSleep, onPressStr
           const m = data.total_minutes % 60;
           setSleepDisplay(`${h}h y ${m}min`);
         } else {
-          setSleepDisplay('No registrado');
+          setSleepDisplay('dashboard.noData');
         }
       }
 
@@ -49,27 +50,29 @@ export const StatsBoard: React.FC<StatsBoardProps> = ({ onPressSleep, onPressStr
       if (resStress.ok) {
         const sData = await resStress.json();
         
-        if (sData.exists && sData.data) {
-          const breakdown = sData.data.breakdown;
-          
-          const levels = [
-            { name: "Relajado", val: Number(breakdown.relajado) || 0 },
-            { name: "Leve", val: Number(breakdown.leve) || 0 },
-            { name: "Moderado", val: Number(breakdown.moderado) || 0 },
-            { name: "Alto", val: Number(breakdown.alto) || 0 },
-          ];
+      // ... dentro del fetch de Stress
+if (sData.exists && sData.data) {
+  const breakdown = sData.data.breakdown;
+  
+  const levels = [
+    { key: "dashboard.relaxed", val: Number(breakdown.relajado) || 0 },
+    { key: "dashboard.mild", val: Number(breakdown.leve) || 0 },
+    { key: "dashboard.moderate", val: Number(breakdown.moderado) || 0 },
+    { key: "dashboard.high", val: Number(breakdown.alto) || 0 },
+  ];
 
-          const main = levels.sort((a, b) => b.val - a.val)[0];
-          setStressLevel(main.val > 0 ? main.name : 'Hacer test');
-          
-        } else {
-          setStressLevel('Hacer test');
-        }
+  const main = levels.sort((a, b) => b.val - a.val)[0];
+  
+  setStressLevel(main.val > 0 ? main.key : 'dashboard.takeTest');
+  
+} else {
+  setStressLevel('dashboard.takeTest');
+}
       }
     } catch (error) {
       console.error("Error fetching stats:", error);
-      setSleepDisplay('No registrado');
-      setStressLevel('Hacer test');
+      setSleepDisplay('dashboard.noData');
+      setStressLevel('dashboard.takeTest');
     }
   }
 
@@ -87,7 +90,7 @@ export const StatsBoard: React.FC<StatsBoardProps> = ({ onPressSleep, onPressStr
         <View style={[styles.card, styles.sleepCard]}>
           <View style={styles.header}>
             <Feather name="moon" size={16} color="#333" />
-            <Text style={styles.cardTitle}>Duración del sueño</Text>
+            <Text style={styles.cardTitle}>{t('dashboard.sleepDuration')}</Text>
           </View>
           
           <View style={styles.chartContainer}>
@@ -100,7 +103,7 @@ export const StatsBoard: React.FC<StatsBoardProps> = ({ onPressSleep, onPressStr
             ))}
           </View>
 
-          <Text style={styles.valueText}>{sleepDisplay}</Text>
+          <Text style={styles.valueText}>{t(sleepDisplay)}</Text>
         </View>
       </TouchableOpacity>
       
@@ -113,7 +116,7 @@ export const StatsBoard: React.FC<StatsBoardProps> = ({ onPressSleep, onPressStr
         <View style={[styles.card, styles.stressCard]}>
           <View style={styles.header}>
             <Feather name="frown" size={16} color="#333" />
-            <Text style={styles.cardTitle}>Indicador de estrés</Text>
+            <Text style={styles.cardTitle}>{t('dashboard.stressIndicator')}</Text>
           </View>
 
           <View style={styles.chartContainerStress}>
@@ -122,7 +125,7 @@ export const StatsBoard: React.FC<StatsBoardProps> = ({ onPressSleep, onPressStr
             ))}
           </View>
 
-          <Text style={styles.valueText}>{stressLevel}</Text>
+          <Text style={styles.valueText}>{t(stressLevel)}</Text>
         </View>
       </TouchableOpacity>
     </View>

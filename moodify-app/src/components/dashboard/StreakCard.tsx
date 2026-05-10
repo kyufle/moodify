@@ -4,11 +4,12 @@ import { ThemedText } from '../themed-text';
 import { UserContext } from '../user-provider';
 import React, { useState, useMemo } from 'react';
 import DiamanteRacha from '@/assets/images/diamante-racha.svg'
+import { useTranslation } from 'react-i18next';
 
 export const StreakCard = () => {
   const [loading, setLoading] = useState(false);
   const { userValue, setUserValue } = React.useContext(UserContext);
-
+  const { t } = useTranslation();
   const user = userValue?.user;
 
   const handleStreak = async (recover = false) => {
@@ -121,18 +122,17 @@ export const StreakCard = () => {
             <DiamanteRacha style={styles.diamondIcon} />
           </View>
 
-          <Text style={styles.title}>{user.streak} {user.streak === 1 ? 'día' : 'días'} en racha!</Text>
+          <ThemedText style={styles.title}>{user.streak} {user.streak === 1 ? t('dashboard.day') : t('dashboard.days')} {t('dashboard.roll')}</ThemedText>
 
           <View style={styles.weekContainer}>
             {weekData.days.map((day, index) => (
               <View key={index} style={[styles.dayItem, day.isToday && styles.dayItemToday]}>
                 <DiamanteRacha style={[
-                    styles.diamondIcon,
-                    { 
-                      opacity: day.recorded ? 1 : 0.15, 
-                      transform: [{ scale: day.recorded ? 1.1 : 0.9 }] 
-                    }
-                  ]} />
+                  styles.diamondIcon,
+                  {
+                    opacity: day.recorded ? 1 : 0.5,
+                  }
+                ]} />
                 <Text style={[
                   styles.dayLabel,
                   day.isToday && styles.dayLabelToday,
@@ -151,7 +151,7 @@ export const StreakCard = () => {
           >
             <Feather name={weekData.isRegToday ? "check-circle" : "bar-chart-2"} size={18} color="#6B21A8" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>
-              {weekData.isRegToday ? "Progreso guardado" : loading ? "Registrando..." : "Registrar progreso"}
+              {weekData.isRegToday ? t('dashboard.savedProgress') : loading ? t('dashboard.registering') : t('dashboard.recordProgress')}
             </Text>
           </TouchableOpacity>
         </>
@@ -163,16 +163,16 @@ export const StreakCard = () => {
 const styles = StyleSheet.create({
   card: { backgroundColor: '#E8EAFD', borderRadius: 24, padding: 20, marginHorizontal: 20, marginTop: 20, elevation: 4, minHeight: 180 },
   title: { fontSize: 18, fontWeight: '700', color: '#334155', marginBottom: 16 },
-  weekContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 },
-  dayItem: { alignItems: 'center', justifyContent: 'center', width: 40, height: 56, borderRadius: 20 },
-  dayItemToday: { backgroundColor: '#FFF1E6', borderWidth: 2, borderColor: '#FFFFFF' },
+  weekContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+  dayItem: { alignItems: 'center', justifyContent: 'center', width: 40, height: 52, borderRadius: 20 }, // Reducido de 60 a 52
+  dayItemToday: { backgroundColor: '#FFF1E6', borderWidth: 2, borderColor: '#FFFFFF', height: 70 },
   diamondIcon: { width: 24, height: 24 },
-  dayLabel: { fontSize: 12, color: '#94A3B8', marginTop: 4, fontWeight: '500' },
-  dayLabelToday: { color: '#D97706', fontWeight: '700' },
+  dayLabel: { fontSize: 12, color: '#94A3B8', marginTop: -2, fontWeight: '500' }, // Cambiado de 4 a -2 para acercarlo
+  dayLabelToday: { color: '#D97706', fontWeight: '700', position: 'relative', top: -7 },
   dayLabelRecorded: { color: '#6B21A8', fontWeight: '600' },
   button: { backgroundColor: '#FFFFFF', borderRadius: 20, paddingVertical: 14, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', elevation: 3 },
   buttonIcon: { marginRight: 8 },
   buttonText: { fontSize: 16, fontWeight: '700', color: '#6B21A8' },
-  pointsBadge: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', backgroundColor: '#F3E8FF', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, borderWidth: 1, borderColor: '#E9D5FF', marginBottom: 10 },
+  pointsBadge: { flexDirection: 'row', justifyContent: 'flex-start', backgroundColor: '#F3E8FF', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, borderWidth: 1, borderColor: '#E9D5FF', marginBottom: 10, width: 60 },
   pointsText: { fontSize: 14, fontWeight: '800', color: '#6B21A8', marginRight: 4 },
 });

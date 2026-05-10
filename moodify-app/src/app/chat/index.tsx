@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-// Importamos SafeAreaView y useSafeAreaInsets para control total
+
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatCustomizer } from './ChatCustomizer';
 
@@ -32,7 +32,7 @@ interface SearchUser {
 
 export default function ChatMainList() {
   const router = useRouter();
-  const insets = useSafeAreaInsets(); // Obtenemos los bordes seguros del dispositivo
+  const insets = useSafeAreaInsets();
   const { userValue, setUserValue } = useContext(UserContext);
   const token = userValue?.accessToken;
   const userId = userValue?.user?.id;
@@ -194,17 +194,11 @@ export default function ChatMainList() {
   }
 
   return (
-    // SafeAreaView aplicado con estilo para no forzar toda la pantalla si no es necesario
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       {!isFullSearchView && (
         <View style={styles.header}>
-          <Text style={styles.whatsappTitle}>WhatsApp</Text>
+          <Text style={styles.whatsappTitle}>Moodify chat</Text>
           <View style={styles.headerIcons}>
-            <TouchableOpacity style={{ padding: 5 }}>
-                <Feather name="camera" size={24} color="black" />
-            </TouchableOpacity>
-            
-            {/* BOTÓN CORREGIDO: hitSlop y padding para fácil acceso en móvil */}
             <TouchableOpacity 
                 onPress={() => setCustomizerVisible(true)}
                 style={{ marginLeft: 15, padding: 5 }}
@@ -252,7 +246,7 @@ export default function ChatMainList() {
           <FlatList
             data={conversations}
             keyExtractor={(item) => `chat-${item.id}`}
-            contentContainerStyle={{ paddingBottom: 100 }} // Espacio para que el último chat no quede detrás del nav
+            contentContainerStyle={{ paddingBottom: 100 }}
             renderItem={({ item }) => {
               const chatPartner = String(item.user_id) === String(userId) ? item.recipient : item.user;
               const senderId = item.last_message_sender_id || item.sender_id;
@@ -408,6 +402,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    zIndex: 5 // Reducido para no bloquear elementos del header
+    zIndex: 5
   },
 });

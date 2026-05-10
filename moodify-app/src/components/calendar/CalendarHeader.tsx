@@ -3,11 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from 'expo-router';
 import { UserContext } from '@/components/user-provider';
+import { useTranslation } from 'react-i18next';
 
 export const CalendarHeader = () => {
   const navigation = useNavigation();
   const { logout } = useContext(UserContext);
-
+  const {t, i18n} = useTranslation();
+  const currentLanguage = i18n.language || 'ca';
   return (
     <View style={styles.container}>
       {/* Botón Atrás */}
@@ -21,9 +23,12 @@ export const CalendarHeader = () => {
 
       {/* Textos centrales */}
       <View style={styles.textContainer}>
-        <Text style={styles.title}>Calendario de mood</Text>
+        <Text style={styles.title}>{t('calendarGrid.moodCalendar')}</Text>
         <Text style={styles.subtitle}>
-          {new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric', timeZone: 'Europe/Madrid' }).toUpperCase()}
+         {new Date().toLocaleString(currentLanguage, { 
+        month: 'long', 
+        year: 'numeric' 
+      }).toUpperCase()}
         </Text>
       </View>
 

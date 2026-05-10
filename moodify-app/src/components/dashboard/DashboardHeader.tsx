@@ -53,7 +53,7 @@ export const DashboardHeader = () => {
       </View>
       <View>
               <ThemedText style={styles.dateText}>{currentDateFormatted}</ThemedText>
-              <ThemedText style={styles.fraseText}>¡Hola {user.name}! ¿Cómo te sientes hoy?</ThemedText>
+              <ThemedText style={styles.fraseText}>{t('dashboard.messageHello')} {user.name} {t('dashboard.messageWelcome')}</ThemedText>
         </View>
     </View>
   );

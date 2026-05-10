@@ -4,6 +4,7 @@ import { UserContext } from '../user-provider';
 import { MOOD_CONFIG } from '../../utils/utils';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { ThemedText } from '../themed-text';
 
 export const ActionAlertCard = () => {
   const { t, i18n } = useTranslation();
@@ -25,7 +26,9 @@ export const ActionAlertCard = () => {
           }
         });
         const dataHis = await resHis.json();
-        if (Array.isArray(dataHis)) setHistory(dataHis);
+        if (Array.isArray(dataHis)) {
+          setHistory(dataHis);
+        }
       } catch (e) {
         console.error("Error al mirar la base de datos:", e);
       } finally {
@@ -45,22 +48,37 @@ export const ActionAlertCard = () => {
 
   if (!userValue?.user || loading) return null;
 
-  const lastEntry = history.length > 0 ? history[0] : null; 
+  // Intentamos obtener el último registro (el más reciente)
+  const lastEntry = history.length > 0 ? history[history.length - 1] : null; 
   const config = lastEntry ? MOOD_CONFIG[lastEntry.mood as keyof typeof MOOD_CONFIG] : null;
+  
+  // Validación de fecha mejorada (compara año, mes y día por separado)
+  const isToday = (() => {
+    if (!lastEntry?.date) return false;
+    const d = new Date(lastEntry.date);
+    const today = new Date();
+    return (
+      d.getDate() === today.getDate() &&
+      d.getMonth() === today.getMonth() &&
+      d.getFullYear() === today.getFullYear()
+    );
+  })();
 
   const ConfusedIcon = MOOD_CONFIG.confused.icon;
-  if (!lastEntry || !config) {
+  
+  if (!lastEntry || !isToday || !config) {
     return (
       <View style={[styles.card, { backgroundColor: '#D6D6D6', marginHorizontal: 20, marginTop: 20 }]}>
         <View style={styles.textColumn}>
           <Text style={[styles.description, { fontWeight: '700', color: '#333' }]}>
-            {t('calendarGrid.noRegistryToday') || 'Ups, todavía no has registrado cómo te sientes hoy...'}
+            {t('calendarGrid.howFeelNow')}
           </Text>
+          <ThemedText style={{color: 'black'}}>{t('calendarGrid.textRegister')}</ThemedText>
           <TouchableOpacity 
             style={[styles.actionButton, { marginTop: 15 }]} 
             onPress={() => router.push('/calendar')}
           >
-            <Text style={styles.actionButtonText}>{t('calendarGrid.registerNow') || 'Regístralo'}</Text>
+            <Text style={styles.actionButtonText}>{t('calendarGrid.registerNow')}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.graphicContainer}>
@@ -69,7 +87,8 @@ export const ActionAlertCard = () => {
       </View>
     );
   }
-   const ConfigIcon = config.icon;
+  
+  const ConfigIcon = config.icon;
 
   return (
     <View style={[styles.card, { backgroundColor: config.color, marginHorizontal: 20, marginTop: 20 }]}>
@@ -90,8 +109,7 @@ export const ActionAlertCard = () => {
       </View>
 
       <View style={styles.graphicContainer}>
-        <ConfigIcon style={styles.moodIconColor}
-        />          
+        <ConfigIcon style={styles.moodIconColor} />          
       </View>
     </View>
   );
@@ -156,7 +174,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: -15,
     bottom: 10,
-    opacity: 0.15,
+    opacity: 0.50,
     tintColor: '#000'
   },
   actionButton: { 

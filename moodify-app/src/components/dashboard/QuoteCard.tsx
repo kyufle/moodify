@@ -12,13 +12,13 @@ export const QuoteCard = () => {
 
   return (
     <LinearGradient
-      colors={['#1E293B', '#334155']}
+      colors={['#d2eaebcb', '#d1dceb']}
       style={styles.container}
     >
       <Feather 
         name="message-square" 
         size={24} 
-        color="rgba(255, 255, 255, 0.2)" 
+        color="rgba(21, 56, 255, 0.2)" 
         style={styles.quoteIcon} 
       />
       
@@ -30,7 +30,7 @@ export const QuoteCard = () => {
         <Text style={styles.author}>— {quote.author}</Text>
         <View style={styles.tag}>
           <Text style={styles.tagText}>
-            {t('motivation', 'MOTIVACIÓN').toUpperCase()}
+            {t('dashboard.motivation').toUpperCase()}
           </Text>
         </View>
       </View>
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     left: 15,
   },
   quoteText: {
-    color: '#FFFFFF',
+    color: '#777777',
     fontSize: 16,
     fontWeight: '700',
     lineHeight: 24,
@@ -67,18 +67,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   author: {
-    color: 'rgba(255, 255, 255, 0.6)',
+    color: 'rgba(56, 56, 56, 0.6)',
     fontSize: 13,
     fontWeight: '600',
   },
   tag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#77777780',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
   },
   tagText: {
-    color: '#FFF',
+    color: '#d1dceb',
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 1,
