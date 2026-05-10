@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -117,7 +118,7 @@ class UserController extends Controller
             'textColorOther' => 'required|string|max:7',
         ]);
         $user = $request->user();
-        
+
         $user->update([
             'bg_image' => $request->bgName,
             'my_msg_color' => $request->myMsgColor,
@@ -127,6 +128,69 @@ class UserController extends Controller
         ]);
 
         return response()->json(['status' => 'success', 'theme' => $user]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'username' => 'required|string|max:50|alpha_dash|unique:users,username,' . $user->id,
+            'email'    => 'required|email|unique:users,email,' . $user->id,
+        ]);
+
+        $user->update([
+            'name'     => $request->name,
+            'username' => $request->username,
+            'email'    => $request->email,
+        ]);
+
+        return response()->json(['status' => 'success', 'user' => $user]);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password'     => 'required|min:8',
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'La contraseña actual no es correcta.',
+            ], 422);
+        }
+
+        $user->update(['password' => Hash::make($request->new_password)]);
+
+        return response()->json(['status' => 'success']);
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $request->validate([
+            'is_public'             => 'nullable|boolean',
+            'show_in_community'     => 'nullable|boolean',
+            'notifications_enabled' => 'nullable|boolean',
+            'app_bg'                => 'nullable|string|max:50',
+            'language'              => 'nullable|string|max:5',
+        ]);
+
+        $user = $request->user();
+
+        $user->update($request->only([
+            'is_public',
+            'show_in_community',
+            'notifications_enabled',
+            'app_bg',
+            'language',
+        ]));
+
+        return response()->json(['status' => 'success', 'user' => $user]);
     }
 
 }

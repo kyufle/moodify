@@ -37,4 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/search', [ChatController::class, 'searchUsers']);
     Route::post('/users/follow', [ChatController::class, 'toggleFollow']);
     Route::post('/chat-themes', [UserController::class, 'updateTheme']);
+    Route::post('/update-profile', [UserController::class, 'updateProfile']);
+    Route::post('/change-password', [UserController::class, 'changePassword']);
+    Route::post('/update-settings', [UserController::class, 'updateSettings']);
 });
