@@ -3,6 +3,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MoodRegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\CommunityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -40,4 +41,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/update-profile', [UserController::class, 'updateProfile']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
     Route::post('/update-settings', [UserController::class, 'updateSettings']);
+    Route::get('/community/following-moods', [CommunityController::class, 'followingMoods']);
+    Route::get('/community/suggested', [CommunityController::class, 'suggestedUsers']);
+    Route::get('/community/posts', [CommunityController::class, 'getPosts']);
+    Route::post('/community/posts', [CommunityController::class, 'createPost']);
+    Route::post('/community/posts/{id}/like', [CommunityController::class, 'likePost']);
 });

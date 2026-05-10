@@ -1,0 +1,1242 @@
+================================================================================
+  MOODIFY — DOCUMENTACIÓN COMPLETA DE ARQUITECTURA Y ESTRUCTURA
+  Fecha: Mayo 2026
+================================================================================
+
+  Moodify es una app de bienestar mental que combina registro de estados de ánimo,
+  seguimiento de hábitos, chat con IA (psicóloga "Bloom"), mensajería P2P entre
+  usuarios y una comunidad/foro social.
+
+  Tecnologías principales:
+  ─ Frontend:  React Native + Expo (Expo Router, TypeScript)
+  ─ Backend:   Laravel 13 + Sanctum (API REST), SQLite
+  ─ IA:        Ollama (modelo qwen3-vl:30b) via PsicologoService
+  ─ Auth:      Bearer tokens (Laravel Sanctum)
+
+================================================================================
+  ÍNDICE
+================================================================================
+
+  1.  Estructura de directorios completa
+  2.  Frontend — Pantallas (rutas Expo Router)
+  3.  Frontend — Componentes detallados
+  4.  Frontend — UserContext y flujo de autenticación
+  5.  Frontend — Variables de entorno
+  6.  Backend — Rutas API (routes/api.php)
+  7.  Backend — Controladores
+  8.  Backend — Modelos
+  9.  Backend — Esquema de base de datos (todas las tablas)
+  10. Backend — Migraciones
+  11. Backend — Servicios (PsicologoService / IA)
+  12. Flujo completo de las funcionalidades principales
+  13. Relaciones entre componentes y endpoints
+  14. Internacionalización (i18n)
+  15. Configuración de entorno
+
+================================================================================
+  1. ESTRUCTURA DE DIRECTORIOS COMPLETA
+================================================================================
+
+  moodify/
+  ├── moodify-app/                    ← Frontend Expo/React Native
+  │   ├── .env                        ← Variables de entorno del frontend
+  │   ├── .env.example
+  │   ├── app.json                    ← Configuración Expo
+  │   ├── package.json
+  │   └── src/
+  │       ├── app/                    ← Rutas (Expo Router, file-based)
+  │       │   ├── _layout.tsx         ← Layout raíz (providers)
+  │       │   ├── index.tsx           ← Pantalla Login/Registro
+  │       │   ├── dashboard.tsx       ← Pantalla principal
+  │       │   ├── calendar.tsx        ← Calendario de estados de ánimo
+  │       │   ├── community.tsx       ← Foro/Comunidad
+  │       │   ├── profile.tsx         ← Perfil y ajustes
+  │       │   ├── settings.tsx        ← Redirección a /profile
+  │       │   ├── explore.tsx         ← Placeholder (info/aprendizaje)
+  │       │   ├── challenge/
+  │       │   │   └── [id].tsx        ← Detalle de reto (ruta dinámica)
+  │       │   └── chat/
+  │       │       ├── index.tsx       ← Lista de conversaciones
+  │       │       ├── [@username].tsx ← Chat P2P dinámico (param: username)
+  │       │       ├── bloom.tsx       ← Chat con Bloom (IA psicóloga)
+  │       │       └── ChatCustomizer.tsx ← Modal de personalización de tema
+  │       │
+  │       ├── components/
+  │       │   ├── user-provider.tsx   ← UserContext (estado global de sesión)
+  │       │   ├── animated-icon.tsx   ← Splash screen overlay
+  │       │   ├── animated-icon.web.tsx
+  │       │   ├── app-tabs.tsx        ← Navegación por tabs
+  │       │   ├── app-tabs.web.tsx
+  │       │   ├── StaticBottomNavBar.tsx ← Barra de navegación inferior
+  │       │   ├── themed-text.tsx
+  │       │   ├── themed-view.tsx
+  │       │   ├── external-link.tsx
+  │       │   ├── hint-row.tsx
+  │       │   ├── web-badge.tsx
+  │       │   ├── Login.jsx           ← Formulario de login
+  │       │   ├── CreateUser.jsx      ← Formulario de registro
+  │       │   │
+  │       │   ├── dashboard/
+  │       │   │   ├── DashboardView.tsx
+  │       │   │   ├── DashboardBackground.tsx
+  │       │   │   ├── DashboardHeader.tsx
+  │       │   │   ├── StreakCard.tsx
+  │       │   │   ├── ActionAlertCard.tsx
+  │       │   │   ├── StatsBoard.tsx
+  │       │   │   ├── QuoteCard.tsx
+  │       │   │   ├── Sleep.tsx
+  │       │   │   └── Stress.tsx
+  │       │   │
+  │       │   ├── calendar/
+  │       │   │   ├── CalendarView.tsx
+  │       │   │   ├── CalendarHeader.tsx
+  │       │   │   ├── CalendarGrid.tsx
+  │       │   │   ├── MoodRegisterScreen.tsx
+  │       │   │   ├── MonthlySummary.tsx
+  │       │   │   └── InfoCards.tsx
+  │       │   │
+  │       │   ├── chat/
+  │       │   │   ├── ChatScreen.tsx
+  │       │   │   ├── ChatListCard.tsx
+  │       │   │   ├── MessageBubble.tsx
+  │       │   │   ├── ChatQuickActions.tsx
+  │       │   │   ├── ChatCustomizer.tsx
+  │       │   │   └── ChatSettingsModals.tsx
+  │       │   │
+  │       │   ├── forum/
+  │       │   │   ├── ForumView.tsx
+  │       │   │   ├── ForumHeader.tsx
+  │       │   │   ├── PostCard.tsx
+  │       │   │   ├── FriendsMoods.tsx
+  │       │   │   ├── DiscoverPeople.tsx
+  │       │   │   └── StaffAnnouncements.tsx
+  │       │   │
+  │       │   ├── profile/
+  │       │   │   ├── HabitProgress.tsx
+  │       │   │   ├── ChallengesSection.tsx
+  │       │   │   └── AchievementsBar.tsx
+  │       │   │
+  │       │   └── ui/
+  │       │       └── collapsible.tsx
+  │       │
+  │       ├── constants/
+  │       │   ├── status-colors-claro.tsx
+  │       │   └── theme.ts
+  │       │
+  │       ├── hooks/
+  │       │   ├── use-color-scheme.ts
+  │       │   ├── use-color-scheme.web.ts
+  │       │   └── use-theme.ts
+  │       │
+  │       ├── i18n/
+  │       │   ├── i18n.js             ← Configuración i18next
+  │       │   ├── es.js               ← Español (idioma por defecto)
+  │       │   ├── en.js               ← Inglés
+  │       │   └── ca.js               ← Catalán
+  │       │
+  │       └── utils/
+  │           └── utils.js            ← Funciones de utilidad (avatarMap, etc.)
+  │
+  └── moodify_backend/                ← Backend Laravel 13
+      ├── .env                        ← Configuración del backend
+      ├── moodify                     ← Base de datos SQLite (archivo real)
+      ├── database/
+      │   ├── database.sqlite         ← Archivo SQLite vacío (no usado)
+      │   └── migrations/             ← 15+ migraciones
+      │
+      ├── routes/
+      │   └── api.php                 ← Todas las rutas API
+      │
+      └── app/
+          ├── Http/
+          │   └── Controllers/
+          │       ├── AuthController.php
+          │       ├── UserController.php
+          │       ├── MoodRegisterController.php
+          │       ├── ChatController.php
+          │       ├── CommunityController.php
+          │       └── StressController.php
+          │
+          ├── Models/
+          │   ├── User.php
+          │   ├── MoodRegister.php
+          │   ├── Conversation.php
+          │   ├── MessageAi.php
+          │   ├── MessageP2P.php
+          │   └── StressLog.php
+          │
+          └── Services/
+              └── PsicologoService.php  ← Integración con Ollama (IA)
+
+
+================================================================================
+  2. FRONTEND — PANTALLAS (RUTAS EXPO ROUTER)
+================================================================================
+
+  Expo Router usa el sistema de archivos para definir rutas, igual que Next.js.
+  Cada archivo en /src/app/ es una ruta navegable.
+
+  ── / (index.tsx) ─────────────────────────────────────────────────────────────
+  Pantalla de bienvenida. Muestra logo, tagline y botones para Login/Registro.
+  Estado local: showLogin (bool), showRegister (bool)
+  Renderiza: <Login /> o <CreateUser /> según el estado.
+  Tras login exitoso → router.replace('/dashboard')
+
+  ── /dashboard (dashboard.tsx) ────────────────────────────────────────────────
+  Pantalla principal tras iniciar sesión.
+  Renderiza: <DashboardView />
+  Consume: UserContext (accessToken, user)
+  Contiene: saludo, racha, alerta de ánimo, estadísticas, cita del día.
+
+  ── /calendar (calendar.tsx) ──────────────────────────────────────────────────
+  Calendario mensual de estados de ánimo.
+  Renderiza: <CalendarView />
+  Consume: UserContext
+  Contiene: grid de emojis por día, registro de estado, resumen mensual.
+
+  ── /community (community.tsx) ────────────────────────────────────────────────
+  Feed de comunidad y foro social.
+  Renderiza: <ForumView />
+  Consume: UserContext
+  Contiene: tabs Feed/Personas, posts, likes, sugerencias de amigos.
+
+  ── /profile (profile.tsx) ────────────────────────────────────────────────────
+  Perfil completo y centro de ajustes del usuario.
+  Consume: UserContext (userValue, setUserValue, logout)
+  Contiene:
+    ─ Hero card: avatar, nombre, email, puntos, racha
+    ─ Tab "Perfil": HabitProgress, ChallengesSection, AchievementsBar
+    ─ Tab "Ajustes": cuenta, privacidad, idioma, notificaciones, logout
+    ─ Modal: Editar perfil (nombre, username, email)
+    ─ Modal: Cambiar contraseña (con verificación de fortaleza)
+    ─ Modal: Selector de idioma
+  API calls:
+    ─ POST /update-profile
+    ─ POST /change-password
+    ─ POST /update-settings
+
+  ── /settings (settings.tsx) ──────────────────────────────────────────────────
+  Redirige a /profile. Mantiene compatibilidad con enlace desde el navBar.
+
+  ── /chat (chat/index.tsx) ────────────────────────────────────────────────────
+  Lista de conversaciones activas (P2P y con Bloom).
+  Consume: UserContext
+  API calls: GET /conversations
+  Muestra: avatar, nombre, último mensaje, hora, badge de no leídos.
+  Contiene: botón para buscar usuarios y abrir chat P2P.
+
+  ── /chat/@username (chat/[@username].tsx) ────────────────────────────────────
+  Chat individual entre dos usuarios.
+  Param: username del destinatario.
+  API calls:
+    ─ GET /messages/user/{recipientId} (carga historial)
+    ─ POST /messages (envía mensaje)
+    ─ POST /messages/read/{senderId} (marca como leídos)
+  Muestra: burbujas de mensajes, estado online, personalización de tema.
+
+  ── /chat/bloom (chat/bloom.tsx) ──────────────────────────────────────────────
+  Chat con la psicóloga IA "Bloom".
+  API calls: POST /chat (cada mensaje)
+  Muestra: mensajes de usuario y respuestas de Bloom.
+  El historial se mantiene en la conversación con type='ai'.
+
+  ── /challenge/[id] (challenge/[id].tsx) ──────────────────────────────────────
+  Vista de detalle de un reto específico.
+  Param: id del reto.
+  Renderiza información del reto y estado de progreso.
+
+  ── /explore (explore.tsx) ────────────────────────────────────────────────────
+  Sección informativa/educativa. Actualmente placeholder.
+
+
+================================================================================
+  3. FRONTEND — COMPONENTES DETALLADOS
+================================================================================
+
+  ── AUTENTICACIÓN ─────────────────────────────────────────────────────────────
+
+  Login.jsx
+  ─ Props: ninguno
+  ─ Consume: UserContext (setUserValue), useRouter
+  ─ Campos: emailUsername, password, showPassword (toggle)
+  ─ API: POST /api/login → { success, access_token, user }
+  ─ On success: setUserValue({ accessToken: data.access_token, user: data.user })
+  ─ Navega a: /dashboard
+
+  CreateUser.jsx
+  ─ Props: ninguno
+  ─ Consume: ninguno (solo notificación visual)
+  ─ Campos: fullName, username, email, password, confirmPassword
+  ─ API: POST /api/register → { status, user }
+  ─ On success: muestra toast de éxito, no redirige (usuario debe iniciar sesión)
+
+  ── PROVIDERS ─────────────────────────────────────────────────────────────────
+
+  user-provider.tsx (UserContext)
+  ─ Estado: userValue = { accessToken: string|null, user: object|null }
+  ─ Expone: userValue, setUserValue, logout
+  ─ logout(): setUserValue({ accessToken: null, user: null }) + router.replace('/')
+  ─ Helper: getUserThemeFromContext(userValue) → { bgName, myMsgColor, otherMsgColor, textColorOther, textColorOwn }
+  ─ Usado en: TODOS los componentes que necesitan auth o datos del usuario
+
+  ── NAVEGACIÓN ────────────────────────────────────────────────────────────────
+
+  StaticBottomNavBar.tsx
+  ─ Props: activeTab ('home'|'calendar'|'chat'|'community'|'user')
+  ─ Iconos: Feather (home, calendar, message-circle, users, user)
+  ─ Resalta la pestaña activa con color #6366F1
+  ─ Navega con router.push() a cada ruta correspondiente
+
+  ── DASHBOARD ─────────────────────────────────────────────────────────────────
+
+  DashboardView.tsx
+  ─ Contenedor principal del dashboard
+  ─ Renderiza en orden: DashboardHeader, StreakCard, ActionAlertCard, StatsBoard, QuoteCard
+  ─ Gestiona visibilidad de modales (Sleep, Stress)
+
+  DashboardHeader.tsx
+  ─ Muestra saludo personalizado ("Buenos días, {nombre}")
+  ─ Consume: UserContext (user.name)
+
+  StreakCard.tsx
+  ─ Muestra racha actual, puntos y opción de recuperar racha perdida
+  ─ API: POST /api/streakRegister
+  ─ Si hay días perdidos, ofrece recuperar (cuesta 6 puntos/día perdido)
+  ─ Actualiza userValue con patchContext tras recuperación
+
+  ActionAlertCard.tsx
+  ─ Comprueba si el usuario ya registró estado hoy
+  ─ API: POST /api/actionAlert → { ok, exists, user }
+  ─ Si no existe: muestra botón para ir a /calendar a registrar
+
+  StatsBoard.tsx
+  ─ Muestra: horas de sueño (del sleep_log de hoy) y puntuación de estrés
+  ─ API: GET /api/getDashboardInfo → { lastMood, sleepMinutes, streak }
+  ─ Botones: abren modales Sleep y Stress
+
+  Sleep.tsx (modal)
+  ─ Permite registrar horas de sueño (hora inicio, hora fin)
+  ─ API: POST /api/saveSleepLog → { date, start_time, end_time, total_minutes }
+  ─ API: GET /api/fillInHours → datos del día
+
+  Stress.tsx (modal)
+  ─ Test de 10 preguntas tipo Likert (escala 1-5) para medir estrés percibido
+  ─ API: POST /api/store → { total_score, breakdown }
+  ─ API: GET /api/getStatus → { exists, data }
+
+  QuoteCard.tsx
+  ─ Cita inspiracional estática o aleatoria
+  ─ No consume API (contenido local)
+
+  ── CALENDARIO ────────────────────────────────────────────────────────────────
+
+  CalendarView.tsx
+  ─ Contenedor. Gestiona el mes visible y el modal de registro.
+
+  CalendarGrid.tsx
+  ─ Muestra grid 7×N con emoji de humor por día
+  ─ API: GET /api/get-mood-calendar → { data: { "YYYY-MM-DD": "mood_name" } }
+  ─ Días pasados: emoji del humor. Hoy: resaltado. Futuro: gris.
+  ─ Al pulsar un día: abre MoodRegisterScreen
+
+  MoodRegisterScreen.tsx (modal)
+  ─ Selector de emoji de humor (28 opciones) + campo de texto libre
+  ─ API: POST /api/save-mood → { mood, daily_text?, date? }
+  ─ Actualiza el grid tras guardar
+
+  MonthlySummary.tsx
+  ─ Gráfico/lista de distribución de humores del mes
+  ─ API: GET /api/get-monthly-stats → [{ mood, total }]
+
+  InfoCards.tsx
+  ─ Timeline del día actual: lista de registros de humor con hora
+  ─ API: GET /api/get-today-timeline → [{ id, mood, time, text }]
+
+  ── CHAT ──────────────────────────────────────────────────────────────────────
+
+  ChatListCard.tsx
+  ─ Tarjeta individual en la lista de conversaciones
+  ─ Props: conversation { id, type, label, recipient, last_message, unread_count }
+  ─ Muestra: avatar (inicial), nombre, último mensaje, tiempo relativo, badge no leídos
+  ─ Al pulsar: navega a /chat/@username o /chat/bloom
+
+  ChatScreen.tsx
+  ─ Interfaz completa de chat P2P
+  ─ Consume: UserContext (para saber quién es el remitente)
+  ─ Muestra: lista de MessageBubble, input de mensaje, estado online
+  ─ Polling o manejo de mensajes nuevos
+  ─ Estilos del chat leídos de UserContext (my_msg_color, other_msg_color, etc.)
+
+  MessageBubble.tsx
+  ─ Props: message { content, role/sender_id, created_at, read_at }
+  ─ Diferencia: propios (derecha, color primario) vs. ajenos (izquierda, secundario)
+  ─ Textos con color configurable via UserContext
+
+  ChatCustomizer.tsx (modal)
+  ─ Permite cambiar colores de los globos de chat y fondo
+  ─ API: POST /api/chat-themes → actualiza my_msg_color, other_msg_color, etc.
+  ─ Actualiza UserContext al guardar
+
+  ── COMUNIDAD (FORUM) ─────────────────────────────────────────────────────────
+
+  ForumView.tsx
+  ─ Vista principal de la comunidad
+  ─ Estado: activeTab ('feed'|'personas'), posts[], loadingPosts, showPostModal
+  ─ Header con gradiente índigo/violeta, saludo y tabs
+  ─ Tab "Feed": FriendsMoods → StaffAnnouncements → barra compose → lista PostCard
+  ─ Tab "Personas": DiscoverPeople
+  ─ Modal de nueva publicación: TextInput con autoFocus, contador de chars, botón Publicar
+  ─ Backdrop del modal como Pressable absoluto (no interfiere con el sheet)
+  ─ API calls:
+      GET  /community/posts              → carga inicial
+      POST /community/posts              → nueva publicación
+
+  ForumHeader.tsx
+  ─ Cabecera de la sección comunidad
+  ─ Muestra: saludo con nombre del usuario, icono búsqueda, icono notificaciones
+  ─ Consume: UserContext (user.name)
+  ─ Props: onSearchPress? () => void
+
+  PostCard.tsx
+  ─ Props: post { id, user_name, username, content, date, likes_count, is_liked }
+  ─ Estado local: liked (bool), likeCount (int), liking (bool)
+  ─ Optimistic update: cambia estado inmediatamente, revierte si falla la API
+  ─ Gradiente de avatar determinado por: post.id % 5 (5 gradientes)
+  ─ timeAgo(dateStr): formatea "Ahora / Hace Xmin / Xh / Xd / dd MMM"
+  ─ API: POST /community/posts/{id}/like → { liked, likes_count }
+  ─ Botones: like (con corazón rojo si activo), comentar (placeholder), compartir
+
+  FriendsMoods.tsx
+  ─ Tarjetas horizontales de estados de ánimo de amigos seguidos
+  ─ API: GET /community/following-moods → [{ id, name, username, mood, mood_date }]
+  ─ Mapeo MOOD_MAP: 20 estados → { emoji, label, color, bg }
+  ─ Cada tarjeta: borde izquierdo del color del humor, avatar gradiente, nombre, emoji + label, tiempo relativo
+  ─ Empty state: CTA "Seguir personas" (→ setActiveTab('personas'))
+
+  DiscoverPeople.tsx
+  ─ Buscador de usuarios + sugerencias
+  ─ Estado: query, suggested[], searchResults[], searching, loadingSuggested
+  ─ API: GET /community/suggested → usuarios públicos no seguidos (ordenados por racha)
+  ─ API: GET /users/search?q={query} → búsqueda por username
+  ─ API: POST /users/follow { followed_id } → seguir/dejar de seguir
+  ─ PersonCard: avatar gradiente, nombre, @usuario, badge de racha, botón Seguir/Siguiendo
+  ─ Toggle follow actualiza la lista local sin refetch
+
+  StaffAnnouncements.tsx
+  ─ Sección de anuncios del equipo de Moodify
+  ─ Contenido estático o traído desde la API (según implementación)
+
+  ── PERFIL ────────────────────────────────────────────────────────────────────
+
+  HabitProgress.tsx
+  ─ Barras de progreso de hábitos activos del usuario
+  ─ Consume datos de todo_lists o del contexto
+
+  ChallengesSection.tsx
+  ─ Lista de retos activos con progreso
+  ─ Enlaza a /challenge/[id]
+
+  AchievementsBar.tsx
+  ─ Badges/medallas desbloqueados por el usuario
+
+
+================================================================================
+  4. FRONTEND — USERCONTEXT Y FLUJO DE AUTENTICACIÓN
+================================================================================
+
+  ESTRUCTURA DE USERCONTEXT
+  ──────────────────────────
+  userValue: {
+    accessToken: string | null,     // Bearer token de Sanctum
+    user: {
+      id:                  number,
+      name:                string,
+      email:               string,
+      username:            string,
+      type_user:           'admin' | 'user',
+      points:              number,
+      streak:              number,
+      last_streak_day:     string | null,  // ISO datetime
+      last_seen_at:        string | null,
+      image_id:            string | null,
+      theme_color:         string,         // '#6366F1' por defecto
+      bg_image:            string | null,
+      my_msg_color:        string,         // '#6366F1' por defecto
+      other_msg_color:     string,         // '#F1F5F9' por defecto
+      text_colorOwn:       string,         // '#FFFFFF' por defecto
+      text_colorOther:     string,         // '#FFFFFF' por defecto
+      is_public:           boolean,        // true por defecto
+      show_in_community:   boolean,        // true por defecto
+      notifications_enabled: boolean,     // true por defecto
+      app_bg:              string,         // 'default' por defecto
+      language:            string,         // 'es' por defecto
+    } | null
+  }
+
+  FLUJO DE AUTENTICACIÓN
+  ──────────────────────
+  1. REGISTRO (CreateUser.jsx)
+     ─ POST /api/register { fullName, username, email, password }
+     ─ Backend: crea usuario + auto-verifica email (email_verified_at = now())
+     ─ Respuesta: { status: 'success', user }
+     ─ Frontend: muestra éxito, NO redirige. Usuario debe iniciar sesión.
+
+  2. LOGIN (Login.jsx)
+     ─ POST /api/login { emailUsername, password }
+     ─ Backend: acepta email O username, valida contraseña, comprueba verificación
+     ─ Respuesta: { success: true, access_token, user, token_type: 'Bearer' }
+     ─ Frontend: setUserValue({ accessToken: data.access_token, user: data.user })
+     ─ Navega a: /dashboard
+
+  3. USO DEL TOKEN
+     ─ Todos los requests autenticados incluyen: Authorization: Bearer {accessToken}
+     ─ El token se almacena solo en memoria (UserContext) — se pierde al cerrar la app
+     ─ No hay persistencia local (AsyncStorage) — hay que hacer login cada vez
+
+  4. ACTUALIZAR CONTEXTO (patchContext pattern)
+     ─ Cuando el backend devuelve un user actualizado:
+       setUserValue((prev) => ({ ...prev, user: updatedUser }))
+     ─ Esto provoca re-render de todos los componentes que consumen UserContext
+
+  5. LOGOUT (profile.tsx)
+     ─ Alert de confirmación
+     ─ logout() → setUserValue({ accessToken: null, user: null }) + router.replace('/')
+
+  CÓMO SE USA EL TOKEN EN CADA COMPONENTE
+  ────────────────────────────────────────
+  const { userValue } = useContext(UserContext);
+  const token = userValue?.accessToken;
+
+  const authHeaders = {
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
+
+  // Cada fetch autenticado:
+  const r = await fetch(`${API}ruta`, { headers: authHeaders });
+
+
+================================================================================
+  5. FRONTEND — VARIABLES DE ENTORNO
+================================================================================
+
+  Archivo: moodify-app/.env
+
+  EXPO_PUBLIC_API_URL=http://localhost:8000/api/
+
+  ─ Usado como: const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://moodify_backend.test/api/'
+  ─ Todas las URLs de la API se construyen concatenando: ${API}endpoint
+  ─ IMPORTANTE: Cambiar en .env requiere reiniciar el servidor de Expo (r en terminal)
+  ─ Para dispositivo físico: cambiar a la IP local de la máquina (ej: http://192.168.1.X:8000/api/)
+
+  OLLAMA_HOST="ipollama"
+  ─ Usado por el backend (PsicologoService) para conectar con Ollama
+  ─ En backend/.env también debe estar configurado
+
+
+================================================================================
+  6. BACKEND — RUTAS API (routes/api.php)
+================================================================================
+
+  BASE URL: http://localhost:8000/api/
+
+  ── SIN AUTENTICACIÓN ─────────────────────────────────────────────────────────
+
+  POST   /login              AuthController@login
+  POST   /register            AuthController@register
+
+  ── CON AUTENTICACIÓN (middleware auth:sanctum) ───────────────────────────────
+
+  GET    /user                → Devuelve usuario autenticado (Sanctum helper)
+
+  ── RACHA Y ALERTAS ───────────────────────────────────────────────────────────
+  POST   /streakRegister      UserController@streakRegister
+  POST   /actionAlert         UserController@actionAlert
+
+  ── SUEÑO ─────────────────────────────────────────────────────────────────────
+  POST   /saveSleepLog        UserController@saveSleepLog
+  GET    /fillInHours         UserController@fillInHours
+
+  ── ESTRÉS ────────────────────────────────────────────────────────────────────
+  GET    /getStatus           StressController@getStatus
+  POST   /store               StressController@store
+
+  ── ESTADOS DE ÁNIMO ──────────────────────────────────────────────────────────
+  POST   /save-mood           MoodRegisterController@saveMood
+  GET    /get-mood-calendar   MoodRegisterController@getMoodCalendar
+  GET    /get-today-timeline  MoodRegisterController@getTodayTimeline
+  GET    /get-monthly-stats   MoodRegisterController@getMonthlyStats
+  GET    /getDashboardInfo    MoodRegisterController@getDashboardInfo
+
+  ── CHAT IA (BLOOM) ───────────────────────────────────────────────────────────
+  POST   /chat                ChatController@store
+
+  ── CHAT P2P ──────────────────────────────────────────────────────────────────
+  GET    /conversations       ChatController@index
+  POST   /messages            ChatController@storeP2P
+  GET    /messages/user/{recipientId}   ChatController@getMessagesByUserId
+  POST   /messages/read/{senderId}      ChatController@markAsRead
+
+  ── BÚSQUEDA Y SOCIAL ─────────────────────────────────────────────────────────
+  GET    /users/search        ChatController@searchUsers       (?q=texto)
+  POST   /users/follow        ChatController@toggleFollow
+
+  ── PERFIL Y AJUSTES ──────────────────────────────────────────────────────────
+  POST   /update-profile      UserController@updateProfile
+  POST   /change-password     UserController@changePassword
+  POST   /update-settings     UserController@updateSettings
+  POST   /chat-themes         UserController@updateTheme
+  POST   /update-profile      UserController@updateProfile
+
+  ── COMUNIDAD / FORO ──────────────────────────────────────────────────────────
+  GET    /community/following-moods     CommunityController@followingMoods
+  GET    /community/suggested           CommunityController@suggestedUsers
+  GET    /community/posts               CommunityController@getPosts       (?page=1)
+  POST   /community/posts               CommunityController@createPost
+  POST   /community/posts/{id}/like     CommunityController@likePost
+
+
+================================================================================
+  7. BACKEND — CONTROLADORES
+================================================================================
+
+  ── AuthController.php ────────────────────────────────────────────────────────
+
+  login(Request $request)
+  ─ Valida: emailUsername (required), password (required)
+  ─ Detecta si es email o username con filter_var(FILTER_VALIDATE_EMAIL)
+  ─ Busca usuario en BD, verifica contraseña con Hash::check
+  ─ Comprueba email_verified_at no sea null
+  ─ Genera token: $user->createToken('auth_token')->plainTextToken
+  ─ Retorna: { success: true, access_token, user, token_type: 'Bearer' }
+  ─ Errores: 401 credenciales incorrectas, 403 email no verificado
+
+  register(Request $request)
+  ─ Valida: fullName, username (unique), email (unique), password (min:8)
+  ─ Crea usuario con User::create([name, email, username, password hash])
+  ─ Auto-verifica: $register->email_verified_at = now(); $register->save();
+  ─ Retorna 201: { status: 'success', message, user }
+
+  ── UserController.php ────────────────────────────────────────────────────────
+
+  streakRegister(Request $request)
+  ─ Obtiene usuario autenticado
+  ─ Si never registered: inicia racha, +3 puntos
+  ─ Si registered today: devuelve estado actual (no modifica)
+  ─ Si yesterday: incrementa racha +1, +3 puntos
+  ─ Si días perdidos: puede recuperar a coste de 6 puntos/día perdido
+  ─ Actualiza: streak, points, last_streak_day
+  ─ Retorna: { ok, streak, points, days_missed, recovery_cost }
+
+  actionAlert(Request $request)
+  ─ Comprueba si existe mood_register con user_id + date = today
+  ─ Retorna: { ok: true, exists: bool, user: object }
+
+  saveSleepLog(Request $request)
+  ─ Valida: date, start_time, end_time, total_minutes
+  ─ updateOrCreate([user_id, date], [start_time, end_time, total_minutes])
+  ─ Retorna: { ok: true, data: sleepLog }
+
+  fillInHours()
+  ─ Busca sleep_log de hoy para el usuario autenticado
+  ─ Retorna: { ok: true, data: sleepLog | null }
+
+  updateProfile(Request $request)
+  ─ Valida: name (required), username (unique excepto propio), email (unique excepto propio)
+  ─ $user->update([name, username, email])
+  ─ Retorna: { status: 'success', user: object completo }
+
+  changePassword(Request $request)
+  ─ Valida: current_password (required), new_password (min:8)
+  ─ Verifica contraseña actual con Hash::check
+  ─ Actualiza: $user->update(['password' => Hash::make($new_password)])
+  ─ Retorna: { status: 'success' } | 422 si contraseña incorrecta
+
+  updateSettings(Request $request)
+  ─ Valida (todos nullable): is_public, show_in_community, notifications_enabled, app_bg, language
+  ─ $user->update($request->only([campos]))
+  ─ Retorna: { status: 'success', user: object completo }
+
+  updateTheme(Request $request)
+  ─ Acepta: bgName, myMsgColor, otherMsgColor, textColorOwn, textColorOther
+  ─ Mapea a campos de BD: bg_image, my_msg_color, other_msg_color, etc.
+  ─ Retorna: { status: 'success', user: object con tema actualizado }
+
+  ── MoodRegisterController.php ────────────────────────────────────────────────
+
+  saveMood(Request $request)
+  ─ Valida: mood (required, enum de ~28 valores), daily_text?, date?
+  ─ Crea nuevo registro (permite múltiples por día → historial)
+  ─ Retorna: { ok: true, data: { id, user_id, mood, daily_text, date } }
+
+  getMoodCalendar(Request $request)
+  ─ Obtiene todos los registros del mes actual del usuario
+  ─ Agrupa por fecha, toma el ÚLTIMO de cada día
+  ─ Retorna: { data: { "2026-05-10": "happy", "2026-05-09": "calm", ... } }
+
+  getTodayTimeline(Request $request)
+  ─ Obtiene todos los registros de hoy ordenados por fecha desc
+  ─ Retorna: [{ id, mood, time: ISO_string, text: daily_text }]
+
+  getMonthlyStats(Request $request)
+  ─ Agrupa registros del mes por mood con COUNT
+  ─ Retorna: [{ mood: 'happy', total: 8 }, { mood: 'calm', total: 5 }, ...]
+
+  getDashboardInfo(Request $request)
+  ─ Consulta en paralelo: último mood, sleep de hoy, racha actual
+  ─ Retorna: { lastMood: 'happy'|null, sleepMinutes: int|0, streak: int }
+
+  ── ChatController.php ────────────────────────────────────────────────────────
+
+  index() → GET /conversations
+  ─ Busca conversaciones donde user_id = auth OR recipient_id = auth
+  ─ Solo type = 'p2p'
+  ─ Append para cada conversación: last_message, last_message_sender_id, last_message_at, unread_count
+  ─ Retorna: array de conversaciones con datos de destinatario
+
+  getMessagesByUserId($recipientId) → GET /messages/user/{recipientId}
+  ─ Busca o crea conversación P2P entre los dos usuarios
+  ─ Carga historial de messages_p2p ordenado por created_at asc
+  ─ Actualiza last_seen_at del usuario autenticado
+  ─ Retorna: { messages[], recipient_online: bool (last_seen < 5min), conversation }
+
+  storeP2P(Request) → POST /messages
+  ─ Valida: mensaje (required), recipient_id (required)
+  ─ Crea o reutiliza conversación P2P
+  ─ Inserta en messages_p2p: { conversations_id, sender_id, content }
+  ─ Retorna: { status: 'success', conversation_id, message: objeto }
+
+  markAsRead($senderId) → POST /messages/read/{senderId}
+  ─ Actualiza read_at = now() para todos los mensajes de senderId en la conversación
+  ─ Retorna: { status: 'success' }
+
+  searchUsers(Request) → GET /users/search?q=
+  ─ Si q vacío: retorna []
+  ─ WHERE username LIKE '%{q}%' AND id != auth_user
+  ─ Para cada resultado: comprueba si auth_user sigue al usuario (is_following)
+  ─ Retorna: [{ id, name, username, image_id, streak, is_following }]
+
+  toggleFollow(Request) → POST /users/follow
+  ─ Valida: followed_id (required)
+  ─ Comprueba en followed_follower si ya existe el par (follower_id, followed_id)
+  ─ Si existe: DELETE (dejar de seguir) → retorna { status: 'unfollowed' }
+  ─ Si no existe: INSERT → retorna { status: 'followed' }
+
+  store(Request) → POST /chat (IA Bloom)
+  ─ Valida: mensaje (required)
+  ─ Busca o crea conversación con type='ai' para el usuario
+  ─ Guarda mensaje del usuario en messages_ai (role: 'user')
+  ─ Llama a PsicologoService::generarRespuesta(historial, mensaje)
+  ─ Guarda respuesta de Bloom en messages_ai (role: 'assistant')
+  ─ Retorna: { respuesta: texto_bloom, status: 'ok' }
+
+  ── CommunityController.php ───────────────────────────────────────────────────
+
+  followingMoods(Request) → GET /community/following-moods
+  ─ Obtiene IDs de usuarios que sigo (followed_follower WHERE follower_id = auth)
+  ─ Para cada uno: último registro en mood_registers (orderBy date DESC, limit 1)
+  ─ Retorna: [{ id, name, username, image_id, mood: string|null, mood_date: string|null }]
+
+  suggestedUsers(Request) → GET /community/suggested
+  ─ Excluye: los que ya sigo + yo mismo
+  ─ Filtra: is_public = true
+  ─ Ordena: por streak DESC, limit 10
+  ─ Retorna: [{ id, name, username, image_id, streak, points }]
+
+  getPosts(Request) → GET /community/posts?page=1
+  ─ JOIN publications + users
+  ─ Paginación: 20 por página, offset calculado
+  ─ Para cada post: likesCount (COUNT post_likes), isLiked (EXISTS para auth user)
+  ─ Retorna: [{ id, title, content, date, user_id, user_name, username, image_id, likes_count, is_liked }]
+
+  createPost(Request) → POST /community/posts
+  ─ Valida: content (required, max:1000)
+  ─ INSERT en publications: { title:'', text_publications: content, date: now(), user_id: auth }
+  ─ Hace JOIN para devolver datos completos del post recién creado
+  ─ Retorna 201: { id, title, content, date, user_id, user_name, username, image_id, likes_count: 0, is_liked: false }
+
+  likePost(Request, $id) → POST /community/posts/{id}/like
+  ─ Comprueba si existe (user_id, publication_id) en post_likes
+  ─ Si existe: DELETE → liked = false
+  ─ Si no existe: INSERT → liked = true
+  ─ Cuenta total de likes del post
+  ─ Retorna: { liked: bool, likes_count: int }
+
+  ── StressController.php ──────────────────────────────────────────────────────
+
+  getStatus(Request) → GET /getStatus
+  ─ Busca stress_test de hoy (created_at DATE = today) para el usuario
+  ─ Retorna: { exists: bool, data: { total_score, breakdown }|null }
+
+  store(Request) → POST /store
+  ─ Valida: total_score (required, int), breakdown (array)
+  ─ Inserta en stress_tests: { user_id, total_score, breakdown: JSON }
+  ─ Retorna: { status: 'success' }
+
+
+================================================================================
+  8. BACKEND — MODELOS
+================================================================================
+
+  ── User.php ──────────────────────────────────────────────────────────────────
+  Tabla: users
+  Extends: Authenticatable (para Sanctum)
+  Atributo PHP 8: #[Fillable([...])]
+  Fillable: name, email, username, password, last_streak_day, last_seen_at,
+            bg_image, my_msg_color, other_msg_color, text_colorOwn, text_colorOther,
+            is_public, show_in_community, notifications_enabled, app_bg, language
+  Hidden: password, remember_token
+  Casts: email_verified_at → datetime
+  Traits: HasApiTokens (Sanctum), HasFactory, Notifiable
+
+  ── MoodRegister.php ──────────────────────────────────────────────────────────
+  Tabla: mood_registers
+  Fillable: user_id, mood, date, daily_text
+  Relación: belongsTo(User)
+
+  ── Conversation.php ──────────────────────────────────────────────────────────
+  Tabla: conversations
+  Fillable: user_id, type, label, recipient_id, is_blocked, blocked_by
+  Appends (atributos computados): last_message, last_message_sender_id,
+                                   last_message_at, unread_count
+  Relaciones:
+    user()      → belongsTo(User, 'user_id')
+    recipient() → belongsTo(User, 'recipient_id')
+    messagesAi() → hasMany(MessageAi, 'conversations_id')
+    messagesP2P() → hasMany(MessageP2P, 'conversations_id')
+
+  ── MessageAi.php ─────────────────────────────────────────────────────────────
+  Tabla: messages_ai
+  Fillable: conversations_id, role, content, mood_detected
+  Relación: belongsTo(Conversation, 'conversations_id')
+
+  ── MessageP2P.php ────────────────────────────────────────────────────────────
+  Tabla: messages_p2p
+  Fillable: conversations_id, sender_id, content, read_at
+  Relaciones:
+    conversation() → belongsTo(Conversation, 'conversations_id')
+    sender()       → belongsTo(User, 'sender_id')
+
+  ── StressLog.php ─────────────────────────────────────────────────────────────
+  Tabla: stress_tests
+  Fillable: user_id, total_score, breakdown
+  Casts: breakdown → array (JSON)
+
+
+================================================================================
+  9. BACKEND — ESQUEMA DE BASE DE DATOS
+================================================================================
+
+  Base de datos: SQLite
+  Archivo: moodify_backend/moodify  (el archivo "moodify" sin extensión)
+  Nota: moodify_backend/database/database.sqlite existe pero está vacío (0 bytes)
+
+  ── TABLE: users ──────────────────────────────────────────────────────────────
+  id                    INTEGER  PRIMARY KEY AUTOINCREMENT
+  name                  VARCHAR  NOT NULL
+  email                 VARCHAR  NOT NULL   UNIQUE
+  email_verified_at     DATETIME NULL
+  password              VARCHAR  NOT NULL   (bcrypt hash)
+  remember_token        VARCHAR  NULL
+  username              VARCHAR  NOT NULL   UNIQUE
+  type_user             VARCHAR  DEFAULT 'user'  CHECK IN ('admin','user')
+  points                INTEGER  DEFAULT 0
+  streak                INTEGER  DEFAULT 0
+  last_streak_day       DATETIME NULL
+  image_id              VARCHAR  NULL
+  last_seen_at          DATETIME NULL
+  theme_color           VARCHAR  DEFAULT '#6366F1'
+  bg_image              VARCHAR  NULL
+  my_msg_color          VARCHAR  DEFAULT '#6366F1'
+  other_msg_color       VARCHAR  DEFAULT '#F1F5F9'
+  text_colorOwn         VARCHAR  DEFAULT '#FFFFFF'
+  text_colorOther       VARCHAR  DEFAULT '#FFFFFF'
+  is_public             TINYINT  DEFAULT 1
+  show_in_community     TINYINT  DEFAULT 1
+  notifications_enabled TINYINT  DEFAULT 1
+  app_bg                VARCHAR  DEFAULT 'default'
+  language              VARCHAR  DEFAULT 'es'
+  created_at            DATETIME NULL
+  updated_at            DATETIME NULL
+
+  ── TABLE: mood_registers ─────────────────────────────────────────────────────
+  id          INTEGER  PRIMARY KEY AUTOINCREMENT
+  user_id     INTEGER  NOT NULL   FK → users(id) CASCADE DELETE
+  mood        VARCHAR  (enum de ~28 valores)
+  date        TIMESTAMP NULL
+  daily_text  TEXT     NULL
+  created_at  DATETIME NULL
+  updated_at  DATETIME NULL
+
+  Valores de mood: happy, glad, excited, calm, proud, confident, grateful,
+                   in_love, peaceful, sad, angry, scared, anxious, annoyed,
+                   frustrated, embarrassed, lonely, worried, furious, tired,
+                   sleepy, bored, confused, surprised, serious, shy, hungry,
+                   motivated, relaxed, energetic, focused, stressed, nervous,
+                   overwhelmed, hopeful
+
+  ── TABLE: sleep_logs ─────────────────────────────────────────────────────────
+  id              INTEGER  PRIMARY KEY AUTOINCREMENT
+  user_id         INTEGER  FK → users(id) CASCADE DELETE
+  date            DATE     NULL
+  start_time      DATETIME NULL
+  end_time        DATETIME NULL
+  total_minutes   INTEGER  NULL
+
+  ── TABLE: stress_tests ───────────────────────────────────────────────────────
+  id           INTEGER  PRIMARY KEY AUTOINCREMENT
+  user_id      INTEGER  FK → users(id) CASCADE DELETE
+  total_score  INTEGER  NOT NULL
+  breakdown    JSON/TEXT  (serializado como JSON)
+  created_at   DATETIME NULL
+  updated_at   DATETIME NULL
+
+  ── TABLE: conversations ──────────────────────────────────────────────────────
+  id           INTEGER  PRIMARY KEY AUTOINCREMENT
+  user_id      INTEGER  FK → users(id) CASCADE DELETE
+  type         VARCHAR  CHECK IN ('ai','p2p')
+  label        VARCHAR  NULL
+  recipient_id INTEGER  FK → users(id) NULL
+  is_blocked   TINYINT  DEFAULT 0
+  blocked_by   INTEGER  FK → users(id) NULL
+  created_at   DATETIME NULL
+  updated_at   DATETIME NULL
+
+  ── TABLE: messages_ai ────────────────────────────────────────────────────────
+  id                INTEGER  PRIMARY KEY AUTOINCREMENT
+  conversations_id  INTEGER  FK → conversations(id) CASCADE DELETE
+  role              VARCHAR  CHECK IN ('user','assistant')
+  content           LONGTEXT NOT NULL
+  mood_detected     VARCHAR  NULL
+  created_at        DATETIME NULL
+  updated_at        DATETIME NULL
+
+  ── TABLE: messages_p2p ───────────────────────────────────────────────────────
+  id                INTEGER  PRIMARY KEY AUTOINCREMENT
+  conversations_id  INTEGER  FK → conversations(id) CASCADE DELETE
+  sender_id         INTEGER  FK → users(id) CASCADE DELETE
+  content           TEXT     NULL
+  read_at           TIMESTAMP NULL
+  created_at        DATETIME NULL
+  updated_at        DATETIME NULL
+
+  ── TABLE: publications ───────────────────────────────────────────────────────
+  id                  INTEGER  PRIMARY KEY AUTOINCREMENT
+  title               VARCHAR(100)   (vacío para posts de foro, usado para otro tipo)
+  text_publications   TEXT     NOT NULL
+  date                TIMESTAMP NOT NULL
+  user_id             INTEGER  FK → users(id)
+  (sin timestamps created_at/updated_at)
+
+  ── TABLE: post_likes ─────────────────────────────────────────────────────────
+  id              INTEGER  PRIMARY KEY AUTOINCREMENT
+  user_id         INTEGER  FK → users(id) CASCADE DELETE
+  publication_id  INTEGER  FK → publications(id) CASCADE DELETE
+  created_at      DATETIME NULL
+  updated_at      DATETIME NULL
+  UNIQUE (user_id, publication_id)  → un usuario no puede dar like dos veces
+
+  ── TABLE: followed_follower (pivote) ─────────────────────────────────────────
+  follower_id  INTEGER  FK → users(id) CASCADE DELETE
+  followed_id  INTEGER  FK → users(id) CASCADE DELETE
+  created_at   DATETIME NULL
+  updated_at   DATETIME NULL
+  (sin PK autoincrement — clave compuesta follower_id + followed_id)
+
+  ── TABLE: todo_lists ─────────────────────────────────────────────────────────
+  id              INTEGER  PRIMARY KEY AUTOINCREMENT
+  title           VARCHAR(100)
+  time_quantity   VARCHAR(100)
+  times_for_week  VARCHAR(100)
+  completed       TINYINT  DEFAULT 0
+  user_id         INTEGER  FK → users(id) CASCADE DELETE
+
+  ── TABLAS DE FRAMEWORK (Laravel) ─────────────────────────────────────────────
+  migrations         (registro de migraciones ejecutadas)
+  sessions           (sesiones Laravel)
+  cache              (caché Laravel)
+  cache_locks        (bloqueos de caché)
+  failed_jobs        (trabajos de cola fallidos)
+  password_reset_tokens
+
+
+================================================================================
+  10. BACKEND — MIGRACIONES
+================================================================================
+
+  Las migraciones se ejecutan con: php artisan migrate
+  La base de datos real es: moodify_backend/moodify (SQLite sin extensión)
+
+  Orden cronológico aproximado:
+  ─ create_users_table                    (usuarios base)
+  ─ create_password_reset_tokens_table
+  ─ create_sessions_table
+  ─ create_cache_table
+  ─ create_jobs_table
+  ─ add_username_to_users_table           (campo username)
+  ─ add_points_streak_to_users_table      (gamificación)
+  ─ create_mood_registers_table
+  ─ create_sleep_logs_table
+  ─ create_stress_tests_table
+  ─ create_conversations_table
+  ─ create_messages_ai_table
+  ─ create_messages_p2p_table
+  ─ create_publications_table
+  ─ create_followed_follower_table
+  ─ add_chat_fields_to_users_table        (colores de chat)
+  ─ create_todo_lists_table
+  ─ 2026_05_10_000000_add_profile_settings_to_users
+      Añade: is_public, show_in_community, notifications_enabled, app_bg, language
+  ─ 2026_05_10_000001_create_post_likes_table
+      Crea tabla post_likes con FK y UNIQUE constraint
+
+
+================================================================================
+  11. BACKEND — SERVICIO DE IA (PsicologoService.php)
+================================================================================
+
+  Ubicación: moodify_backend/app/Services/PsicologoService.php
+
+  Función: Integración con Ollama para generar respuestas de Bloom (psicóloga IA)
+
+  Modelo usado: qwen3-vl:30b (multimodal)
+  Endpoint Ollama: POST {OLLAMA_HOST}/api/chat
+
+  System prompt de Bloom:
+  ─ Se presenta como psicóloga empática llamada Bloom
+  ─ Tiene escucha activa, nunca juzga
+  ─ Hace preguntas abiertas para profundizar
+  ─ Responde siempre en el idioma del usuario
+  ─ Tono cálido, cercano, profesional
+
+  Método principal: generarRespuesta(array $historial, string $nuevoMensaje)
+  ─ Formatea el historial de messages_ai como array de mensajes OpenAI-compatible
+  ─ Añade el nuevo mensaje al final
+  ─ Llama a Ollama con el historial completo (conversación continua)
+  ─ Retorna: string con la respuesta de Bloom
+  ─ En caso de error: retorna mensaje de fallback predefinido
+
+  Integración en ChatController@store:
+  1. Guarda mensaje del usuario → messages_ai (role: 'user')
+  2. Recupera historial completo de la conversación
+  3. Llama PsicologoService::generarRespuesta(historial, mensaje)
+  4. Guarda respuesta → messages_ai (role: 'assistant')
+  5. Retorna { respuesta, status: 'ok' } al frontend
+
+
+================================================================================
+  12. FLUJO COMPLETO DE LAS FUNCIONALIDADES PRINCIPALES
+================================================================================
+
+  ── REGISTRO DE ESTADO DE ÁNIMO (flujo completo) ─────────────────────────────
+
+  1. Usuario abre /calendar
+  2. CalendarGrid carga: GET /get-mood-calendar → mapa de fechas
+  3. Usuario pulsa el día de hoy
+  4. Se abre MoodRegisterScreen (modal)
+  5. Selecciona emoji de humor + escribe texto opcional
+  6. Pulsa "Guardar"
+  7. POST /save-mood { mood, daily_text, date }
+  8. Backend: INSERT en mood_registers
+  9. Frontend: cierra modal, recarga CalendarGrid
+  10. ActionAlertCard (en /dashboard) ya no muestra alerta
+
+  ── CHAT P2P (flujo completo) ──────────────────────────────────────────────────
+
+  1. Usuario abre /chat
+  2. GET /conversations → lista de chats con último mensaje
+  3. Pulsa en un chat O busca usuario con GET /users/search?q=
+  4. Navega a /chat/@username
+  5. GET /messages/user/{recipientId} → historial + estado online
+  6. Usuario escribe y envía: POST /messages { mensaje, recipient_id }
+  7. Mensaje aparece en burbuja derecha (propio)
+  8. Cuando el otro usuario abre el chat: POST /messages/read/{senderId}
+  9. Badge de no leídos se actualiza en la lista
+
+  ── CHAT CON BLOOM IA (flujo completo) ────────────────────────────────────────
+
+  1. Usuario abre /chat/bloom
+  2. Carga historial de la conversación AI del usuario (ya persistida en BD)
+  3. Usuario escribe mensaje
+  4. POST /chat { mensaje }
+  5. Backend:
+     a. Guarda mensaje usuario en messages_ai
+     b. Recupera historial completo
+     c. PsicologoService llama a Ollama con historial + nuevo mensaje
+     d. Guarda respuesta de Bloom en messages_ai
+  6. Frontend recibe { respuesta } y muestra burbuja de Bloom
+
+  ── PUBLICAR EN LA COMUNIDAD (flujo completo) ─────────────────────────────────
+
+  1. Usuario abre /community → tab Feed
+  2. GET /community/posts → carga los 20 posts más recientes
+  3. Pulsa la barra "¿Qué tienes en mente?"
+  4. Se abre el modal de nueva publicación
+  5. Escribe el texto (max 1000 chars), contador visible
+  6. Pulsa "Publicar"
+  7. POST /community/posts { content }
+  8. Backend: INSERT en publications, devuelve post completo
+  9. Frontend: añade el nuevo post al inicio de la lista, cierra modal
+  10. El post aparece inmediatamente en el feed
+
+  ── DAR LIKE A UN POST (flujo completo) ───────────────────────────────────────
+
+  1. Usuario ve PostCard en el feed
+  2. Pulsa el icono de corazón
+  3. Optimistic update: corazón se pone rojo, contador +1 inmediatamente
+  4. POST /community/posts/{id}/like
+  5. Backend: toggle en post_likes (INSERT o DELETE)
+  6. Devuelve: { liked: bool, likes_count: int }
+  7. Frontend: actualiza estado con valores reales del servidor
+  8. Si falla la red: rollback al estado anterior
+
+  ── SEGUIR A UN USUARIO (flujo completo) ──────────────────────────────────────
+
+  1. Usuario ve PersonCard en DiscoverPeople o búsqueda
+  2. Pulsa "Seguir"
+  3. Optimista: botón cambia a "Siguiendo" inmediatamente
+  4. POST /users/follow { followed_id }
+  5. Backend: INSERT en followed_follower → retorna { status: 'followed' }
+  6. Para dejar de seguir: mismo endpoint, DELETE en BD → { status: 'unfollowed' }
+  7. El usuario ahora aparece en /community/following-moods
+
+  ── ACTUALIZAR PERFIL (flujo completo) ────────────────────────────────────────
+
+  1. Usuario abre /profile → tab Ajustes
+  2. Pulsa "Editar perfil"
+  3. Se abre modal con campos pre-rellenados (nombre, @usuario, email)
+  4. Modifica los campos
+  5. Pulsa "Guardar cambios"
+  6. POST /update-profile { name, username, email }
+  7. Backend: valida unicidad excluyendo propio ID, actualiza
+  8. Retorna: { status: 'success', user: objeto actualizado }
+  9. Frontend: patchContext(data.user) → actualiza UserContext
+  10. Hero card muestra nombre actualizado inmediatamente
+
+
+================================================================================
+  13. RELACIONES ENTRE COMPONENTES Y ENDPOINTS
+================================================================================
+
+  COMPONENTE                    → ENDPOINTS CONSUMIDOS
+  ─────────────────────────────────────────────────────────────────────────────
+  Login.jsx                     → POST /login
+  CreateUser.jsx                → POST /register
+  StreakCard.tsx                → POST /streakRegister
+  ActionAlertCard.tsx           → POST /actionAlert
+  StatsBoard.tsx                → GET /getDashboardInfo
+  Sleep.tsx                     → POST /saveSleepLog, GET /fillInHours
+  Stress.tsx                    → POST /store, GET /getStatus
+  CalendarGrid.tsx              → GET /get-mood-calendar
+  MoodRegisterScreen.tsx        → POST /save-mood
+  MonthlySummary.tsx            → GET /get-monthly-stats
+  InfoCards.tsx                 → GET /get-today-timeline
+  ChatScreen.tsx (list)         → GET /conversations
+  ChatScreen.tsx (P2P)          → GET /messages/user/{id}, POST /messages, POST /messages/read/{id}
+  bloom.tsx                     → POST /chat
+  ChatCustomizer.tsx            → POST /chat-themes
+  DiscoverPeople.tsx            → GET /community/suggested, GET /users/search?q=, POST /users/follow
+  FriendsMoods.tsx              → GET /community/following-moods
+  ForumView.tsx                 → GET /community/posts, POST /community/posts
+  PostCard.tsx                  → POST /community/posts/{id}/like
+  profile.tsx                   → POST /update-profile, POST /change-password, POST /update-settings
+
+  TABLA BD                → CONTROLADORES QUE LA USAN
+  ─────────────────────────────────────────────────────────────────────────────
+  users                   → AuthController, UserController, ChatController, CommunityController
+  mood_registers          → MoodRegisterController, CommunityController (followingMoods)
+  sleep_logs              → UserController
+  stress_tests            → StressController
+  conversations           → ChatController
+  messages_ai             → ChatController, PsicologoService
+  messages_p2p            → ChatController
+  publications            → CommunityController
+  post_likes              → CommunityController
+  followed_follower       → ChatController, CommunityController
+  todo_lists              → (sin controlador activo expuesto actualmente)
+
+
+================================================================================
+  14. INTERNACIONALIZACIÓN (i18n)
+================================================================================
+
+  Sistema: i18next
+  Configuración: moodify-app/src/i18n/i18n.js
+
+  Idiomas soportados:
+  ─ es  Español (por defecto)
+  ─ en  Inglés
+  ─ ca  Catalán
+  ─ fr  Français  (parcial)
+  ─ de  Deutsch   (parcial)
+  ─ pt  Português (parcial)
+
+  Archivos de traducción:
+  ─ es.js  → traducción completa
+  ─ en.js  → traducción completa
+  ─ ca.js  → traducción completa
+
+  Namespaces de claves:
+  ─ panel.*            → pantalla dashboard
+  ─ firstPage.*        → pantalla de bienvenida/login
+  ─ loginRegister.*    → formularios de acceso
+  ─ message.*          → mensajes de error/éxito de la API
+  ─ message.fieldRequired
+  ─ message.notVerified
+  ─ message.incorrectCredentials
+  ─ message.register.createUserSuccess
+  ─ message.register.accountAlreadyExistEmail
+  ─ message.register.accountAlreadyExistUsername
+
+  El idioma seleccionado se guarda en users.language y en los ajustes locales.
+  El selector de idioma está en /profile → Ajustes → Apariencia.
+
+
+================================================================================
+  15. CONFIGURACIÓN DE ENTORNO
+================================================================================
+
+  ── FRONTEND (moodify-app/.env) ───────────────────────────────────────────────
+
+  EXPO_PUBLIC_API_URL=http://localhost:8000/api/
+
+  Notas:
+  ─ Para emulador Android: cambiar a http://10.0.2.2:8000/api/
+  ─ Para dispositivo físico: cambiar a http://{IP_LOCAL}:8000/api/
+  ─ Requiere reinicio de Expo tras cambiar: pulsa 'r' en la terminal
+  ─ El prefijo EXPO_PUBLIC_ es obligatorio para que Expo lo inyecte en el bundle
+
+  ── BACKEND (moodify_backend/.env) ────────────────────────────────────────────
+
+  APP_URL=http://localhost
+  DB_CONNECTION=sqlite
+  DB_DATABASE=moodify          ← Apunta al archivo ./moodify (sin extensión)
+  OLLAMA_HOST="ipollama"       ← Host del servidor Ollama para la IA
+
+  Notas:
+  ─ El archivo de BD real es: moodify_backend/moodify (172KB aprox.)
+  ─ moodify_backend/database/database.sqlite existe pero está VACÍO (0 bytes)
+  ─ El servidor Laravel se inicia con: php artisan serve (puerto 8000 por defecto)
+  ─ Sanctum ya está configurado para APIs (stateless, sin CSRF para API routes)
+
+  ── COMANDOS ÚTILES ───────────────────────────────────────────────────────────
+
+  # Backend
+  cd moodify_backend
+  php artisan serve                          → Inicia servidor en localhost:8000
+  php artisan migrate:status                 → Ver estado de migraciones
+  php artisan migrate                        → Ejecutar migraciones pendientes
+  php artisan route:list                     → Ver todas las rutas
+  sqlite3 moodify ".tables"                  → Ver tablas en la BD
+  sqlite3 moodify "SELECT * FROM users;"     → Consultar datos
+
+  # Frontend
+  cd moodify-app
+  npx expo start                             → Inicia Expo (web en localhost:8081)
+  npx expo start --web                       → Fuerza modo web
+  npx tsc --noEmit                           → Verificar TypeScript sin compilar
+
+================================================================================
+  FIN DEL DOCUMENTO
+================================================================================

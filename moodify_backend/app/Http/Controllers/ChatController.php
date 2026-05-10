@@ -170,10 +170,12 @@ public function getMessagesByUserId($recipientId)
                 ->exists();
 
             return [
-                'id' => $user->id,
-                'username' => $user->username,
-                'image_id' => $user->image_id,
-                'is_following' => $isFollowing
+                'id'           => $user->id,
+                'name'         => $user->name,
+                'username'     => $user->username,
+                'image_id'     => $user->image_id,
+                'streak'       => $user->streak,
+                'is_following' => $isFollowing,
             ];
         });
 
