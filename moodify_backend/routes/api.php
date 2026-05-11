@@ -1,5 +1,8 @@
 <?php
+use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChallengeController;
+use App\Http\Controllers\HabitController;
 use App\Http\Controllers\MoodRegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatController;
@@ -17,10 +20,12 @@ Route::post('/streakRegister', [UserController::class, 'streakRegister'])->middl
 Route::post('/actionAlert',[UserController::class, 'actionAlert'])->middleware('auth:sanctum');
 Route::post('/saveSleepLog',[UserController::class, 'saveSleepLog'])->middleware('auth:sanctum');
 Route::post('/fillInHours',[UserController::class, 'fillInHours'])->middleware('auth:sanctum');
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/getStatus', [App\Http\Controllers\StressController::class, 'getStatus']);
     Route::post('/store', [App\Http\Controllers\StressController::class, 'store']);
 });
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/save-mood', [MoodRegisterController::class, 'saveMood']);
     Route::get('/get-mood-calendar', [MoodRegisterController::class, 'getMoodCalendar']);
@@ -46,4 +51,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/community/posts', [CommunityController::class, 'getPosts']);
     Route::post('/community/posts', [CommunityController::class, 'createPost']);
     Route::post('/community/posts/{id}/like', [CommunityController::class, 'likePost']);
+
+    Route::get('/habits/weekly-status', [HabitController::class, 'getWeeklyStatus']);
+    Route::get('/habits/today', [HabitController::class, 'getTodayHabits']);
+    Route::post('/habits', [HabitController::class, 'store']);
+    Route::post('/habits/toggle/{id}', [HabitController::class, 'toggleHabit']);
+    Route::delete('/habits/{id}', [HabitController::class, 'destroy']);
+
+    Route::get('/challenges', [ChallengeController::class, 'index']);
+    Route::post('/challenges', [ChallengeController::class, 'store']);
+    Route::put('/challenges/{id}', [ChallengeController::class, 'update']);
+    Route::delete('/challenges/{id}', [ChallengeController::class, 'destroy']);
+
+    Route::post('/challenges/{id}/mark-day', [ChallengeController::class, 'markDay']);
+
+    Route::get('/achievements', [AchievementController::class, 'getAchievements']);
 });
