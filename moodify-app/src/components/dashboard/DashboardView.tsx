@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { DashboardBackground } from './DashboardBackground';
@@ -9,12 +9,13 @@ import { StatsBoard } from './StatsBoard';
 import { QuoteCard } from './QuoteCard';
 import { Sleep } from './Sleep';
 import Stress from './Stress'; 
+import { UserContext } from '@/components/user-provider';
 import { StaticBottomNavBar } from '../StaticBottomNavBar';
 
 const DashboardView = () => {
   const [showSleep, setShowSleep] = useState(false);
   const [showStress, setShowStress] = useState(false); 
-
+  const { unreadCount } = useContext(UserContext);
   if (showSleep) {
     return <Sleep onBack={() => setShowSleep(false)} />;
   }
@@ -44,7 +45,10 @@ const DashboardView = () => {
         </ScrollView>
       </DashboardBackground>
 
-      <StaticBottomNavBar activeTab="home" />
+      <StaticBottomNavBar 
+        activeTab="home" 
+        hasNotifications={unreadCount > 0} 
+      />
     </View>
   );
 };

@@ -8,11 +8,12 @@ import { UserContext } from '../user-provider';
 import questionsData from '../../utils/stress.json'; 
 import { getJsonText, getRandomQuestions, processResults } from '../../utils/utils';
 import { StaticBottomNavBar } from '../StaticBottomNavBar';
+import { ThemedText } from '../themed-text';
 
 const { width } = Dimensions.get('window');
 
 const Stress = ({ navigation }: any) => {
-  const { i18n } = useTranslation();
+  const {t, i18n } = useTranslation();
   const { userValue } = useContext(UserContext);
 
   const [view, setView] = useState<'LOADING' | 'ROCO' | 'INTRO' | 'QUIZ' | 'CALCULATING'>('LOADING');
@@ -81,6 +82,16 @@ const Stress = ({ navigation }: any) => {
     }
   };
 
+  const handleBack = () => {
+    if (currentIndex > 0) {
+      const prevIdx = currentIndex - 1;
+      setCurrentIndex(prevIdx);
+      setSelectedInCurrent(userAnswers[prevIdx] || null);
+    } else {
+      navigation.goBack();
+    }
+  };
+
   const saveAndFinish = async (finalAnswers: any[]) => {
     setView('CALCULATING');
     const results = processResults(finalAnswers);
@@ -115,10 +126,10 @@ const Stress = ({ navigation }: any) => {
   const getMainLevel = (breakdown: any) => {
     if (!breakdown) return { name: "Pendiente", color: "#666" };
     const levels = [
-      { name: "Relajado", val: Number(breakdown.relajado) || 0, color: '#acdaad' },
-      { name: "Leve", val: Number(breakdown.leve) || 0, color: 'rgb(240, 235, 190)' },
-      { name: "Moderado", val: Number(breakdown.moderado) || 0, color: '#dacbac' },
-      { name: "Alto", val: Number(breakdown.alto) || 0, color: '#f0bebe' },
+      { name: t('dashboard.relaxed'), val: Number(breakdown.relajado) || 0, color: '#a2cea2' },
+      { name: t('dashboard.mild'), val: Number(breakdown.leve) || 0, color: 'rgb(226, 222, 182)' },
+      { name: t('dashboard.moderate'), val: Number(breakdown.moderado) || 0, color: '#ccbea1' },
+      { name: t('dashboard.high'), val: Number(breakdown.alto) || 0, color: '#dfadad' },
     ];
     return levels.sort((a, b) => b.val - a.val)[0];
   };
@@ -133,17 +144,17 @@ const Stress = ({ navigation }: any) => {
     </View>
   );
 
-  if (view === 'ROCO') {
+if (view === 'ROCO') {
     const data = lastResult?.data || lastResult;
     const mainLevel = getMainLevel(data?.breakdown);
 
     return (
-      <View style={styles.containerCenter}>
+      <ScrollView contentContainerStyle={[styles.containerCenter, { paddingVertical: 60 }]}>
         <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
           <Feather name="x" size={28} color="#333" />
         </TouchableOpacity>
         
-        <Text style={styles.title}>Tu Estado de Hoy</Text>
+        <Text style={styles.title}>{t('survey.actualStress')}</Text>
         
         <PieChart
           donut radius={110} innerRadius={85}
@@ -155,24 +166,48 @@ const Stress = ({ navigation }: any) => {
           ]}
           centerLabelComponent={() => (
             <View style={{alignItems:'center'}}>
-              <Text style={{fontSize: 34, fontWeight:'bold'}}>{data?.total_score || 0}</Text>
-              <Text style={{fontSize: 12, color: '#666', letterSpacing: 1}}>PUNTOS</Text>
+              {/* Aquí mostramos la puntuación sobre 40 */}
+              <Text style={{fontSize: 28, fontWeight:'bold'}}>{data?.total_score || 0}/40</Text>
+              <Text style={{fontSize: 10, color: '#666', letterSpacing: 1, fontWeight: '600'}}>{t('dashboard.totalPoints')}</Text>
             </View>
           )}
         />
 
+        {/* Leyenda Explicativa */}
+        <View style={styles.legendContainer}>
+          <View style={styles.legendItem}>
+            <View style={[styles.dot, { backgroundColor: '#acdaad' }]} />
+            <Text style={styles.legendText}>0-10: {t('dashboard.relaxed')}</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.dot, { backgroundColor: 'rgb(240, 235, 190)' }]} />
+            <Text style={styles.legendText}>11-20: {t('dashboard.mild')}</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.dot, { backgroundColor: '#dacbac' }]} />
+            <Text style={styles.legendText}>21-30:  {t('dashboard.moderate')}</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.dot, { backgroundColor: '#daacac' }]} />
+            <Text style={styles.legendText}>31-40: {t('dashboard.high')}</Text>
+          </View>
+        </View>
+
         <View style={styles.levelContainer}>
-            <Text style={styles.levelLabel}>Nivel predominante:</Text>
+            <Text style={styles.levelLabel}>{t('dashboard.actualState')}</Text>
             <Text style={[styles.levelValue, { color: mainLevel.color }]}>
                 {mainLevel.name}
             </Text>
         </View>
 
-        <TouchableOpacity style={styles.btnSecondaryOutline} onPress={startQuiz}>
-          <Text style={styles.btnSecondaryText}>Repetir análisis</Text>
+        <TouchableOpacity 
+          style={[styles.btnSecondaryOutline, { backgroundColor: mainLevel.color }]} // Aquí aplicamos el color dinámico
+          onPress={startQuiz}
+        >
+          <Text style={styles.btnSecondaryText}>{t('dashboard.repeatTest')}</Text>
         </TouchableOpacity>
         <StaticBottomNavBar activeTab="home" />
-      </View>
+      </ScrollView>
     );
   }
 
@@ -180,12 +215,18 @@ const Stress = ({ navigation }: any) => {
     const currentQuestion = quizQuestions[currentIndex];
     return (
       <View style={styles.quizWrapper}>
-        <View style={styles.storyHeader}>
-          {quizQuestions.map((_, i) => (
-            <View key={i} style={styles.storySegmentWrapper}>
-              <View style={[styles.storySegment, i <= currentIndex && styles.storyActive]} />
-            </View>
-          ))}
+        <ThemedText style={styles.titleView}>{t('survey.stressChart')}</ThemedText>
+        <View style={styles.quizHeaderRow}>
+          <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
+            <Feather name="chevron-left" size={30} color="#333" />
+          </TouchableOpacity>
+          <View style={styles.storyHeader}>
+            {quizQuestions.map((_, i) => (
+              <View key={i} style={styles.storySegmentWrapper}>
+                <View style={[styles.storySegment, i <= currentIndex && styles.storyActive]} />
+              </View>
+            ))}
+          </View>
         </View>
         <ScrollView contentContainerStyle={styles.quizContent}>
           <Text style={styles.questionText}>{getJsonText(currentQuestion?.pregunta, i18n.language)}</Text>
@@ -204,7 +245,7 @@ const Stress = ({ navigation }: any) => {
           </View>
           {selectedInCurrent && (
             <TouchableOpacity style={styles.btnNext} onPress={handleNext}>
-              <Text style={styles.btnText}>{currentIndex === 9 ? "Ver mi gráfico" : "Siguiente"}</Text>
+              <Text style={styles.btnText}>{currentIndex === 9 ? t('survey.seeMyChart') : t('survey.following')}</Text>
             </TouchableOpacity>
           )}
         </ScrollView>
@@ -217,14 +258,17 @@ const Stress = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
+  titleView: {paddingLeft: 40, paddingTop: 40, fontWeight: 800, fontSize: 20, color:'#acdaad' },
   containerCenter: { flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', padding: 30 },
-  closeBtn: { position: 'absolute', top: 60, right: 25 },
+  closeBtn: { position: 'absolute', top: 60, left: 25 },
   quizWrapper: { flex: 1, backgroundColor: '#fff' },
-  storyHeader: { flexDirection: 'row', paddingTop: 60, paddingHorizontal: 20, marginBottom: 20 },
-  storySegmentWrapper: { flex: 1, paddingHorizontal: 2 },
+  quizHeaderRow: { flexDirection: 'row', alignItems: 'center', paddingTop: 20, paddingHorizontal: 15 },
+  backBtn: { marginRight: 10 },
+  storyHeader: { flexDirection: 'row', flex: 1 },
+  storySegmentWrapper: { flex: 1, paddingHorizontal: 1 },
   storySegment: { height: 4, backgroundColor: '#F0F0F0', borderRadius: 2 },
   storyActive: { backgroundColor: '#acdaad' },
-  quizContent: { paddingHorizontal: 25, paddingBottom: 40 },
+  quizContent: { paddingHorizontal: 25, paddingBottom: 40, paddingTop: 20 },
   questionText: { fontSize: 26, fontWeight: 'bold', marginBottom: 40, color: '#1A1A1A', lineHeight: 32 },
   answersList: { gap: 15 },
   answerCard: { backgroundColor: '#F8F9FA', padding: 20, borderRadius: 18, borderWidth: 1, borderColor: '#F0F0F0' },
@@ -236,14 +280,57 @@ const styles = StyleSheet.create({
   levelValue: { fontSize: 36, fontWeight: '900' },
   btnNext: { backgroundColor: '#90b890', paddingVertical: 18, borderRadius: 35, marginTop: 40, alignItems: 'center', elevation: 2 },
   btnPrimary: { backgroundColor: '#acdaad', paddingVertical: 18, paddingHorizontal: 60, borderRadius: 35, marginTop: 20 },
-  btnSecondaryOutline: { marginTop: 40, padding: 15 },
-  btnSecondaryText: { color: '#90b890', fontWeight: 'bold', fontSize: 15 },
+  btnSecondaryOutline: { 
+    marginTop: 40, 
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 3, 
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+
+  btnSecondaryText: { 
+    color: '#FFFFFF',
+    fontWeight: 'bold', 
+    fontSize: 16 
+  },
   btnText: { color: '#fff', fontWeight: 'bold', fontSize: 17 },
   btnCancel: { color: '#AAA', marginTop: 25, fontSize: 15 },
-  title: { fontSize: 22, fontWeight: '700', color: '#333', marginBottom: 40 },
+  title: { fontSize: 22, fontWeight: '500', color: '#333', marginBottom: 40 },
   introTitle: { fontSize: 32, fontWeight: 'bold', marginBottom: 15, color: '#1A1A1A' },
   introDesc: { textAlign: 'center', color: '#666', marginBottom: 40, lineHeight: 22, fontSize: 16 },
-  emoji: { fontSize: 80, marginBottom: 20 }
+  emoji: { fontSize: 80, marginBottom: 20 },
+  legendContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignContent:'center',
+    marginTop: 25,
+    paddingHorizontal: 20,
+    gap: 10
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '45%',
+    marginBottom: 5
+  },
+  dot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8
+  },
+  legendText: {
+    fontSize: 13,
+    color: '#555',
+    fontWeight: '500'
+  }
 });
 
 export default Stress;

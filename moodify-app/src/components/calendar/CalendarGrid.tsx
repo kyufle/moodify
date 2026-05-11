@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
-  TextInput, Image, Dimensions, ActivityIndicator, Alert
+  TextInput, Image, Dimensions, ActivityIndicator, Alert,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { MOOD_CONFIG } from '../../utils/utils';
 import { UserContext } from '../user-provider';
 import { useTranslation } from 'react-i18next';
+import { ThemedView } from '../themed-view';
 
 const { width } = Dimensions.get('window');
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
@@ -70,6 +73,11 @@ export const CalendarGrid = () => {
   const handleSaveMood = async () => {
     if (!selectedMood) return Alert.alert("Aviso", "Selecciona una emoción");
     setLoading(true);
+    
+    // Capturamos la fecha manual YYYY-MM-DD para evitar desfases de día
+    const now = new Date();
+    const dateString = now.toLocaleDateString('en-CA'); // Formato YYYY-MM-DD local
+
     try {
       const response = await fetch(`${API_BASE_URL}/save-mood`, {
         method: 'POST',
@@ -77,7 +85,7 @@ export const CalendarGrid = () => {
         body: JSON.stringify({
           mood: selectedMood,
           daily_text: diaryText,
-          date: new Date().toISOString().split('T')[0]
+          date: dateString,
         }),
       });
 
@@ -109,12 +117,18 @@ export const CalendarGrid = () => {
 
   if (currentView === 'register') {
     return (
+       <ThemedView style={styles.container}>
+           <KeyboardAvoidingView 
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={{ flex: 1 }}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      />
       <ScrollView style={styles.registerContainer} showsVerticalScrollIndicator={false}>
         <TouchableOpacity onPress={() => setCurrentView('calendar')} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← {t('loginRegister.back') || 'Volver'}</Text>
+          <Text style={styles.backButtonText}>← {t('calendarGrid.back') || 'Volver'}</Text>
         </TouchableOpacity>
 
-        <Text style={styles.title}>{t('calendarGrid.howAreYou')}</Text>
+        <Text style={styles.title}>{t('calendarGrid.howFeelNow')}</Text>
 
         <View style={styles.moodSelectorGrid}>
           {Object.keys(MOOD_CONFIG).map((key) => {
@@ -149,10 +163,10 @@ export const CalendarGrid = () => {
                 {t(`moodNames.${selectedMood}`)}
               </Text>
             </Text>
-            <Image
-              source={MOOD_CONFIG[selectedMood as keyof typeof MOOD_CONFIG].icon}
-              style={styles.iconLarge}
-            />
+            {(() => {
+                const IconComp = MOOD_CONFIG[selectedMood as keyof typeof MOOD_CONFIG].icon;
+                return <IconComp width={80} height={80} />;
+            })()}
           </View>
         )}
 
@@ -169,6 +183,9 @@ export const CalendarGrid = () => {
         </TouchableOpacity>
         <View style={{ height: 40 }} />
       </ScrollView>
+
+       </ThemedView>
+     
     );
   }
 
@@ -234,21 +251,42 @@ export const CalendarGrid = () => {
 
             {isHistoryExpanded && (
               <View style={styles.historyList}>
-                {history.map(item => (
-                  <View key={item.id} style={styles.historyItem}>
-                    <Image
-                      source={MOOD_CONFIG[item.mood as keyof typeof MOOD_CONFIG]?.icon}
-                      style={[styles.historyIcon, { backgroundColor: MOOD_CONFIG[item.mood as keyof typeof MOOD_CONFIG]?.color }]}
-                    />
-                    <View style={{ flex: 1, marginLeft: 12 }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={styles.historyMood}>{t(`moodNames.${item.mood}`)}</Text>
-                        <Text style={styles.historyTime}>{new Date(item.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+                {history.map(item => {
+                  // TRUCO: Si la fecha viene del servidor sin zona, le añadimos 'Z' 
+                  // para que JS sepa que es UTC y la convierta a local (+2h en España)
+                  let dateStr = item.time || item.created_at || item.date;
+                  if (dateStr && !dateStr.includes('Z') && !dateStr.includes('+')) {
+                    dateStr += 'Z';
+                  }
+                  
+                  const dateObj = new Date(dateStr);
+                  const isValid = !isNaN(dateObj.getTime());
+                  const moodInfo = MOOD_CONFIG[item.mood as keyof typeof MOOD_CONFIG];
+                  const IconComp = moodInfo?.icon;
+
+                  return (
+                    <View key={item.id} style={styles.historyItem}>
+                      <View style={[styles.historyIconContainer, { backgroundColor: moodInfo?.color || '#CBD5E1' }]}>
+                        {IconComp && <IconComp width={24} height={24} />}
                       </View>
-                      {item.text && <Text style={styles.historyText} numberOfLines={1}>{item.text}</Text>}
+                      <View style={{ flex: 1, marginLeft: 12 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Text style={styles.historyMood}>{t(`moodNames.${item.mood}`)}</Text>
+                          <Text style={styles.historyTime}>
+                            {isValid 
+                              ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+                              : '--:--'}
+                          </Text>
+                        </View>
+                        {(item.text || item.daily_text) && (
+                          <Text style={styles.historyText} numberOfLines={1}>
+                            {item.text || item.daily_text}
+                          </Text>
+                        )}
+                      </View>
                     </View>
-                  </View>
-                ))}
+                  );
+                })}
               </View>
             )}
 
@@ -268,14 +306,12 @@ export const CalendarGrid = () => {
                   <Text style={styles.titleCard}>{t(`moodNames.${lastEntry.mood}`)}</Text>
                   <Text style={styles.description}>{getSafePhrase()}</Text>
                 </View>
-                {config && lastEntry && (
-                    <View style={styles.cardWatermark}>
-                      {(() => {
-                        const WatermarkIcon = config.icon;
-                        return <WatermarkIcon width={80} height={80} opacity={0.3} />;
-                      })()}
-                    </View>
-                )}
+                <View style={styles.cardWatermark}>
+                  {(() => {
+                    const WatermarkIcon = config.icon;
+                    return <WatermarkIcon width={80} height={80} opacity={0.3} />;
+                  })()}
+                </View>
               </View>
             )}
           </View>
@@ -294,7 +330,6 @@ const styles = StyleSheet.create({
   moodCell: { flex: 1, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   todayCell: { borderWidth: 2, borderColor: '#6366F1' },
   dayNumberText: { fontSize: 10, fontWeight: '900', color: 'rgba(0,0,0,0.2)' },
-  iconInCalendar: { width: '70%', height: '70%', resizeMode: 'contain' },
   registerButton: { marginTop: 20, backgroundColor: '#334155', borderRadius: 16, paddingVertical: 14, alignItems: 'center' },
   registerButtonText: { color: '#FFFFFF', fontWeight: '700' },
   registerContainer: { flex: 1, backgroundColor: 'white', padding: 20 },
@@ -303,22 +338,21 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
   moodSelectorGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 8 },
   moodOption: { width: '31%', aspectRatio: 1, borderRadius: 16, backgroundColor: '#F1F5F9', justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
-  iconSmall: { width: 30, height: 30, resizeMode: 'contain', marginBottom: 4 },
+  iconSmall: { width: 30, height: 30, marginBottom: 4 },
   moodLabelSmall: { fontSize: 10, fontWeight: '600', color: '#475569' },
   feedbackBox: { marginVertical: 20, alignItems: 'center', backgroundColor: '#F8FAFC', padding: 20, borderRadius: 24 },
   feedbackText: { fontSize: 16, marginBottom: 10 },
-  iconLarge: { width: 80, height: 80, resizeMode: 'contain' },
   textArea: { backgroundColor: '#F1F5F9', borderRadius: 16, padding: 15, height: 100, textAlignVertical: 'top' },
   btnSave: { padding: 16, borderRadius: 16, alignItems: 'center', backgroundColor: '#334155', marginTop: 15 },
   btnTextWhite: { color: 'white', fontWeight: 'bold' },
   collapsibleHeader: { flexDirection: 'row', justifyContent: 'space-between', padding: 15, backgroundColor: '#F8FAFC', borderRadius: 16 },
   collapsibleTitle: { fontSize: 14, fontWeight: '700' },
   historyList: { marginTop: 10 },
-  historyItem: { flexDirection: 'row', padding: 12, backgroundColor: 'white', borderRadius: 12, marginBottom: 8, elevation: 1 },
-  historyIcon: { width: 35, height: 35, borderRadius: 8 },
-  historyMood: { fontWeight: '700', fontSize: 14 },
-  historyTime: { fontSize: 11, color: '#94A3B8' },
-  historyText: { fontSize: 12, color: '#64748B' },
+  historyItem: { flexDirection: 'row', padding: 12, backgroundColor: 'white', borderRadius: 12, marginBottom: 8, elevation: 1, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 },
+  historyIconContainer: { width: 42, height: 42, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
+  historyMood: { fontWeight: '700', fontSize: 14, color: '#1E293B' },
+  historyTime: { fontSize: 11, color: '#94A3B8', fontWeight: '600' },
+  historyText: { fontSize: 12, color: '#64748B', marginTop: 2 },
   recommendCard: { flexDirection: 'row', backgroundColor: '#FEF3C7', padding: 12, borderRadius: 12, alignItems: 'center', gap: 10, marginTop: 10 },
   recommendText: { fontSize: 12, color: '#92400E', flex: 1 },
   card: { borderRadius: 20, padding: 20, flexDirection: 'row', overflow: 'hidden' },
@@ -326,5 +360,5 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 12, fontWeight: '700', opacity: 0.6 },
   titleCard: { fontSize: 20, fontWeight: 'bold', marginVertical: 4 },
   description: { fontSize: 14, lineHeight: 18, opacity: 0.8 },
-  cardWatermark: { width: 80, height: 80, position: 'absolute', right: 10, bottom: 10, opacity: 0.3 }
+  cardWatermark: { position: 'absolute', right: 10, bottom: 10, opacity: 0.3 }
 });

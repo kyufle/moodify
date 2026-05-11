@@ -7,6 +7,7 @@ import { DashboardBackground } from './DashboardBackground';
 import { StaticBottomNavBar } from '../StaticBottomNavBar';
 import { ThemedText } from '../themed-text';
 import { UserContext } from '../user-provider';
+import { useTranslation } from 'react-i18next';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -19,7 +20,7 @@ const HANDLER_RADIUS = 24;
 
 export const Sleep = ({ onBack }: { onBack: () => void }) => {
   const { userValue } = useContext(UserContext);
-
+  const {t} = useTranslation();
   const [startAngle, setStartAngle] = useState(0);
   const [endAngle, setEndAngle] = useState((6 / 24) * (2 * Math.PI));
   const [startTimeText, setStartTimeText] = useState("00:00");
@@ -141,12 +142,12 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
       });
 
       if (response.ok) {
-        Alert.alert("Éxito", "Registro de sueño sincronizado.");
+        Alert.alert(t('sleep.correctSaveTitle'), t('sleep.correctSave'));
       } else {
-        throw new Error("Error al guardar");
+        throw new Error(t('sleep.errorSave2'));
       }
     } catch (error) {
-      Alert.alert("Error", "No se pudo guardar el registro.");
+      Alert.alert(t('sleep.error'), t('sleep.errorSave'));
     }
   };
 
@@ -197,8 +198,6 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
   const totalDiffMinutes = Math.round((diff / (2 * Math.PI)) * 24 * 60);
   const hDiff = Math.floor(totalDiffMinutes / 60);
   const mDiff = totalDiffMinutes % 60;
-
-  // Lógica de color: Rojo si < 8h o >= 11h. Verde en el rango intermedio.
   const hoursDecimal = totalDiffMinutes / 60;
   const statusColor = (hoursDecimal < 8 || hoursDecimal >= 11) ? '#934b5d' : '#87a98f';
 
@@ -211,7 +210,7 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
               <TouchableOpacity onPress={onBack} style={styles.backButton}>
                 <Feather name="chevron-left" size={32} color="black" />
               </TouchableOpacity>
-              <ThemedText style={styles.headerTitle}>Registro de Sueño</ThemedText>
+              <ThemedText style={styles.headerTitle}>{t('sleep.title')}</ThemedText>
               <View style={{ width: 32 }} />
             </View>
 
@@ -219,7 +218,7 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
               <View style={styles.timeInfoRow}>
                 <View style={styles.timeBox}>
                   <Feather name="moon" size={30} color="#6e75a4" />
-                  <ThemedText style={styles.timeLabel}>DESDE</ThemedText>
+                  <ThemedText style={styles.timeLabel}>{t('sleep.from').toUpperCase()}</ThemedText>
                   <TextInput
                     style={styles.timeInput}
                     value={startTimeText}
@@ -232,7 +231,7 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
                 </View>
                 <View style={styles.timeBox}>
                   <Feather name="sun" size={30} color="#6e75a4" />
-                  <ThemedText style={styles.timeLabel}>HASTA</ThemedText>
+                  <ThemedText style={styles.timeLabel}>{t('sleep.until').toUpperCase()}</ThemedText>
                   <TextInput
                     style={styles.timeInput}
                     value={endTimeText}
@@ -270,12 +269,12 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
               </View>
 
               <View style={styles.summaryContainer}>
-                <ThemedText style={styles.summaryLabel}>Has dormido un total de:</ThemedText>
+                <ThemedText style={styles.summaryLabel}>{t('sleep.sleptTotal')}</ThemedText>
                 <ThemedText style={[styles.summaryValue, { color: statusColor }]}>
                   {hDiff}h {mDiff.toString().padStart(2, '0')}min
                 </ThemedText>
                 <TouchableOpacity style={styles.saveButton} activeOpacity={0.8} onPress={handleSave}>
-                  <ThemedText style={styles.saveButtonText}>Guardar registro</ThemedText>
+                  <ThemedText style={styles.saveButtonText}>{t('sleep.saveRegister')}</ThemedText>
                 </TouchableOpacity>
               </View>
             </View>
@@ -301,7 +300,7 @@ const styles = StyleSheet.create({
   gestureOverlay: { position: 'absolute', width: HANDLER_RADIUS * 2, height: HANDLER_RADIUS * 2, backgroundColor: 'transparent' },
   summaryContainer: { alignItems: 'center', width: '100%', paddingHorizontal: 25 },
   summaryLabel: { color: '#888', fontSize: 20, marginBottom: 20 },
-  summaryValue: { fontSize: 36, fontWeight: 'bold', marginBottom: 15 },
+  summaryValue: { fontSize: 36, fontWeight: 'bold', marginBottom: 15, padding: 8 },
   saveButton: { backgroundColor: '#6e75a4', width: '60%', padding: 16, borderRadius: 18, alignItems: 'center' },
   saveButtonText: { color: 'white', fontSize: 20 },
 });

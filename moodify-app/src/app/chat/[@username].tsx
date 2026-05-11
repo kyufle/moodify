@@ -60,11 +60,10 @@ export default function PersonalChatScreen() {
     ? avatarMap[imageKey as keyof typeof avatarMap]
     : { uri: 'https://via.placeholder.com/150' };
 
-  // 1. CARGAR TEMA
   useEffect(() => {
     const loadTheme = async () => {
       try {
-        const saved = await SafeStorage.getItem('custom_chat_theme'); // todo Cargarlo de BBDD
+        const saved = await SafeStorage.getItem('custom_chat_theme');
         if (saved) setChatTheme(JSON.parse(saved));
       } catch (e) {
         console.error("Error tema:", e);
@@ -73,7 +72,6 @@ export default function PersonalChatScreen() {
     loadTheme();
   }, []);
 
-  // 2. FUNCIÓN FETCH MEJORADA
   const fetchMessages = async () => {
     if (!token || !recipientId) return;
     try {
@@ -100,7 +98,7 @@ export default function PersonalChatScreen() {
     } catch (e) { 
       console.error("Error fetch:", e); 
     } finally {
-      setLoadingInitial(false); // Aseguramos que quite el loading siempre
+      setLoadingInitial(false);
     }
   };
 
@@ -114,7 +112,6 @@ export default function PersonalChatScreen() {
     } catch (e) { console.error("Error markAsRead:", e); }
   };
 
-  // 3. EFECTO DE CARGA Y ACTUALIZACIÓN
   useEffect(() => {
     if (!token || !recipientId) return;
 
@@ -122,7 +119,6 @@ export default function PersonalChatScreen() {
     fetchMessages();
     markAsRead();
 
-    // Intervalo de actualización
     const intervalId = setInterval(() => {
         fetchMessages();
         markAsRead(); 
@@ -141,7 +137,7 @@ export default function PersonalChatScreen() {
       clearInterval(intervalId);
       subscription.remove();
     };
-  }, [recipientId, token]); // Eliminado myId de aquí para evitar re-renders infinitos
+  }, [recipientId, token]);
 
   const handleSend = async () => {
     if (!inputText.trim() || isSending) return;
@@ -192,7 +188,6 @@ export default function PersonalChatScreen() {
     );
   };
 
-  // Pantalla de carga mientras no hay token o carga inicial activa
   if (loadingInitial) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F8FAFC' }}>
@@ -204,10 +199,10 @@ export default function PersonalChatScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF' }}>
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 25}
-      >
+  behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+  style={{ flex: 1 }}
+  keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0} 
+>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <TouchableOpacity onPress={() => router.back()} style={{ padding: 5 }}>
@@ -265,14 +260,43 @@ export default function PersonalChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10, paddingVertical: 8, backgroundColor: '#FFF', borderBottomWidth: 1, borderBottomColor: '#E2E8F0' },
+  header: { 
+  flexDirection: 'row', 
+  alignItems: 'center', 
+  justifyContent: 'space-between', 
+  paddingHorizontal: 10, 
+  paddingVertical: 12,
+  backgroundColor: '#e7e7e7c2', 
+  borderBottomWidth: 1, 
+  borderBottomColor: '#E2E8F0',
+  paddingTop: Platform.OS === 'android' ? 60 : 8, 
+},
   headerLeft: { flexDirection: 'row', alignItems: 'center' },
   headerIcons: { flexDirection: 'row', alignItems: 'center' },
   avatar: { width: 40, height: 40, borderRadius: 20, marginLeft: 5, backgroundColor: '#F1F5F9' },
   headerTitle: { fontSize: 16, fontWeight: 'bold', color: '#1E293B' },
   statusDot: { width: 8, height: 8, borderRadius: 4, marginRight: 5 },
-  inputContainer: { flexDirection: 'row', padding: 10, backgroundColor: '#FFF', borderTopWidth: 1, borderTopColor: '#E2E8F0', alignItems: 'center' },
-  input: { flex: 1, backgroundColor: '#F1F5F9', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, maxHeight: 100, color: '#000' },
+inputContainer: { 
+  flexDirection: 'row', 
+  paddingHorizontal: 10, 
+  paddingTop: 10,
+  paddingBottom: 10, 
+  backgroundColor: '#FFF', 
+  borderTopWidth: 1, 
+  borderTopColor: '#E2E8F0', 
+  alignItems: 'center'
+},
+input: { 
+  flex: 1, 
+  backgroundColor: '#F1F5F9', 
+  borderRadius: 20, 
+  paddingHorizontal: 15, 
+  paddingVertical: 0, 
+  minHeight: 40, 
+  maxHeight: 100, 
+  color: '#000',
+  textAlignVertical: 'center'
+},
   sendButton: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginLeft: 10 },
   dateSeparator: { flexDirection: 'row', alignItems: 'center', marginVertical: 20, justifyContent: 'center' },
   dateLine: { flex: 1, height: 1, backgroundColor: '#E2E8F0', marginHorizontal: 10 },

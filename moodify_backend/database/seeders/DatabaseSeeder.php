@@ -45,14 +45,5 @@ class DatabaseSeeder extends Seeder
             'username' => 'pablo',
             'image_id' => 'avatar26'
         ]);
-
-        DB::table('mood_registers')->insert([
-            'user_id' => 1,
-            'mood' => 'sad',
-            'date' => now()->format('Y-m-d'),
-            'daily_text' => 'He roto un jarrón',
-            'created_at' => now()->startOfDay()->addHours(19),
-        ]);
-        
     }
 }

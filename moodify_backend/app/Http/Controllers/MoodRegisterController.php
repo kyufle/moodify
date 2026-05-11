@@ -15,19 +15,26 @@ class MoodRegisterController extends Controller
     public function saveMood(Request $request)
     {
         try {
+            // Establecemos la zona horaria de España para toda la ejecución de este método
+            $tz = 'Europe/Madrid';
+            
             $validated = $request->validate([
                 'mood' => 'required|string',
                 'daily_text' => 'nullable|string',
                 'date' => 'nullable|date',
             ]);
 
+            // Si no viene fecha del frontend, usamos la de España hoy
+            $fechaFinal = $validated['date'] ?? Carbon::now($tz)->toDateString();
+
             $register = MoodRegister::create([
                 'user_id' => $request->user()->id,
                 'mood' => $validated['mood'],
                 'daily_text' => $validated['daily_text'] ?? null,
-                'date' => $validated['date'] ?? now()->toDateString(),
+                'date' => $fechaFinal,
             ]);
 
+            // Forzamos que la respuesta también devuelva el objeto con la fecha parseada
             return response()->json([
                 'ok' => true,
                 'data' => $register
@@ -117,6 +124,7 @@ class MoodRegisterController extends Controller
 
         return response()->json($stats);
     }
+    
     public function getDashboardInfo(Request $request)
     {
         $user = $request->user();
