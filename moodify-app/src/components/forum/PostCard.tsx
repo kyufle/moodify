@@ -1,54 +1,133 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { UserContext } from '@/components/user-provider';
 
-interface PostProps {
-  user: string;
-  time: string;
-  content: string;
-  likes: number;
-  comments: number;
-  image?: any;
+const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://moodify_backend.test/api/';
+
+const AVATAR_GRADS: [string, string][] = [
+  ['#6366F1', '#A855F7'],
+  ['#10B981', '#3B82F6'],
+  ['#F59E0B', '#EF4444'],
+  ['#EC4899', '#8B5CF6'],
+  ['#0EA5E9', '#6366F1'],
+];
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1)  return 'Ahora';
+  if (mins < 60) return `Hace ${mins} min`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24)  return `Hace ${hrs}h`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7)  return `Hace ${days}d`;
+  return new Date(dateStr).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
-export const PostCard = ({ user, time, content, likes, comments, image }: PostProps) => {
+export interface PostData {
+  id: number;
+  user_name: string;
+  username: string;
+  image_id: string | null;
+  content: string;
+  date: string;
+  likes_count: number;
+  is_liked: boolean;
+}
+
+interface PostCardProps {
+  post: PostData;
+  onLikeToggle?: (id: number, liked: boolean, count: number) => void;
+}
+
+export const PostCard = ({ post, onLikeToggle }: PostCardProps) => {
+  const { userValue } = useContext(UserContext);
+  const [liked,     setLiked]     = useState(post.is_liked ?? false);
+  const [likeCount, setLikeCount] = useState(post.likes_count ?? 0);
+  const [liking,    setLiking]    = useState(false);
+
+  const grad = AVATAR_GRADS[post.id % AVATAR_GRADS.length];
+  const initial = (post.user_name ?? post.username)[0]?.toUpperCase() ?? '?';
+
+  const handleLike = async () => {
+    if (liking || !userValue?.accessToken) return;
+    setLiking(true);
+    const optimisticLiked = !liked;
+    const optimisticCount = optimisticLiked ? likeCount + 1 : likeCount - 1;
+    setLiked(optimisticLiked);
+    setLikeCount(optimisticCount);
+    try {
+      const res = await fetch(`${API}community/posts/${post.id}/like`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${userValue.accessToken}`,
+          Accept: 'application/json',
+        },
+      });
+      const data = await res.json();
+      setLiked(data.liked);
+      setLikeCount(data.likes_count);
+      onLikeToggle?.(post.id, data.liked, data.likes_count);
+    } catch {
+      setLiked(!optimisticLiked);
+      setLikeCount(likeCount);
+    } finally {
+      setLiking(false);
+    }
+  };
+
   return (
     <View style={styles.card}>
+      {/* Header */}
       <View style={styles.header}>
-        <View style={styles.avatarPlaceholder}>
-          <Feather name="user" size={18} color="#94A3B8" />
+        <LinearGradient colors={grad} style={styles.avatar}>
+          <Text style={styles.avatarInitial}>{initial}</Text>
+        </LinearGradient>
+        <View style={styles.authorInfo}>
+          <Text style={styles.authorName}>{post.user_name}</Text>
+          <Text style={styles.authorMeta}>
+            @{post.username} · {timeAgo(post.date)}
+          </Text>
         </View>
-        <View>
-          <Text style={styles.userName}>{user}</Text>
-          <Text style={styles.time}>{time}</Text>
-        </View>
-        <TouchableOpacity style={styles.moreButton}>
-          <Feather name="more-horizontal" size={20} color="#94A3B8" />
+        <TouchableOpacity style={styles.moreBtn}>
+          <Feather name="more-horizontal" size={20} color="#CBD5E1" />
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.content}>{content}</Text>
+      {/* Content */}
+      <Text style={styles.content}>{post.content}</Text>
 
-      {image && (
-        <View style={styles.imageContainer}>
-          <Image source={image} style={styles.image} />
-        </View>
-      )}
-
+      {/* Footer */}
       <View style={styles.footer}>
-        <View style={styles.statGroup}>
-          <TouchableOpacity style={styles.statButton}>
-            <Feather name="heart" size={20} color="#64748B" />
-            <Text style={styles.statText}>{likes}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.statButton}>
-            <Feather name="message-square" size={20} color="#64748B" />
-            <Text style={styles.statText}>{comments}</Text>
-          </TouchableOpacity>
-        </View>
-        
-        <TouchableOpacity style={styles.statButton}>
-          <Feather name="share-2" size={20} color="#64748B" />
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={handleLike}
+          disabled={liking}
+          activeOpacity={0.7}
+        >
+          <Feather
+            name="heart"
+            size={18}
+            color={liked ? '#EF4444' : '#94A3B8'}
+            style={liked && { opacity: 1 }}
+          />
+          {liked && (
+            <View style={styles.heartFill} />
+          )}
+          <Text style={[styles.actionText, liked && styles.actionTextLiked]}>
+            {likeCount}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7}>
+          <Feather name="message-circle" size={18} color="#94A3B8" />
+          <Text style={styles.actionText}>0</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7}>
+          <Feather name="share-2" size={18} color="#94A3B8" />
         </TouchableOpacity>
       </View>
     </View>
@@ -58,87 +137,76 @@ export const PostCard = ({ user, time, content, likes, comments, image }: PostPr
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 20,
+    marginHorizontal: 16,
     borderRadius: 24,
-    padding: 20,
-    marginBottom: 16,
+    padding: 18,
+    marginBottom: 14,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.04,
-    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
     elevation: 3,
-    borderWidth: 1,
-    borderColor: '#F1F5F9',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
+    gap: 12,
   },
-  avatarPlaceholder: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#F8FAFC',
+  avatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
   },
-  userName: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  avatarInitial: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  authorInfo: { flex: 1 },
+  authorName: {
+    fontSize: 15,
+    fontWeight: '700',
     color: '#1E293B',
   },
-  time: {
+  authorMeta: {
     fontSize: 12,
     color: '#94A3B8',
-    marginTop: 2,
+    marginTop: 1,
   },
-  moreButton: {
-    marginLeft: 'auto',
-    padding: 4,
-  },
+  moreBtn: { padding: 4 },
   content: {
     fontSize: 15,
-    lineHeight: 22,
+    lineHeight: 23,
     color: '#334155',
-    marginBottom: 12,
-  },
-  imageContainer: {
-    width: '100%',
-    height: 200,
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: '#F1F5F9',
-    marginBottom: 12,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    marginBottom: 14,
   },
   footer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    gap: 20,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#F8FAFC',
+    borderTopColor: '#F1F5F9',
   },
-  statGroup: {
-    flexDirection: 'row',
-    gap: 20,
-  },
-  statButton: {
+  actionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
+    position: 'relative',
   },
-  statText: {
+  heartFill: {
+    position: 'absolute',
+    left: 0,
+  },
+  actionText: {
     fontSize: 14,
-    color: '#64748B',
+    color: '#94A3B8',
     fontWeight: '500',
-  }
+  },
+  actionTextLiked: {
+    color: '#EF4444',
+    fontWeight: '700',
+  },
 });

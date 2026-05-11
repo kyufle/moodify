@@ -57,11 +57,13 @@ class AuthController extends Controller
         ]);
 
         $register = User::create([
-            'name' => $request->fullName,
-            'email' => $request->email,
+            'name'     => $request->fullName,
+            'email'    => $request->email,
             'username' => $request->username,
             'password' => Hash::make($request->password),
         ]);
+        $register->email_verified_at = now();
+        $register->save();
         return response()->json([
             'status' => 'success',
             'message' => 'message.register.createUserSuccess',
