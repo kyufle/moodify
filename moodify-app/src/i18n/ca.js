@@ -56,8 +56,11 @@ const ca = {
     relaxed: 'Relaxat',
     mild: 'Lleu',
     moderate: 'Moderat',
-    high: 'Alçada',
-    motivation: 'Motivació'
+    high: 'Alt',
+    motivation: 'Motivació',
+    totalPoints: 'Punts totals',
+    actualState: 'El teu estat actual és:',
+    repeatTest: 'Repetir anàlisi'
 
   },
   calendarGrid:{
@@ -68,10 +71,31 @@ const ca = {
     moodCalendar: 'Calendari de mood',
     recordTodaysMood: 'Registrar ànim d\'avui',
     todaysactivity: 'Activitat d\'avui ',
-    summaryMonth: 'Activitat del mes '
+    summaryMonth: 'Activitat del mes ',
+    back: 'Enrere',
+    todaysNote: 'Explica per què et sents així...',
+    saveStatus: 'Guardar'
+  },
+  sleep:{
+    title: 'Registre de Somni',
+    from: 'des de',
+    until: 'fins',
+    sleptTotal: 'Has dormit un total de:',
+    saveRegister: 'Desa registre',
+    correctSaveTitle: 'Éxito',
+    correctSave: 'Registre de son sincronitzat',
+    errorSave: 'No s\'ha pogut desar el registre.',
+    error: 'Error',
+    errorSave2: 'Error al guardar'
+  },
+  survey:{
+    following: 'Seguint',
+    seeMyChart: 'Veure el meu gràfic',
+    stressChart: 'Enquesta d\'Estrès',
+    actualStress: 'Estrès actual'
   },
   moodNames: {
-    happy: "Felç",
+    happy: "Feliç",
     glad: "Content",
     excited: "Entusiasmat",
     calm: "Calmat",

@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { UserContext } from '../user-provider';
 import { MOOD_CONFIG } from '../../utils/utils';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ThemedText } from '../themed-text';
 
@@ -15,29 +15,39 @@ export const ActionAlertCard = () => {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!token) return;
-      try {
-        const resHis = await fetch(`${API_BASE_URL}/get-today-timeline`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const dataHis = await resHis.json();
+  const fetchData = async () => {
+    if (!token) return;
+    try {
+      const resHis = await fetch(`${API_BASE_URL}/get-today-timeline?t=${Date.now()}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const text = await resHis.text();
+      
+      if (text.startsWith('[') || text.startsWith('{')) {
+        const dataHis = JSON.parse(text);
         if (Array.isArray(dataHis)) {
           setHistory(dataHis);
         }
-      } catch (e) {
-        console.error("Error al mirar la base de datos:", e);
-      } finally {
-        setLoading(false);
+      } else {
+        console.warn("La API no devolvió JSON:", text.substring(0, 50));
       }
-    };
+    } catch (e) {
+      console.error("Error en fetchData:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-  }, [token]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [token])
+  );
 
   const getSafePhrase = (config: any) => {
     if (!config) return "";
@@ -48,11 +58,9 @@ export const ActionAlertCard = () => {
 
   if (!userValue?.user || loading) return null;
 
-  // Intentamos obtener el último registro (el más reciente)
-  const lastEntry = history.length > 0 ? history[history.length - 1] : null; 
+  const lastEntry = history.length > 0 ? history[0] : null; 
   const config = lastEntry ? MOOD_CONFIG[lastEntry.mood as keyof typeof MOOD_CONFIG] : null;
   
-  // Validación de fecha mejorada (compara año, mes y día por separado)
   const isToday = (() => {
     if (!lastEntry?.date) return false;
     const d = new Date(lastEntry.date);
@@ -64,9 +72,9 @@ export const ActionAlertCard = () => {
     );
   })();
 
-  const ConfusedIcon = MOOD_CONFIG.confused.icon;
-  
+  // CASO A: NO HAY REGISTRO HOY (Gris)
   if (!lastEntry || !isToday || !config) {
+    const ConfusedIcon = MOOD_CONFIG.confused.icon;
     return (
       <View style={[styles.card, { backgroundColor: '#D6D6D6', marginHorizontal: 20, marginTop: 20 }]}>
         <View style={styles.textColumn}>
@@ -74,6 +82,7 @@ export const ActionAlertCard = () => {
             {t('calendarGrid.howFeelNow')}
           </Text>
           <ThemedText style={{color: 'black'}}>{t('calendarGrid.textRegister')}</ThemedText>
+          
           <TouchableOpacity 
             style={[styles.actionButton, { marginTop: 15 }]} 
             onPress={() => router.push('/calendar')}
@@ -81,35 +90,38 @@ export const ActionAlertCard = () => {
             <Text style={styles.actionButtonText}>{t('calendarGrid.registerNow')}</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.graphicContainer}>
-          <ConfusedIcon style={styles.moodIconGris} />
+        
+        <View style={styles.cardWatermark}>
+           <ConfusedIcon width={100} height={100} opacity={0.2} />
         </View>
       </View>
     );
   }
   
-  const ConfigIcon = config.icon;
+  // CASO B: SÍ HAY REGISTRO HOY (Color)
+  const WatermarkIcon = config.icon;
 
   return (
     <View style={[styles.card, { backgroundColor: config.color, marginHorizontal: 20, marginTop: 20 }]}>
       <View style={styles.textColumn}>
-        <Text style={styles.subtitle}>{t('calendarGrid.howFeelNow') || '¿Cómo te sientes ahora?'}</Text>
-        <Text style={styles.title}>
-          {t(`moodNames.${lastEntry.mood}`)}
-        </Text>
+        <Text style={styles.subtitleCard}>¿CÓMO TE SIENTES AHORA?</Text>
+        <Text style={styles.titleCard}>{t(`moodNames.${lastEntry.mood}`)}</Text>
         <Text style={styles.description}>
           {getSafePhrase(config)}
         </Text>
+
         <TouchableOpacity 
-          style={[styles.actionButton, { marginTop: 15, backgroundColor: 'rgba(0,0,0,0.1)' }]} 
+          style={[styles.actionButton, { marginTop: 15, backgroundColor: 'rgba(0,0,0,0.15)' }]} 
           onPress={() => router.push('/calendar')}
         >
-          <Text style={[styles.actionButtonText, { color: '#000' }]}>{t('calendarGrid.viewHistory') || 'Ver historial'}</Text>
+          <Text style={[styles.actionButtonText, { color: '#000' }]}>
+            {t('calendarGrid.viewHistory') || 'Ver historial'}
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.graphicContainer}>
-        <ConfigIcon style={styles.moodIconColor} />          
+      <View style={styles.cardWatermark}>
+        <WatermarkIcon width={100} height={100} opacity={0.3} />
       </View>
     </View>
   );
@@ -121,8 +133,9 @@ const styles = StyleSheet.create({
     padding: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    minHeight: 140,
+    minHeight: 150, // Un poco más alto para que quepa el botón bien
     overflow: 'hidden',
+    position: 'relative',
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -131,57 +144,39 @@ const styles = StyleSheet.create({
   },
   textColumn: {
     flex: 1,
-    paddingRight: 60,
     zIndex: 2,
+    justifyContent: 'center'
   },
-  subtitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: 'rgba(0,0,0,0.6)',
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 22,
+  subtitleCard: {
+    fontSize: 11,
     fontWeight: '800',
+    color: 'rgba(0,0,0,0.5)',
+    marginBottom: 2,
+    letterSpacing: 0.5
+  },
+  titleCard: {
+    fontSize: 24,
+    fontWeight: '900',
     color: '#000',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   description: {
     fontSize: 14,
     lineHeight: 18,
     color: 'rgba(0,0,0,0.7)',
+    maxWidth: '85%'
   },
-  graphicContainer: {
-    width: 120,
-    height: '100%',
-    position: 'absolute',
-    right: 24,
-    bottom: 0,
-  },
-  moodIconColor: {
-    width: 100,
-    height: 100,
-    resizeMode: 'contain',
+  cardWatermark: {
     position: 'absolute',
     right: -15,
-    bottom: 10,
-    opacity: 0.4 
-  },
-  moodIconGris: {
-    width: 100,
-    height: 100,
-    resizeMode: 'contain',
-    position: 'absolute',
-    right: -15,
-    bottom: 10,
-    opacity: 0.50,
-    tintColor: '#000'
+    bottom: -15,
+    zIndex: 1,
   },
   actionButton: { 
     backgroundColor: '#333', 
     borderRadius: 12, 
     paddingVertical: 8, 
-    paddingHorizontal: 15, 
+    paddingHorizontal: 16, 
     alignSelf: 'flex-start' 
   },
   actionButtonText: { 

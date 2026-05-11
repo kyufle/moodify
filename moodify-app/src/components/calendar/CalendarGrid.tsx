@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
-  TextInput, Dimensions, ActivityIndicator, Alert,
-  KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback 
+  TextInput, Image, Dimensions, ActivityIndicator, Alert,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
-
 import { Feather } from '@expo/vector-icons';
 import { MOOD_CONFIG } from '../../utils/utils';
 import { UserContext } from '../user-provider';
 import { useTranslation } from 'react-i18next';
+import { ThemedView } from '../themed-view';
 
 const { width } = Dimensions.get('window');
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
@@ -72,6 +73,11 @@ export const CalendarGrid = () => {
   const handleSaveMood = async () => {
     if (!selectedMood) return Alert.alert("Aviso", "Selecciona una emoción");
     setLoading(true);
+    
+    // Capturamos la fecha manual YYYY-MM-DD para evitar desfases de día
+    const now = new Date();
+    const dateString = now.toLocaleDateString('en-CA'); // Formato YYYY-MM-DD local
+
     try {
       const response = await fetch(`${API_BASE_URL}/save-mood`, {
         method: 'POST',
@@ -79,7 +85,7 @@ export const CalendarGrid = () => {
         body: JSON.stringify({
           mood: selectedMood,
           daily_text: diaryText,
-          date: new Date().toISOString().split('T')[0]
+          date: dateString,
         }),
       });
 
@@ -111,80 +117,75 @@ export const CalendarGrid = () => {
 
   if (currentView === 'register') {
     return (
-      <KeyboardAvoidingView 
-        style={{ flex: 1, backgroundColor: 'white' }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
-      >
-        <ScrollView 
-          style={{ flex: 1 }}
-          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 25, paddingBottom: 100 }}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-          alwaysBounceVertical={true}
-        >
-          <TouchableOpacity onPress={() => setCurrentView('calendar')} style={styles.backButton}>
-            <Text style={styles.backButtonText}>← {t('loginRegister.back') || 'Volver'}</Text>
-          </TouchableOpacity>
+       <ThemedView style={styles.container}>
+           <KeyboardAvoidingView 
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={{ flex: 1 }}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      />
+      <ScrollView style={styles.registerContainer} showsVerticalScrollIndicator={false}>
+        <TouchableOpacity onPress={() => setCurrentView('calendar')} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← {t('calendarGrid.back') || 'Volver'}</Text>
+        </TouchableOpacity>
 
-          <Text style={styles.title}>{t('calendarGrid.howAreYou')}</Text>
+        <Text style={styles.title}>{t('calendarGrid.howFeelNow')}</Text>
 
-          <View style={styles.moodSelectorGrid}>
-            {Object.keys(MOOD_CONFIG).map((key) => {
-              const MoodConfigIcon = MOOD_CONFIG[key as keyof typeof MOOD_CONFIG].icon;
-              return (
-                <TouchableOpacity
-                  key={key}
-                  onPress={() => setSelectedMood(key)}
-                  style={[
-                    styles.moodOption,
-                    selectedMood === key && {
-                      backgroundColor: MOOD_CONFIG[key as keyof typeof MOOD_CONFIG].color,
-                      borderColor: '#334155',
-                      borderWidth: 1.5,
-                    }
-                  ]}
-                >
-                  <MoodConfigIcon width={30} height={30} />
-                  <Text style={styles.moodLabelSmall} numberOfLines={1}>
-                    {t(`moodNames.${key}`)}
-                  </Text>
-                </TouchableOpacity>
-              )
-            })}
-          </View>
+        <View style={styles.moodSelectorGrid}>
+          {Object.keys(MOOD_CONFIG).map((key) => {
+            const MoodConfigIcon = MOOD_CONFIG[key as keyof typeof MOOD_CONFIG].icon;
+            return (
+              <TouchableOpacity
+                key={key}
+                onPress={() => setSelectedMood(key)}
+                style={[
+                  styles.moodOption,
+                  selectedMood === key && {
+                    backgroundColor: MOOD_CONFIG[key as keyof typeof MOOD_CONFIG].color,
+                    borderColor: '#334155',
+                    borderWidth: 1.5
+                  }
+                ]}
+              >
+                <MoodConfigIcon style={styles.iconSmall} />
+                <Text style={styles.moodLabelSmall} numberOfLines={1}>
+                  {t(`moodNames.${key}`)}
+                </Text>
+              </TouchableOpacity>
+            )
+          })}
+        </View>
 
-          {selectedMood && (
-            <View style={[styles.feedbackBox, { backgroundColor: MOOD_CONFIG[selectedMood as keyof typeof MOOD_CONFIG].color + '30' }]}>
-              <Text style={styles.feedbackText}>
-                {t('calendarGrid.youFeel')} <Text style={{ fontWeight: 'bold' }}>{t(`moodNames.${selectedMood}`)}</Text>
+        {selectedMood && (
+          <View style={styles.feedbackBox}>
+            <Text style={styles.feedbackText}>
+              {t('calendarGrid.youFeel')}{' '}
+              <Text style={{ fontWeight: 'bold' }}>
+                {t(`moodNames.${selectedMood}`)}
               </Text>
-              <View style={styles.iconLargeContainer}>
-                {(() => {
-                  const MoodIcon = MOOD_CONFIG[selectedMood as keyof typeof MOOD_CONFIG].icon;
-                  return <MoodIcon width={100} height={100} />;
-                })()}
-              </View>
-            </View>
-          )}
+            </Text>
+            {(() => {
+                const IconComp = MOOD_CONFIG[selectedMood as keyof typeof MOOD_CONFIG].icon;
+                return <IconComp width={80} height={80} />;
+            })()}
+          </View>
+        )}
 
-          <TextInput
-            placeholder={t('calendarGrid.todaysNote')}
-            style={styles.textArea}
-            multiline
-            value={diaryText}
-            onChangeText={setDiaryText}
-            placeholderTextColor="#94A3B8"
-            onFocus={() => {
-              // Pequeño truco para asegurar que el input sea visible en algunos dispositivos
-            }}
-          />
+        <TextInput
+          placeholder={t('calendarGrid.todaysNote')}
+          style={styles.textArea}
+          multiline
+          value={diaryText}
+          onChangeText={setDiaryText}
+        />
 
-          <TouchableOpacity style={styles.btnSave} onPress={handleSaveMood} disabled={loading}>
-            {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnTextWhite}>{t('calendarGrid.saveStatus')}</Text>}
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        <TouchableOpacity style={styles.btnSave} onPress={handleSaveMood} disabled={loading}>
+          {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnTextWhite}>{t('calendarGrid.saveStatus')}</Text>}
+        </TouchableOpacity>
+        <View style={{ height: 40 }} />
+      </ScrollView>
+
+       </ThemedView>
+     
     );
   }
 
@@ -198,8 +199,10 @@ export const CalendarGrid = () => {
     return phrasesArray ? phrasesArray[0] : "Gracias por registrar tu estado";
   };
 
+  const isTooLittleSleep = sleepData.totalMinutes > 0 && sleepData.totalMinutes < 480;
+
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }} showsVerticalScrollIndicator={false}>
+    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
         <View style={styles.daysRow}>
           {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((day, idx) => <Text key={idx} style={styles.dayText}>{day}</Text>)}
@@ -233,7 +236,7 @@ export const CalendarGrid = () => {
         </View>
 
         <TouchableOpacity style={styles.registerButton} onPress={() => setCurrentView('register')}>
-          <Text style={styles.registerButtonText}>{t('calendarGrid.recordTodaysMood')}</Text>
+          <Text style={styles.registerButtonText}>Registrar ánimo de hoy</Text>
         </TouchableOpacity>
 
         {history.length > 0 && (
@@ -241,45 +244,73 @@ export const CalendarGrid = () => {
             <TouchableOpacity style={styles.collapsibleHeader} onPress={() => setIsHistoryExpanded(!isHistoryExpanded)} activeOpacity={0.7}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Feather name="clock" size={18} color="#64748B" style={{ marginRight: 10 }} />
-                <Text style={styles.collapsibleTitle}>{t('calendarGrid.todaysactivity')} ({history.length})</Text>
+                <Text style={styles.collapsibleTitle}>{t('calendarGrid.todaysactivity')}({history.length})</Text>
               </View>
               <Feather name={isHistoryExpanded ? "chevron-up" : "chevron-down"} size={20} color="#64748B" />
             </TouchableOpacity>
 
             {isHistoryExpanded && (
               <View style={styles.historyList}>
-                {history.map(item => (
-                  <View key={item.id} style={styles.historyItem}>
-                    <View style={[styles.historyIconSmall, { backgroundColor: MOOD_CONFIG[item.mood as keyof typeof MOOD_CONFIG]?.color }]}>
-                         {(() => {
-                            const Icon = MOOD_CONFIG[item.mood as keyof typeof MOOD_CONFIG]?.icon;
-                            return Icon ? <Icon width={22} height={22} /> : null;
-                         })()}
-                    </View>
-                    <View style={{ flex: 1, marginLeft: 12 }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={styles.historyMood}>{t(`moodNames.${item.mood}`)}</Text>
-                        <Text style={styles.historyTime}>{new Date(item.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+                {history.map(item => {
+                  // TRUCO: Si la fecha viene del servidor sin zona, le añadimos 'Z' 
+                  // para que JS sepa que es UTC y la convierta a local (+2h en España)
+                  let dateStr = item.time || item.created_at || item.date;
+                  if (dateStr && !dateStr.includes('Z') && !dateStr.includes('+')) {
+                    dateStr += 'Z';
+                  }
+                  
+                  const dateObj = new Date(dateStr);
+                  const isValid = !isNaN(dateObj.getTime());
+                  const moodInfo = MOOD_CONFIG[item.mood as keyof typeof MOOD_CONFIG];
+                  const IconComp = moodInfo?.icon;
+
+                  return (
+                    <View key={item.id} style={styles.historyItem}>
+                      <View style={[styles.historyIconContainer, { backgroundColor: moodInfo?.color || '#CBD5E1' }]}>
+                        {IconComp && <IconComp width={24} height={24} />}
                       </View>
-                      {item.text && <Text style={styles.historyText} numberOfLines={1}>{item.text}</Text>}
+                      <View style={{ flex: 1, marginLeft: 12 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Text style={styles.historyMood}>{t(`moodNames.${item.mood}`)}</Text>
+                          <Text style={styles.historyTime}>
+                            {isValid 
+                              ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+                              : '--:--'}
+                          </Text>
+                        </View>
+                        {(item.text || item.daily_text) && (
+                          <Text style={styles.historyText} numberOfLines={1}>
+                            {item.text || item.daily_text}
+                          </Text>
+                        )}
+                      </View>
                     </View>
-                  </View>
-                ))}
+                  );
+                })}
+              </View>
+            )}
+
+            {isTooLittleSleep && (
+              <View style={styles.recommendCard}>
+                <Feather name="moon" size={20} color="#F59E0B" />
+                <Text style={styles.recommendText}>
+                  Dormiste <Text style={{ fontWeight: '800' }}>{sleepData.hours}h {sleepData.minutes}m</Text>. ¡Prueba el resto de 8h!
+                </Text>
               </View>
             )}
 
             {config && lastEntry && (
               <View style={[styles.card, { backgroundColor: config.color, marginTop: 15 }]}>
                 <View style={styles.textColumn}>
-                  <Text style={styles.subtitleCard}>¿CÓMO TE SIENTES AHORA?</Text>
+                  <Text style={styles.subtitle}>¿Cómo te sientes ahora?</Text>
                   <Text style={styles.titleCard}>{t(`moodNames.${lastEntry.mood}`)}</Text>
                   <Text style={styles.description}>{getSafePhrase()}</Text>
                 </View>
                 <View style={styles.cardWatermark}>
-                   {(() => {
-                      const WatermarkIcon = config.icon;
-                      return <WatermarkIcon width={80} height={80} opacity={0.3} />;
-                   })()}
+                  {(() => {
+                    const WatermarkIcon = config.icon;
+                    return <WatermarkIcon width={80} height={80} opacity={0.3} />;
+                  })()}
                 </View>
               </View>
             )}
@@ -297,35 +328,36 @@ const styles = StyleSheet.create({
   gridContainer: { flexDirection: 'row', flexWrap: 'wrap' },
   cellWrapper: { width: '14.28%', aspectRatio: 1, padding: 3 },
   moodCell: { flex: 1, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-  todayCell: { borderWidth: 2, borderColor: '#334155' },
+  todayCell: { borderWidth: 2, borderColor: '#6366F1' },
   dayNumberText: { fontSize: 10, fontWeight: '900', color: 'rgba(0,0,0,0.2)' },
   registerButton: { marginTop: 20, backgroundColor: '#334155', borderRadius: 16, paddingVertical: 14, alignItems: 'center' },
   registerButtonText: { color: '#FFFFFF', fontWeight: '700' },
-  backButton: { marginVertical: 15 },
+  registerContainer: { flex: 1, backgroundColor: 'white', padding: 20 },
+  backButton: { marginBottom: 20 },
   backButtonText: { color: '#6366F1', fontWeight: 'bold' },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  moodSelectorGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 10 },
-  moodOption: { width: '31%', aspectRatio: 1, borderRadius: 16, backgroundColor: '#F1F5F9', justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
-  moodLabelSmall: { fontSize: 10, fontWeight: '600', color: '#475569', marginTop: 4 },
-  feedbackBox: { marginVertical: 15, alignItems: 'center', padding: 20, borderRadius: 24 },
-  feedbackText: { fontSize: 16, color: '#334155' },
-  iconLargeContainer: { marginTop: 10 },
-  textArea: { backgroundColor: '#F1F5F9', borderRadius: 16, padding: 15, height: 100, textAlignVertical: 'top', color: '#1E293B', borderWidth: 1, borderColor: '#E2E8F0' },
+  moodSelectorGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 8 },
+  moodOption: { width: '31%', aspectRatio: 1, borderRadius: 16, backgroundColor: '#F1F5F9', justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
+  iconSmall: { width: 30, height: 30, marginBottom: 4 },
+  moodLabelSmall: { fontSize: 10, fontWeight: '600', color: '#475569' },
+  feedbackBox: { marginVertical: 20, alignItems: 'center', backgroundColor: '#F8FAFC', padding: 20, borderRadius: 24 },
+  feedbackText: { fontSize: 16, marginBottom: 10 },
+  textArea: { backgroundColor: '#F1F5F9', borderRadius: 16, padding: 15, height: 100, textAlignVertical: 'top' },
   btnSave: { padding: 16, borderRadius: 16, alignItems: 'center', backgroundColor: '#334155', marginTop: 15 },
   btnTextWhite: { color: 'white', fontWeight: 'bold' },
   collapsibleHeader: { flexDirection: 'row', justifyContent: 'space-between', padding: 15, backgroundColor: '#F8FAFC', borderRadius: 16 },
   collapsibleTitle: { fontSize: 14, fontWeight: '700' },
   historyList: { marginTop: 10 },
-  historyItem: { flexDirection: 'row', padding: 12, backgroundColor: 'white', borderRadius: 12, marginBottom: 8, elevation: 1 },
-  historyIconSmall: { width: 35, height: 35, borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  historyMood: { fontWeight: '700', fontSize: 14 },
-  historyTime: { fontSize: 11, color: '#94A3B8' },
-  historyText: { fontSize: 12, color: '#64748B' },
+  historyItem: { flexDirection: 'row', padding: 12, backgroundColor: 'white', borderRadius: 12, marginBottom: 8, elevation: 1, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 },
+  historyIconContainer: { width: 42, height: 42, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
+  historyMood: { fontWeight: '700', fontSize: 14, color: '#1E293B' },
+  historyTime: { fontSize: 11, color: '#94A3B8', fontWeight: '600' },
+  historyText: { fontSize: 12, color: '#64748B', marginTop: 2 },
   recommendCard: { flexDirection: 'row', backgroundColor: '#FEF3C7', padding: 12, borderRadius: 12, alignItems: 'center', gap: 10, marginTop: 10 },
   recommendText: { fontSize: 12, color: '#92400E', flex: 1 },
   card: { borderRadius: 20, padding: 20, flexDirection: 'row', overflow: 'hidden' },
   textColumn: { flex: 1, zIndex: 2 },
-  subtitleCard: { fontSize: 11, fontWeight: '700', opacity: 0.5 },
+  subtitle: { fontSize: 12, fontWeight: '700', opacity: 0.6 },
   titleCard: { fontSize: 20, fontWeight: 'bold', marginVertical: 4 },
   description: { fontSize: 14, lineHeight: 18, opacity: 0.8 },
   cardWatermark: { position: 'absolute', right: 10, bottom: 10, opacity: 0.3 }

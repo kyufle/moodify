@@ -3,7 +3,13 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-export const StaticBottomNavBar = ({ activeTab }: { activeTab: 'calendar' | 'community' | 'home' | 'user' | 'chat' }) => {
+// Añadimos hasNotifications a la interfaz
+interface Props {
+  activeTab: 'calendar' | 'community' | 'home' | 'user' | 'chat';
+  hasNotifications?: boolean;
+}
+
+export const StaticBottomNavBar = ({ activeTab, hasNotifications }: Props) => {
   return (
     <View style={styles.tabBarContainer}>
       <TouchableOpacity style={styles.tabItem} onPress={() => router.navigate('/calendar')} activeOpacity={0.7}>
@@ -42,13 +48,18 @@ export const StaticBottomNavBar = ({ activeTab }: { activeTab: 'calendar' | 'com
         onPress={() => router.navigate('/chat')}
         activeOpacity={0.7}
       >
-        <Feather name="message-circle" size={24} color={activeTab === 'chat' ? '#1E293B' : '#94A3B8'} />
+        <View>
+          <Feather name="message-circle" size={24} color={activeTab === 'chat' ? '#1E293B' : '#94A3B8'} />
+          {/* Círculo de notificación */}
+          {hasNotifications && <View style={styles.notificationDot} />}
+        </View>
       </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  // ... (tus otros estilos se mantienen igual)
   tabBarContainer: {
     position: 'absolute',
     bottom: 0,
@@ -62,7 +73,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingBottom: 0, 
     elevation: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
@@ -74,6 +84,17 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  notificationDot: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#bf98eb', // Rojo vibrante
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
   },
   homeButtonWrapper: {
     top: -20, 

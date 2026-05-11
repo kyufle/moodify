@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/save-mood', [MoodRegisterController::class, 'saveMood']);
     Route::get('/get-mood-calendar', [MoodRegisterController::class, 'getMoodCalendar']);
-    Route::get('/get-today-timeline', [MoodRegisterController::class, 'getTodayTimeline']);
+    Route::get('/get-today-timeline', [UserController::class, 'actionAlert']);
     Route::get('/get-monthly-stats', [MoodRegisterController::class, 'getMonthlyStats']);
     Route::get('/getDashboardInfo',[MoodRegisterController::class, 'getDashboardInfo']);
 });
