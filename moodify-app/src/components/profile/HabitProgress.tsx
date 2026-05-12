@@ -13,12 +13,19 @@ import {
   TextStyle
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { format, parseISO } from 'date-fns';
+import { es, enUS, ca } from 'date-fns/locale'; // Importamos los idiomas necesarios
 import { UserContext } from '../../components/user-provider';
+import { useTranslation } from 'react-i18next';
 
-const AVAILABLE_ICONS = ['wind', 'droplet', 'zap', 'book', 'coffee', 'heart', 'star', 'target', 'award', 'activity'];
-const AVAILABLE_COLORS = ['#6366F1', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#8B5CF6', '#EF4444'];
+const AVAILABLE_ICONS = [
+  'coffee', 'trending-up', 'moon', 'target', 'heart', 'star', 'activity', 'book',
+  'zap', 'wind', 'sun', 'umbrella', 'anchor', 'award', 'bicycle', 'camera',
+  'check-circle', 'cloud', 'codepen', 'command', 'compass', 'cpu', 'droplet',
+  'eye', 'feather', 'flag', 'gift', 'headphones', 'layers', 'map', 'package',
+  'printer', 'rss', 'scissors', 'shopping-cart', 'smile', 'tv', 'watch'
+];
+const AVAILABLE_COLORS = ['#8a5cf69c', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#8B5CF6', '#EF4444'];
 
 interface Habit {
   id: number;
@@ -40,13 +47,23 @@ export const HabitProgress = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [weeklyStatus, setWeeklyStatus] = useState<DayStatus[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation(); // Extraemos i18n para saber el idioma actual
   
   const [modalVisible, setModalVisible] = useState(false);
   const [newName, setNewName] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('target');
-  const [selectedColor, setSelectedColor] = useState('#6366F1');
+  const [selectedColor, setSelectedColor] = useState('#8a5cf69c');
 
-  const todayName = format(new Date(), "EEEE, dd 'de' MMMM", { locale: es });
+  // Mapeo de locales para date-fns
+  const locales: { [key: string]: Locale } = { 
+    es: es, 
+    en: enUS, 
+    ca: ca 
+  };
+  const currentLocale = locales[i18n.language] || es;
+
+  // Fecha de hoy formateada según idioma
+  const todayName = format(new Date(), "EEEE, dd 'de' MMMM", { locale: currentLocale });
 
   const loadAllData = async () => {
     if (!userValue?.accessToken) return;
@@ -137,14 +154,14 @@ export const HabitProgress = () => {
   const completedCount = habits.filter(h => h.done == 1).length;
   const progressPercent = habits.length > 0 ? Math.round((completedCount / habits.length) * 100) : 0;
 
-  if (loading) return <ActivityIndicator color="#6366F1" style={{ marginVertical: 40 }} />;
+  if (loading) return <ActivityIndicator color="#8a5cf69c" style={{ marginVertical: 40 }} />;
 
   return (
     <View style={styles.container}>
       {/* 1. CABECERA */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Mi Rutina</Text>
+          <Text style={styles.title}>{t('profile.myRoutine')}</Text>
           <Text style={styles.dateText}>{todayName}</Text>
         </View>
         <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
@@ -152,31 +169,39 @@ export const HabitProgress = () => {
         </TouchableOpacity>
       </View>
 
-      {/* 2. WEEKLY STRIP - AQUÍ APARECE EL TICK SI full_completed ES TRUE */}
+      {/* 2. WEEKLY STRIP - TRADUCIDO DINÁMICAMENTE */}
       <View style={styles.weeklyStrip}>
-        {weeklyStatus.map((item, index) => (
-          <View key={index} style={styles.dayCol}>
-            <Text style={styles.dayLabel}>{item.day_label}</Text>
-            <View style={[
-              styles.dayCircle, 
-              item.full_completed && styles.dayCircleCompleted,
-              item.is_today && styles.dayCircleToday
-            ] as ViewStyle[]}>
-              {item.full_completed ? (
-                <Feather name="check" size={14} color="#FFF" />
-              ) : (
-                <Text style={[styles.dayDate, item.is_today && { color: '#6366F1' }] as TextStyle[]}>{item.date}</Text>
-              )}
+        {weeklyStatus.map((item, index) => {
+          // Parseamos la fecha que viene de la API para obtener el nombre del día en el idioma actual
+          const dayNameLocal = format(parseISO(item.date), 'EEEEEE', { locale: currentLocale });
+          const dayNumber = item.date.split('-').pop();
+
+          return (
+            <View key={index} style={styles.dayCol}>
+              <Text style={styles.dayLabel}>{dayNameLocal}</Text>
+              <View style={[
+                styles.dayCircle, 
+                item.full_completed && styles.dayCircleCompleted,
+                item.is_today && styles.dayCircleToday
+              ] as ViewStyle[]}>
+                {item.full_completed ? (
+                  <Feather name="check" size={14} color="#FFF" />
+                ) : (
+                  <Text style={[styles.dayDate, item.is_today && { color: '#8a5cf69c' }] as TextStyle[]}>
+                    {dayNumber}
+                  </Text>
+                )}
+              </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
       </View>
 
       {/* 3. CARD DE ESTADÍSTICAS */}
       <View style={styles.statsCard}>
         <View>
           <Text style={styles.statsCount}>{completedCount} de {habits.length}</Text>
-          <Text style={styles.statsSub}>Hábitos hoy</Text>
+          <Text style={styles.statsSub}>{t('profile.habitsToday')}</Text>
         </View>
         <Text style={styles.statsPercent}>{progressPercent}%</Text>
       </View>
@@ -221,7 +246,7 @@ export const HabitProgress = () => {
                   style={[styles.iconOption, selectedIcon === icon && styles.iconOptionActive] as ViewStyle[]} 
                   onPress={() => setSelectedIcon(icon)}
                 >
-                  <Feather name={icon as any} size={20} color={selectedIcon === icon ? '#6366F1' : '#94A3B8'} />
+                  <Feather name={icon as any} size={20} color={selectedIcon === icon ? '#8a5cf69c' : '#94A3B8'} />
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -235,14 +260,14 @@ export const HabitProgress = () => {
                 />
               ))}
             </View>
-            <View style={styles.modalActions}>
+            <div style={styles.modalActions}>
               <TouchableOpacity style={styles.btnCancel} onPress={() => setModalVisible(false)}>
                 <Text style={{ color: '#64748B', fontWeight: '700' }}>Cerrar</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.btnSave, { backgroundColor: selectedColor }] as ViewStyle[]} onPress={handleCreateHabit}>
                 <Text style={{ color: 'white', fontWeight: '800' }}>Guardar</Text>
               </TouchableOpacity>
-            </View>
+            </div>
           </View>
         </View>
       </Modal>
@@ -255,17 +280,17 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   title: { fontSize: 24, fontWeight: '900', color: '#1E293B' } as TextStyle,
   dateText: { color: '#64748B', textTransform: 'capitalize', fontSize: 13 } as TextStyle,
-  addBtn: { backgroundColor: '#6366F1', width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' } as ViewStyle,
+  addBtn: { backgroundColor: '#8a5cf69c', width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' } as ViewStyle,
   
   weeklyStrip: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#F8FAFC', padding: 15, borderRadius: 20, marginBottom: 20, borderWidth: 1, borderColor: '#F1F5F9' } as ViewStyle,
   dayCol: { alignItems: 'center', gap: 6 } as ViewStyle,
   dayLabel: { fontSize: 10, fontWeight: '800', color: '#94A3B8', textTransform: 'uppercase' } as TextStyle,
   dayCircle: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#FFF', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#E2E8F0' } as ViewStyle,
-  dayCircleToday: { borderColor: '#6366F1', borderWidth: 2 } as ViewStyle,
+  dayCircleToday: { borderColor: '#8a5cf69c', borderWidth: 2 } as ViewStyle,
   dayCircleCompleted: { backgroundColor: '#10B981', borderColor: '#10B981' } as ViewStyle,
   dayDate: { fontSize: 12, fontWeight: '700', color: '#64748B' } as TextStyle,
 
-  statsCard: { backgroundColor: '#6366F1', padding: 20, borderRadius: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 } as ViewStyle,
+  statsCard: { backgroundColor: '#8a5cf69c', padding: 20, borderRadius: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 } as ViewStyle,
   statsCount: { fontSize: 20, fontWeight: '900', color: '#FFF' } as TextStyle,
   statsSub: { fontSize: 12, color: 'rgba(255,255,255,0.7)', fontWeight: '600' } as TextStyle,
   statsPercent: { fontSize: 28, fontWeight: '950', color: '#FFF' } as TextStyle,
@@ -283,7 +308,7 @@ const styles = StyleSheet.create({
   input: { backgroundColor: '#F1F5F9', padding: 16, borderRadius: 15, marginBottom: 20, fontSize: 16 } as TextStyle,
   label: { fontWeight: '800', marginBottom: 10, color: '#94A3B8', fontSize: 11, textTransform: 'uppercase' } as TextStyle,
   iconOption: { padding: 12, borderRadius: 12, borderWidth: 1, borderColor: '#F1F5F9', marginRight: 10 } as ViewStyle,
-  iconOptionActive: { backgroundColor: '#EEF2FF', borderColor: '#6366F1' } as ViewStyle,
+  iconOptionActive: { backgroundColor: '#EEF2FF', borderColor: '#8a5cf69c' } as ViewStyle,
   colorGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 25 } as ViewStyle,
   dot: { width: 34, height: 34, borderRadius: 17 } as ViewStyle,
   activeDot: { borderWidth: 3, borderColor: '#CBD5E1' } as ViewStyle,

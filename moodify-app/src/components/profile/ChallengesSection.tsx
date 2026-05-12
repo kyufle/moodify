@@ -5,9 +5,16 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { UserContext } from '../../components/user-provider';
+import { useTranslation } from 'react-i18next';
 
 const COLORS = ['#F472B6', '#60A5FA', '#818CF8', '#10B981', '#F59E0B', '#6366F1'];
-const ICONS = ['coffee', 'trending-up', 'moon', 'target', 'heart', 'star', 'activity', 'book'];
+const ICONS = [
+  'coffee', 'trending-up', 'moon', 'target', 'heart', 'star', 'activity', 'book',
+  'zap', 'wind', 'sun', 'umbrella', 'anchor', 'award', 'bicycle', 'camera',
+  'check-circle', 'cloud', 'codepen', 'command', 'compass', 'cpu', 'droplet',
+  'eye', 'feather', 'flag', 'gift', 'headphones', 'layers', 'map', 'package',
+  'printer', 'rss', 'scissors', 'shopping-cart', 'smile', 'tv', 'watch'
+];
 
 interface Challenge {
   id: string;
@@ -22,7 +29,7 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
   const { userValue } = useContext(UserContext);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
-  
+  const {t} = useTranslation();
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [detailVisible, setDetailVisible] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
@@ -68,6 +75,7 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
       if (res.ok) {
         setCreateModalVisible(false);
         setNewName('');
+        setNewDays('30');
         fetchChallenges();
       }
     } catch (e) { Alert.alert("Error de conexión"); }
@@ -109,7 +117,7 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Text style={styles.sectionTitle}>Mis Retos</Text>
+        <Text style={styles.sectionTitle}>{t('profile.myChallenges')}</Text>
         <TouchableOpacity onPress={() => setCreateModalVisible(true)}>
            <Feather name="plus-circle" size={22} color="#6366F1" />
         </TouchableOpacity>
@@ -128,13 +136,14 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
             </View>
             <Text style={styles.challengeName} numberOfLines={2}>{item.name}</Text>
             <View style={styles.progressRow}>
-              <Text style={styles.progressText}>{item.current_days}/{item.total_days} Días</Text>
+              <Text style={styles.progressText}>{item.current_days}/{item.total_days} {t('profile.days')}</Text>
               <Feather name="maximize-2" size={12} color="#94A3B8" />
             </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
+      {/* MODAL DETALLE */}
       <Modal visible={detailVisible} animationType="slide" presentationStyle="fullScreen">
         <View style={styles.fullView}>
           {selectedChallenge && (
@@ -152,7 +161,7 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
                   <Feather name={selectedChallenge.icon as any} size={40} color={selectedChallenge.color} />
                 </View>
                 <Text style={styles.fullTitle}>{selectedChallenge.name}</Text>
-                <Text style={styles.fullSub}>Progreso: {selectedChallenge.current_days}/{selectedChallenge.total_days} días</Text>
+                <Text style={styles.fullSub}>{t('profile.progress')}: {selectedChallenge.current_days}/{selectedChallenge.total_days} {t('profile.days')}</Text>
                 <View style={styles.calendarContainer}>
                   {Array.from({ length: selectedChallenge.total_days }).map((_, i) => (
                     <View key={i} style={[styles.calendarDay, i < selectedChallenge.current_days && { backgroundColor: selectedChallenge.color, borderColor: selectedChallenge.color }]}>
@@ -161,7 +170,7 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
                   ))}
                 </View>
                 <TouchableOpacity style={[styles.mainBtn, { backgroundColor: selectedChallenge.color }]} onPress={() => markDay(selectedChallenge.id)}>
-                  <Text style={styles.mainBtnText}>Marcar día de hoy</Text>
+                  <Text style={styles.mainBtnText}>{t('profile.markTodaysDate')}</Text>
                 </TouchableOpacity>
               </ScrollView>
             </>
@@ -169,15 +178,42 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
         </View>
       </Modal>
 
+      {/* MODAL CREACIÓN */}
       <Modal visible={createModalVisible} animationType="fade" transparent>
         <View style={styles.overlay}>
           <View style={styles.modal}>
-            <Text style={styles.modalTitleText}>Nuevo Reto</Text>
-            <TextInput style={styles.input} placeholder="Nombre" value={newName} onChangeText={setNewName} />
-            <TextInput style={styles.input} placeholder="Días (ej. 30)" keyboardType="numeric" value={newDays} onChangeText={setNewDays} />
+            <Text style={styles.modalTitleText}>{t('profile.newChallenges')}</Text>
+            
+            <TextInput style={styles.input} placeholderTextColor="#64748B" placeholder={t('profile.nameChallenges')} value={newName} onChangeText={setNewName} />
+            <TextInput style={styles.input} placeholderTextColor="#64748B" placeholder={t('profile.daysPlaceholder')} keyboardType="numeric" value={newDays} onChangeText={setNewDays} />
+
+            <Text style={styles.label}>{t('profile.selectIcon')}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.selectorScroll}>
+                {ICONS.map(icon => (
+                    <TouchableOpacity 
+                        key={icon} 
+                        onPress={() => setSelectedIcon(icon)}
+                        style={[styles.selectorItem, selectedIcon === icon && { borderColor: selectedColor, backgroundColor: selectedColor + '10' }]}
+                    >
+                        <Feather name={icon as any} size={20} color={selectedIcon === icon ? selectedColor : '#94A3B8'} />
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
+
+            <Text style={styles.label}>{t('profile.selectColor')}</Text>
+            <View style={styles.colorRow}>
+                {COLORS.map(color => (
+                    <TouchableOpacity 
+                        key={color} 
+                        onPress={() => setSelectedColor(color)}
+                        style={[styles.colorCircle, { backgroundColor: color }, selectedColor === color && styles.colorSelected]}
+                    />
+                ))}
+            </View>
+
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.btnCancel} onPress={() => setCreateModalVisible(false)}><Text>Cerrar</Text></TouchableOpacity>
-              <TouchableOpacity style={[styles.btnSave, {backgroundColor: selectedColor}]} onPress={handleCreate}><Text style={{color:'white'}}>Crear</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.btnCancel} onPress={() => setCreateModalVisible(false)}><Text style={styles.btnCancelText}>{t('profile.cancel')}</Text></TouchableOpacity>
+              <TouchableOpacity style={[styles.btnSave, {backgroundColor: selectedColor}]} onPress={handleCreate}><Text style={{color:'white', fontWeight: '700'}}>{t('profile.createChallenge')}</Text></TouchableOpacity>
             </View>
           </View>
         </View>
@@ -207,11 +243,18 @@ const styles = StyleSheet.create({
   dayNumber: { fontSize: 14, fontWeight: '700', color: '#CBD5E1' },
   mainBtn: { padding: 20, borderRadius: 20, alignItems: 'center' },
   mainBtnText: { color: 'white', fontSize: 18, fontWeight: '800' },
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 25 },
-  modal: { backgroundColor: '#FFF', borderRadius: 30, padding: 25 },
-  modalTitleText: { fontSize: 20, fontWeight: '800', marginBottom: 20 },
-  input: { backgroundColor: '#F8FAFC', padding: 15, borderRadius: 15, marginBottom: 15, borderWidth: 1, borderColor: '#E2E8F0' },
-  modalButtons: { flexDirection: 'row', gap: 10 },
-  btnCancel: { flex: 1, padding: 18, alignItems: 'center' },
-  btnSave: { flex: 2, padding: 18, borderRadius: 15, alignItems: 'center' }
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 20 },
+  modal: { backgroundColor: '#FFF', borderRadius: 32, padding: 24, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 },
+  modalTitleText: { fontSize: 22, fontWeight: '800', color: '#1E293B', marginBottom: 20, textAlign: 'center' },
+  input: { backgroundColor: '#F8FAFC', padding: 16, borderRadius: 16, marginBottom: 12, borderWidth: 1, borderColor: '#E2E8F0', fontSize: 15 },
+  label: { fontSize: 13, fontWeight: '700', color: '#94A3B8', marginBottom: 10, marginTop: 10, textTransform: 'uppercase' },
+  selectorScroll: { marginBottom: 15 },
+  selectorItem: { width: 48, height: 48, borderRadius: 14, borderWidth: 2, borderColor: '#F1F5F9', justifyContent: 'center', alignItems: 'center', marginRight: 10, backgroundColor: '#F8FAFC' },
+  colorRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 25 },
+  colorCircle: { width: 34, height: 34, borderRadius: 17 },
+  colorSelected: { borderWidth: 3, borderColor: '#1E293B' },
+  modalButtons: { flexDirection: 'row', gap: 12, marginTop: 10 },
+  btnCancel: { flex: 1, padding: 16, alignItems: 'center', justifyContent: 'center' },
+  btnCancelText: { color: '#94A3B8', fontWeight: '600' },
+  btnSave: { flex: 2, padding: 16, borderRadius: 16, alignItems: 'center', justifyContent: 'center' }
 });

@@ -13,7 +13,7 @@ return new class extends Migration
             $table->boolean('show_in_community')->default(true);
             $table->boolean('notifications_enabled')->default(true);
             $table->string('app_bg')->default('default');
-            $table->string('language')->default('es');
+            $table->string('language')->nullable();
         });
     }
 

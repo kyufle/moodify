@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\AchievementController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\HabitController;
@@ -66,4 +67,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/challenges/{id}/mark-day', [ChallengeController::class, 'markDay']);
 
     Route::get('/achievements', [AchievementController::class, 'getAchievements']);
+    Route::post('/profile/update', [ProfileController::class, 'update']);
+    
 });

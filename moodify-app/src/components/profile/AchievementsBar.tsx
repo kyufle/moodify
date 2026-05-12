@@ -1,56 +1,70 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, ViewStyle, TextStyle } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
-interface AchievementsBarProps {
-  unlockedIds: string[];
+interface BadgeProps {
+  unlockedIds: string[]; // Usaremos esto como fuente de verdad
 }
 
-export const AchievementsBar = ({ unlockedIds = [] }: AchievementsBarProps) => {
-  
-  const badgeDefinitions = [
-    { id: '1', title: 'Principiante', desc: 'Tu primer hábito', icon: 'award', color: '#6366F1' },
-    { id: '2', title: 'Multitarea', desc: '5+ hábitos activos', icon: 'layers', color: '#06B6D4' },
-    { id: '9', title: 'Día Perfecto', desc: 'Todo hecho hoy', icon: 'check-circle', color: '#10B981' },
-    { id: '13', title: 'Explorador', desc: '3 iconos distintos', icon: 'compass', color: '#84cc16' },
-    { id: '14', title: 'Arcoíris', desc: '4 colores usados', icon: 'droplet', color: '#A855F7' },
-    { id: '19', title: 'Intelectual', desc: 'Hábito de lectura', icon: 'book', color: '#6366F1' },
+export const AchievementsBar = ({ unlockedIds = [] }: BadgeProps) => {
+  const {t} = useTranslation();
+  const badges = [
+    { id: '1', title: t('profile.beginner'), desc: t('profile.yourFirstHabit'), icon: 'award', color: '#6366F1' },
+    { id: '2', title: t('profile.multitask'), desc: t('profile.activeHabits'), icon: 'layers', color: '#06B6D4' },
+    { id: '3', title: t('profile.ambitious'), desc: t('profile.activeChallenges'), icon: 'target', color: '#EC4899' },
+    { id: '4', title: t('profile.collector'), desc: t('profile.habitsCreated'), icon: 'grid', color: '#F43F5E' },
+    { id: '5', title: t('profile.survivor'), desc: t('profile.challenge50'), icon: 'trending-up', color: '#8B5CF6' },
+    { id: '6', title: t('profile.unstoppable'), desc: t('profile.challengeCompleted'), icon: 'zap', color: '#F59E0B' },
+    { id: '13', title: t('profile.explorer'), desc: t('profile.differentIcons'), icon: 'compass', color: '#84cc16' },
+    { id: '14', title: t('profile.rainbow'), desc: t('profile.colorsUsed'), icon: 'droplet', color: '#A855F7' },
   ];
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Mis Logros</Text>
+        <Text style={styles.title}>{t('profile.myAchievements')}</Text>
         <View style={styles.badgeCountContainer}>
-          <Text style={styles.countText}>
-            {unlockedIds.length} de {badgeDefinitions.length}
-          </Text>
+            <Feather name="unlock" size={12} color="#6366F1" style={{marginRight: 4}} />
+            <Text style={styles.countText}>
+                {unlockedIds.length} / {badges.length}
+            </Text>
         </View>
       </View>
       
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {badgeDefinitions.map((badge) => {
+        {badges.map(badge => {
+          // LA CLAVE: Si el ID está en el array que viene de Laravel, se ilumina.
           const isUnlocked = unlockedIds.includes(badge.id);
-          
+
           return (
-            <View key={badge.id} style={[styles.badgeCard, !isUnlocked && styles.locked]}>
+            <View 
+              key={badge.id} 
+              style={[styles.badgeCard, !isUnlocked && styles.locked] as ViewStyle[]}
+            >
               <View style={[
-                styles.iconCircle, 
-                { backgroundColor: isUnlocked ? badge.color + '20' : '#F1F5F9' }
+                  styles.iconCircle, 
+                  { backgroundColor: isUnlocked ? badge.color + '15' : '#F1F5F9' },
+                  isUnlocked && { borderColor: badge.color + '40', borderWidth: 1 }
               ]}>
                 <Feather 
                   name={badge.icon as any} 
-                  size={24} 
+                  size={22} 
                   color={isUnlocked ? badge.color : '#CBD5E1'} 
                 />
               </View>
-              <Text style={[styles.badgeTitle, !isUnlocked && { color: '#94A3B8' }]}>
-                {badge.title}
+              <Text 
+                  numberOfLines={1} 
+                  style={[styles.badgeTitle, !isUnlocked && { color: '#94A3B8' }] as TextStyle[]}
+              >
+                  {badge.title}
               </Text>
+              <Text style={styles.badgeDesc}>{badge.desc}</Text>
+              
               {!isUnlocked && (
-                <View style={styles.lockIcon}>
-                  <Feather name="lock" size={10} color="#94A3B8" />
-                </View>
+                  <View style={styles.lockBadge}>
+                      <Feather name="lock" size={10} color="#CBD5E1" />
+                  </View>
               )}
             </View>
           );

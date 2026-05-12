@@ -39,6 +39,15 @@ export default function SettingsScreen() {
               <Feather name="user" size={16} color="#6366F1" />
               <Text style={styles.btnText}>Ir a mi perfil</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btn}
+              // Pasamos el parámetro "tab=ajustes"
+              onPress={() => router.replace('/profile?tab=ajustes')}
+              activeOpacity={0.85}
+            >
+              <Feather name="settings" size={16} color="#6366F1" />
+              <Text style={styles.btnText}>Abrir ajustes en mi perfil</Text>
+            </TouchableOpacity>
           </LinearGradient>
         </View>
       </DashboardBackground>
