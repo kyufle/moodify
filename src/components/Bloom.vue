@@ -68,7 +68,7 @@ onUnmounted(() => clearInterval(interval));
       <button @click="anterior" class="btn-primary">
         <i class="pi pi-arrow-left"></i> Enrere
       </button>
-      <button @click="volver" class="btn-primary" style="margin-top: 0">
+      <button @click="volver" class="btn-primary">
         Coneix la tecnologia <i class="pi pi-arrow-right"></i>
       </button>
     </div>
@@ -236,8 +236,13 @@ onUnmounted(() => clearInterval(interval));
 
 /* TAGLINE */
 .tagline {
-  font-size: 0.8rem;
-  color: #9ca3af;
+  font-size: 0.78rem;
+  color: #4b5563;
   margin-bottom: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  padding: 6px 12px;
+  display: inline-block;
 }
 </style>

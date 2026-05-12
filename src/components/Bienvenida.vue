@@ -23,10 +23,11 @@ const irADescubre = () => {
       <span><i class="pi pi-user"></i> Valeria Santana Megia</span>
       <span><i class="pi pi-user"></i> Ruth Romero Carretero</span>
     </div>
-
-    <button @click="irADescubre" class="btn-primary">
-      Dona un cop d'ull <i class="pi pi-arrow-right"></i>
-    </button>
+    <div class="button-group">
+      <button @click="irADescubre" class="btn-primary">
+        Dona un cop d'ull <i class="pi pi-arrow-right"></i>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -35,6 +36,12 @@ img {
   width: 200px;
   height: 200px;
   margin-bottom: 20px;
+
+  @media (max-width: 600px) {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 12px;
+  }
 }
 
 h2 {

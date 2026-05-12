@@ -1,8 +1,16 @@
 <script setup>
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const volver   = () => router.push("/bloom");
 const anterior = () => router.push("/descubre");
+
+const flipped = ref(new Set());
+const toggle = (i) => {
+  const s = new Set(flipped.value);
+  s.has(i) ? s.delete(i) : s.add(i);
+  flipped.value = s;
+};
 
 const cards = [
   {
@@ -49,8 +57,8 @@ const cards = [
     <h1>Funcionalitats</h1>
 
     <div class="cards">
-      <div v-for="(card, i) in cards" :key="i" class="flip-wrap">
-        <div :class="['flip-inner', card.color]">
+      <div v-for="(card, i) in cards" :key="i" class="flip-wrap" @click="toggle(i)">
+        <div :class="['flip-inner', card.color, { flipped: flipped.has(i) }]">
 
           <div class="flip-front">
             <span class="card-emoji">{{ card.emoji }}</span>
@@ -71,7 +79,7 @@ const cards = [
       <button @click="anterior" class="btn-primary">
         <i class="pi pi-arrow-left"></i> Enrere
       </button>
-      <button @click="volver" class="btn-primary" style="margin-top:0">
+      <button @click="volver" class="btn-primary">
         Coneix a Bloom <i class="pi pi-arrow-right"></i>
       </button>
     </div>
@@ -103,7 +111,7 @@ h1 {
 
 .flip-wrap {
   perspective: 900px;
-  height: 150px;
+  height: 180px;
 }
 
 .flip-inner {
@@ -114,10 +122,11 @@ h1 {
   transform-style: preserve-3d;
   transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  cursor: default;
+  cursor: pointer;
 }
 
-.flip-wrap:hover .flip-inner {
+.flip-wrap:hover .flip-inner,
+.flip-inner.flipped {
   transform: rotateY(180deg);
 }
 

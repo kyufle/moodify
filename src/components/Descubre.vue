@@ -60,7 +60,7 @@ const anterior = () => router.push("/");
       <button @click="anterior" class="btn-primary">
         <i class="pi pi-arrow-left"></i> Enrere
       </button>
-      <button @click="volver" class="btn-primary" style="margin-top:0">
+      <button @click="volver" class="btn-primary">
         Veure Funcionalitats <i class="pi pi-arrow-right"></i>
       </button>
     </div>

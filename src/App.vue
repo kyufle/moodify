@@ -34,7 +34,7 @@ const slides = [
 <style scoped>
 .dot-nav {
   position: fixed;
-  bottom: 28px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -48,6 +48,12 @@ const slides = [
   padding: 8px 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   z-index: 100;
+
+  @media (max-width: 480px) {
+    gap: 7px;
+    padding: 7px 12px;
+    bottom: 14px;
+  }
 }
 
 .dot {

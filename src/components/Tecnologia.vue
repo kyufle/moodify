@@ -88,7 +88,7 @@ const volver  = () => router.push("/equip");
       <button @click="anterior" class="btn-primary">
         <i class="pi pi-arrow-left"></i> Enrere
       </button>
-      <button @click="volver" class="btn-primary" style="margin-top: 0">
+      <button @click="volver" class="btn-primary">
         Coneix l'Equip <i class="pi pi-arrow-right"></i>
       </button>
     </div>
@@ -162,8 +162,12 @@ h1 {
 }
 .arrow-label {
   font-size: 0.62rem;
-  color: #9ca3af;
+  color: #4b5563;
   white-space: nowrap;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 6px;
+  padding: 2px 7px;
 }
 .arrow-h.small .arrow-line { width: 24px; }
 .arrow-h.small .arrow-tip  { margin-left: 18px; }
@@ -223,6 +227,39 @@ h1 {
   color: #9ca3af;
   font-size: 0.75rem;
   margin-top: -4px;
+}
+
+/* ── MÓVIL ────────────────────────────────── */
+@media (max-width: 600px) {
+  h1 { font-size: 1.5rem; margin-bottom: 16px; }
+
+  .diagrama { flex-direction: column; align-items: center; }
+
+  .arrow-h {
+    flex-direction: row;
+    gap: 4px;
+  }
+  .arrow-line { width: 2px; height: 28px; }
+  .arrow-tip  { margin: 0; font-size: 0.85rem; }
+  .arrow-label { display: none; }
+
+  .servidor-inner {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .arrow-h.small { flex-direction: row; }
+  .arrow-h.small .arrow-line { width: 2px; height: 20px; }
+
+  .right-group {
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .node { min-width: 80px; padding: 10px 12px; }
+  .node-icon { font-size: 1.4rem; }
+  .node strong { font-size: 0.8rem; }
 }
 
 /* ── BADGES ───────────────────────────────── */

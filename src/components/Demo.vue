@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter } from "vue-router";
+
 const router = useRouter();
 
 const volver = () => {
@@ -8,111 +9,129 @@ const volver = () => {
 </script>
 
 <template>
-  <div class="caja-demo">
-    <h1>Prova la nostra Demo</h1>
-    <div class="text-content">
-      <p>
-        Escaneja aquest codi QR amb la càmera del teu telèfon mòbil per accedir a la versió interactiva de <strong>MOODIFY</strong> i descobrir com funciona.
-      </p>
-      
-      <div class="qr-container">
-        <!-- Puedes sustituir el src de esta imagen con la ruta de tu propio QR real -->
-        <div class="qr-placeholder">
-          <i class="pi pi-qrcode qr-icon"></i>
-          <span>Afegeix aquí el teu QR</span>
-        </div>
-      </div>
+  <div class="caja">
+    <div class="icon-wrapper">
+      <i class="pi pi-heart-fill hero-icon"></i>
     </div>
-    
-    <div class="end-message">
-      <i class="pi pi-check-circle end-icon"></i>
-      <p>Gràcies per descobrir MOODIFY! 💛</p>
-    </div>
+
+    <h1>Gràcies per voler entendre MOODIFY</h1>
+
+    <p class="subtitle">
+      Esperem que aquesta petita demo us ajudi a descobrir una nova manera
+      d’entendre i gestionar les emocions d’una forma més visual, accessible i
+      propera.
+    </p>
+
     <button @click="volver" class="btn-primary">
-      <i class="pi pi-home"></i> Tornar a l'inici
+      <i class="pi pi-home"></i>
+      Tornar a l'inici
     </button>
   </div>
 </template>
 
 <style scoped>
-.caja-demo {
-  border: 2px solid var(--accent-border);
-  padding: 40px;
-  border-radius: 24px;
-  max-width: 550px;
-  width: 90%;
-  background-color: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+.card {
+  width: 100%;
+  max-width: 560px;
+
+  background: white;
+  border-radius: 28px;
+
+  padding: 48px 36px;
+
   text-align: center;
-  box-shadow: var(--shadow);
-  margin-top: 40px;
-  margin-bottom: 40px;
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.08),
+    0 4px 10px rgba(0, 0, 0, 0.04);
+
+  animation: fadeIn 0.45s ease;
+}
+
+.icon-wrapper {
+  width: 90px;
+  height: 90px;
+
+  margin: 0 auto 24px;
+
+  border-radius: 50%;
+
+  background: #fff7ed;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-icon {
+  font-size: 2.5rem;
+  color: #f59e0b;
 }
 
 h1 {
+  font-size: 2.3rem;
   color: #111827;
-  font-size: 2.5rem;
-  margin-bottom: 24px;
+  font-weight: 700;
+
+  margin-bottom: 18px;
 }
 
-.text-content {
-  margin-bottom: 32px;
-}
-
-.text-content p {
-  color: #374151;
-  font-size: 1.15rem;
-  line-height: 1.6;
-  margin-bottom: 32px;
-}
-
-.qr-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.qr-placeholder {
-  width: 250px;
-  height: 250px;
-  background: white;
-  border-radius: 16px;
-  border: 4px dashed var(--accent-border);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  color: #6b7280;
-  font-weight: 600;
-  transition: transform 0.3s ease;
-}
-
-.qr-placeholder:hover {
-  transform: scale(1.05);
-  border-color: var(--accent);
-}
-
-.qr-icon {
-  font-size: 5rem;
-  color: var(--accent-2);
-}
-.end-message {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
+.subtitle {
   color: #4b5563;
-  font-size: 1.1rem;
-  font-weight: 500;
+
+  font-size: 1.08rem;
+  line-height: 1.7;
+
+  margin-bottom: 36px;
 }
 
-.end-icon {
-  font-size: 2.5rem;
-  color: var(--accent);
+.message-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  padding: 16px 20px;
+
+  border-radius: 16px;
+
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+
+  color: #374151;
+  font-weight: 500;
+
+  margin-bottom: 32px;
+}
+
+.message-icon {
+  color: #10b981;
+  font-size: 1.2rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 36px 24px;
+  }
+
+  h1 {
+    font-size: 1.9rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
 }
 </style>
