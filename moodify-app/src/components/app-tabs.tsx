@@ -22,7 +22,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
       {/* Botón 2: Comunidad/Usuarios */}
       <TouchableOpacity 
         style={styles.tabItem} 
-        onPress={() => navigation.navigate('community')} // Ruta placeholder
+        onPress={() => navigation.navigate('community/feed')} // Ruta placeholder
       >
         <Feather name="users" size={24} color={state.index === 1 ? "#1E293B" : "#94A3B8"} />
       </TouchableOpacity>
@@ -71,7 +71,7 @@ export default function AppTabs() {
       screenOptions={{ headerShown: false }}
     >
       <Tabs.Screen name="calendar" />
-      <Tabs.Screen name="community" />
+      <Tabs.Screen name="community/feed" />
       <Tabs.Screen name="dashboard" />
       <Tabs.Screen name="profile" />
       <Tabs.Screen name="chat" />

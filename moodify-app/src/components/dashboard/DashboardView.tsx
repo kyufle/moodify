@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { DashboardBackground } from './DashboardBackground';
 import { DashboardHeader } from './DashboardHeader';
 import { StreakCard } from './StreakCard';
-import { ActionAlertCard } from './ActionAlertCard';
+import  ActionAlertCard from './ActionAlertCard';
 import { StatsBoard } from './StatsBoard'; 
 import { QuoteCard } from './QuoteCard';
 import { Sleep } from './Sleep';

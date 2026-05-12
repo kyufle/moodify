@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 
 // Añadimos hasNotifications a la interfaz
 interface Props {
-  activeTab: 'calendar' | 'community' | 'home' | 'user' | 'chat';
+  activeTab: 'calendar' | 'community/feed' | 'home' | 'user' | 'chat';
   hasNotifications?: boolean;
 }
 
@@ -18,10 +18,10 @@ export const StaticBottomNavBar = ({ activeTab, hasNotifications }: Props) => {
       
       <TouchableOpacity 
         style={styles.tabItem} 
-        onPress={() => router.navigate('/community')} 
+        onPress={() => router.navigate('/community/feed')} 
         activeOpacity={0.7}
       >
-        <Feather name="users" size={24} color={activeTab === 'community' ? '#1E293B' : '#94A3B8'} />
+        <Feather name="users" size={24} color={activeTab === 'community/feed' ? '#1E293B' : '#94A3B8'} />
       </TouchableOpacity>
 
       {/* Botón Home (Elevado) */}

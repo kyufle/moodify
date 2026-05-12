@@ -1,19 +1,26 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity,Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { UserContext } from '../user-provider';
 import { ThemedText } from '../themed-text';
 import { avatarMap } from '../../utils/utils';
 import { useTranslation } from 'react-i18next';
 
+// Asegúrate de que la ruta sea correcta
+import AlertsDrawer from './ActionAlertCard'; 
+
 export const DashboardHeader = () => {
-  const { userValue, logout } = React.use(UserContext);
-  const {t} = useTranslation();
-  if (userValue?.user == null)
-    return;
+  const { userValue } = React.useContext(UserContext); // Cambiado a useContext por convención
+  const { t } = useTranslation();
+  
+  const [isAlertsVisible, setIsAlertsVisible] = useState(false);
+  // NUEVO: Estado para saber cuántas notificaciones hay
+  const [unreadAlerts, setUnreadAlerts] = useState(0);
+
+  if (userValue?.user == null) return null;
 
   const user = userValue.user;
-  console.log(user.image_path);
+  
   const currentDateFormatted = new Intl.DateTimeFormat(undefined, {
     day: '2-digit',
     month: 'long',
@@ -21,41 +28,54 @@ export const DashboardHeader = () => {
   }).format(new Date()); 
 
   return (
-    <View style={styles.container}>
-      <View style={styles.rightActions}>
-          
-          
-          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+    <>
+      <View style={styles.container}>
+        <View style={styles.rightActions}>
+          <TouchableOpacity 
+            style={styles.alertButton} 
+            onPress={() => setIsAlertsVisible(true)}
+          >
             <Feather name="bell" size={18} color="#64748B" />
+            
+            {/* NUEVO: Puntito rojo si hay notificaciones */}
+            {unreadAlerts > 0 && (
+              <View style={styles.redBadge} />
+            )}
+            
           </TouchableOpacity>
         </View>
-      <View style={styles.headerRow}>
         
-        <View style={styles.userInfoContainer}>
-          <View style={styles.avatarRing}>
-            <Image 
-              source={user.image_id ? avatarMap[user.image_id] : null}
-              style={styles.avatar}
-              contentFit="cover"
-            />
+        <View style={styles.headerRow}>
+          <View style={styles.userInfoContainer}>
+            <View style={styles.avatarRing}>
+              <Image 
+                source={user.image_id ? avatarMap[user.image_id] : null}
+                style={styles.avatar}
+                resizeMode="cover" 
+              />
+            </View>
+            <View style={styles.textContainer}>
+              <ThemedText style={styles.welcomeText}>{t('dashboard.welcome')}</ThemedText>
+              <ThemedText style={styles.nameText}>{user.name}</ThemedText>
+            </View>
           </View>
-          <View style={styles.textContainer}>
-            <ThemedText style={styles.welcomeText}>{t('dashboard.welcome')}</ThemedText>
-            <ThemedText style={styles.nameText}>{user.name}</ThemedText>
-          </View>
-          
         </View>
-        
 
-        {/* Lado derecho: Puntos y Logout */}
-        
-      
-      </View>
-      <View>
-              <ThemedText style={styles.dateText}>{currentDateFormatted}</ThemedText>
-              <ThemedText style={styles.fraseText}>{t('dashboard.messageHello')} {user.name} {t('dashboard.messageWelcome')}</ThemedText>
+        <View>
+          <ThemedText style={styles.dateText}>{currentDateFormatted}</ThemedText>
+          <ThemedText style={styles.fraseText}>
+            {t('dashboard.messageHello')} {user.name} {t('dashboard.messageWelcome')}
+          </ThemedText>
         </View>
-    </View>
+      </View>
+
+      {/* RENDERIZAMOS SIEMPRE EL DRAWER (Aunque esté oculto) para que el setInterval funcione */}
+      <AlertsDrawer 
+        isVisible={isAlertsVisible} 
+        onClose={() => setIsAlertsVisible(false)} 
+        onUnreadCount={(count) => setUnreadAlerts(count)} // Recibimos la cantidad
+      />
+    </>
   );
 };
 
@@ -77,13 +97,13 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: '17px',
+    gap: 17, 
     alignItems: 'center',
     marginLeft: 15,
     marginBottom: 15
   },
   userInfoContainer: {
-    gap: '17px',
+    gap: 17,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -108,8 +128,6 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 28,
-    
-    
   },
   textContainer: {
     marginLeft: 12,
@@ -121,7 +139,6 @@ const styles = StyleSheet.create({
     color: '#606060',
     letterSpacing: 0.5,
     marginBottom: 1,
-    
   },
   nameText: {
     fontSize: 18,
@@ -141,19 +158,31 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginLeft: 15
   },
-  
   rightActions: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    gap: '5px'
+    gap: 5
   },
-  logoutButton: {
+  alertButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
     backgroundColor: '#F1F5F9',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative' // Necesario para colocar el puntito encima
+  },
+  // NUEVO: Estilo para el puntito rojo
+  redBadge: {
+    position: 'absolute',
+    top: 6,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#EF4444',
+    borderWidth: 1.5,
+    borderColor: '#F1F5F9'
   }
 });

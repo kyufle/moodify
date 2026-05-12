@@ -144,6 +144,16 @@ const ca = {
     currentPassword: 'Contrasenya actual',
     newPassword: 'Contrasenya nova'
   },
+  alert:{
+    like: 'li ha donat m\'agrada a la teva publicació',
+    comment: 'ha comentat al teu post',
+    follow: 'ha començat a seguir-te',
+    at: "a les"
+  },
+  months: [
+    "gen.", "febr.", "març", "abr.", "maig", "juny", 
+    "jul.", "ag.", "set.", "oct.", "nov.", "des."
+  ],
   moodNames: {
     happy: "Feliç",
     glad: "Content",

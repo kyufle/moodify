@@ -260,14 +260,14 @@ export const HabitProgress = () => {
                 />
               ))}
             </View>
-            <div style={styles.modalActions}>
+            <View style={styles.modalActions}>
               <TouchableOpacity style={styles.btnCancel} onPress={() => setModalVisible(false)}>
                 <Text style={{ color: '#64748B', fontWeight: '700' }}>Cerrar</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.btnSave, { backgroundColor: selectedColor }] as ViewStyle[]} onPress={handleCreateHabit}>
                 <Text style={{ color: 'white', fontWeight: '800' }}>Guardar</Text>
               </TouchableOpacity>
-            </div>
+            </View>
           </View>
         </View>
       </Modal>
