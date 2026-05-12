@@ -1,85 +1,55 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { DashboardBackground } from '@/components/dashboard/DashboardBackground';
-import { UserContext } from '../components/user-provider';
+
 export default function SettingsScreen() {
   const router = useRouter();
-  const [notifications, setNotifications] = React.useState(true);
-  const [darkMode, setDarkMode] = React.useState(false);
-  const { logout } = React.use(UserContext);
-  const SettingItem = ({ icon, label, type = 'chevron', value, onValueChange }: any) => (
-    <TouchableOpacity style={styles.item} disabled={type === 'switch'}>
-      <View style={styles.itemLeft}>
-        <View style={styles.iconBox}>
-          <Feather name={icon} size={20} color="#64748B" />
-        </View>
-        <Text style={styles.itemLabel}>{label}</Text>
-      </View>
-      {type === 'chevron' && <Feather name="chevron-right" size={20} color="#94A3B8" />}
-      {type === 'switch' && (
-        <Switch 
-          value={value} 
-          onValueChange={onValueChange}
-          trackColor={{ false: '#E2E8F0', true: '#6366F1' }}
-        />
-      )}
-    </TouchableOpacity>
-  );
 
   return (
     <View style={{ flex: 1 }}>
       <DashboardBackground>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Feather name="arrow-left" size={24} color="#1E293B" />
+            <Feather name="arrow-left" size={22} color="#1E293B" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Ajustes</Text>
-          <View style={{ width: 44 }} /> 
         </View>
 
-        <ScrollView contentContainerStyle={styles.content}>
-          <View style={styles.mainCard}>
-            <Text style={styles.sectionTitle}>Cuenta</Text>
-            <SettingItem icon="user" label="Información Personal" />
-            <SettingItem icon="lock" label="Contraseña y Seguridad" />
-            <SettingItem icon="eye-off" label="Privacidad" />
-            
-            <View style={styles.divider} />
-            
-            <Text style={styles.sectionTitle}>Preferencias</Text>
-            <SettingItem 
-              icon="bell" 
-              label="Notificaciones Push" 
-              type="switch" 
-              value={notifications} 
-              onValueChange={setNotifications} 
-            />
-            <SettingItem 
-              icon="moon" 
-              label="Modo Oscuro" 
-              type="switch" 
-              value={darkMode} 
-              onValueChange={setDarkMode} 
-            />
-            <SettingItem icon="globe" label="Idioma" />
-
-            <View style={styles.divider} />
-            
-            <Text style={styles.sectionTitle}>Soporte</Text>
-            <SettingItem icon="help-circle" label="Centro de Ayuda" />
-            <SettingItem icon="mail" label="Contactar Soporte" />
-            <SettingItem icon="file-text" label="Términos y Condiciones" />
-
-            <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-              <Feather name="log-out" size={20} color="#EF4444" />
-              <Text style={styles.logoutText}>Cerrar Sesión</Text>
+        <View style={styles.container}>
+          <LinearGradient
+            colors={['#6366F1', '#A855F7']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.card}
+          >
+            <View style={styles.iconBox}>
+              <Feather name="settings" size={32} color="#FFFFFF" />
+            </View>
+            <Text style={styles.title}>Ajustes</Text>
+            <Text style={styles.subtitle}>
+              Ahora puedes gestionar todos tus ajustes directamente desde tu perfil.
+            </Text>
+            <TouchableOpacity
+              style={styles.btn}
+              onPress={() => router.replace('/profile')}
+              activeOpacity={0.85}
+            >
+              <Feather name="user" size={16} color="#6366F1" />
+              <Text style={styles.btnText}>Ir a mi perfil</Text>
             </TouchableOpacity>
-          </View>
-          
-          <Text style={styles.versionText}>Moodify v1.0.4 (Beta)</Text>
-        </ScrollView>
+            <TouchableOpacity
+              style={styles.btn}
+              // Pasamos el parámetro "tab=ajustes"
+              onPress={() => router.replace('/profile?tab=ajustes')}
+              activeOpacity={0.85}
+            >
+              <Feather name="settings" size={16} color="#6366F1" />
+              <Text style={styles.btnText}>Abrir ajustes en mi perfil</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
       </DashboardBackground>
     </View>
   );
@@ -87,101 +57,62 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     paddingTop: 60,
-    paddingBottom: 20,
+    paddingBottom: 10,
   },
   backButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(255,255,255,0.6)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#1E293B',
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 28,
   },
-  content: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  mainCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 32,
-    padding: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 5,
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#94A3B8',
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginTop: 20,
-    marginBottom: 10,
-    paddingHorizontal: 15,
-  },
-  item: {
-    flexDirection: 'row',
+  card: {
+    borderRadius: 28,
+    padding: 36,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 15,
-    borderRadius: 20,
-  },
-  itemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 15,
+    gap: 16,
   },
   iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#F1F5F9',
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 4,
   },
-  itemLabel: {
+  title: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  subtitle: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#334155',
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    lineHeight: 22,
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#F1F5F9',
-    marginHorizontal: 15,
-    marginVertical: 10,
-  },
-  logoutButton: {
+  btn: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 18,
-    marginTop: 20,
-    gap: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
+    gap: 8,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 18,
+    marginTop: 8,
   },
-  logoutText: {
-    fontSize: 16,
+  btnText: {
+    fontSize: 15,
     fontWeight: '700',
-    color: '#EF4444',
+    color: '#6366F1',
   },
-  versionText: {
-    textAlign: 'center',
-    color: '#94A3B8',
-    fontSize: 12,
-    marginTop: 30,
-    fontWeight: '600',
-  }
 });

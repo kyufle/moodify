@@ -3,25 +3,30 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { UserContext } from '@/components/user-provider';
 
-export const ForumHeader = () => {
-  const { userValue, logout } = React.use(UserContext);
+interface ForumHeaderProps {
+  onSearchPress?: () => void;
+}
 
-  if (userValue?.user)
-    return;
-  
+export const ForumHeader = ({ onSearchPress }: ForumHeaderProps) => {
+  const { userValue } = React.use(UserContext);
+
+  if (!userValue?.user) return null;
+
+  const firstName = userValue.user.name?.split(' ')[0] ?? 'Usuario';
+
   return (
     <View style={styles.header}>
       <View>
-        <Text style={styles.title}>Hola, {userValue.user.name}!</Text>
-        <Text style={styles.subtitle}>Conecta y comparte con otros</Text>
+        <Text style={styles.greeting}>Hola, {firstName} 👋</Text>
+        <Text style={styles.subtitle}>Conecta y comparte con tu comunidad</Text>
       </View>
-      
-      <View style={styles.rightIcons}>
-        <TouchableOpacity style={styles.iconButton} onPress={logout}>
-          <Feather name="log-out" size={20} color="#EF4444" />
+
+      <View style={styles.actions}>
+        <TouchableOpacity style={styles.iconBtn} onPress={onSearchPress} activeOpacity={0.7}>
+          <Feather name="user-plus" size={20} color="#6366F1" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
-          <Feather name="bell" size={22} color="#1E293B" />
+        <TouchableOpacity style={styles.iconBtn} activeOpacity={0.7}>
+          <Feather name="bell" size={20} color="#1E293B" />
         </TouchableOpacity>
       </View>
     </View>
@@ -35,23 +40,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 60,
-    paddingBottom: 20,
+    paddingBottom: 16,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+  greeting: {
+    fontSize: 24,
+    fontWeight: '800',
     color: '#1E293B',
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#64748B',
-    marginTop: 2,
+    marginTop: 3,
   },
-  rightIcons: {
+  actions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
   },
-  iconButton: {
+  iconBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
@@ -60,8 +65,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
     elevation: 2,
-  }
+  },
 });

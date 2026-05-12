@@ -21,9 +21,57 @@ return new class extends Migration {
             $table->string('theme_color')->default('#6366F1');
             $table->string('bg_image')->nullable();
             $table->string('my_msg_color')->default('#6366F1');
-            $table->string('other_msg_color')->default('#F1F5F9');
+            $table->string('other_msg_color')->default('#b4c2d1');
             $table->string('text_colorOwn')->default('#FFFFFF');
             $table->string('text_colorOther')->default('#FFFFFF');
+        });
+
+        Schema::create('habits', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->string('icon');
+            $table->string('color');
+            $table->string('time')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+
+        Schema::create('habit_logs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('habit_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->date('date');
+            $table->timestamps();
+            $table->unique(['habit_id', 'date']);
+        });
+
+        Schema::create('challenges', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->string('icon');
+            $table->string('color');
+            $table->integer('current_days')->default(0);
+            $table->integer('total_days');
+            $table->timestamps();
+        });
+
+        Schema::create('challenge_logs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('challenge_id')->constrained()->onDelete('cascade');
+            $table->date('date');
+            $table->timestamps();
+            $table->unique(['challenge_id', 'date']);
+        });
+
+        Schema::create('user_badges', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('badge_id');
+            $table->timestamp('unlocked_at')->nullable();
+            $table->timestamps();
+            $table->unique(['user_id', 'badge_id']);
         });
 
         Schema::create('sleep_logs', function (Blueprint $table) {
