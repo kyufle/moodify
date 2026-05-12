@@ -36,14 +36,16 @@ const MonthlySummary = ({ stats }) => {
           {sortedStats.map((item) => {
             const config = MOOD_CONFIG[item.mood] || { color: '#E2E8F0', icon: null };
             const percentage = (item.total / totalRegisters) * 100;
+            const ConfigIcon = config.icon;
 
             return (
               <View key={item.mood} style={styles.summaryRow}>
                 <View style={styles.summaryLabel}>
-                  <Image 
-                    source={config.icon} 
+                  <ConfigIcon
+                    width={24} height={24}
                     style={[styles.miniIcon, { backgroundColor: config.color }]} 
-                  />
+                  >
+                  </ConfigIcon>
                   <ThemedText style={styles.summaryMoodName} numberOfLines={1}>
                     {t(`moodNames.${item.mood}`)}
                   </ThemedText>

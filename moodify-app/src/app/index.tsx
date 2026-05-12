@@ -47,7 +47,7 @@ export default function HomeScreen() {
                 <View style={styles.arrowIconContainer}>
                   <Icon 
                     name="arrow-right" 
-                    type="material-community" 
+                    type="material-design" 
                     color="#FFFFFF" 
                     size={24} 
                   />
