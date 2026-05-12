@@ -35,7 +35,7 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
 
   const [newName, setNewName] = useState('');
-  const [newDays, setNewDays] = useState('30');
+  const [newDays, setNewDays] = useState('');
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
   const [selectedIcon, setSelectedIcon] = useState(ICONS[0]);
 

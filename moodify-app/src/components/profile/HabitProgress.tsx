@@ -168,13 +168,13 @@ export const HabitProgress = () => {
           <Feather name="plus" size={24} color="white" />
         </TouchableOpacity>
       </View>
-
       {/* 2. WEEKLY STRIP - TRADUCIDO DINÁMICAMENTE */}
       <View style={styles.weeklyStrip}>
         {weeklyStatus.map((item, index) => {
           // Parseamos la fecha que viene de la API para obtener el nombre del día en el idioma actual
           const dayNameLocal = format(parseISO(item.date), 'EEEEEE', { locale: currentLocale });
-          const dayNumber = item.date.split('-').pop();
+          
+          const dayNumber = parseISO(item.date)?.getDate();
 
           return (
             <View key={index} style={styles.dayCol}>
