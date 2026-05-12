@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { 
   View, Text, StyleSheet, FlatList, TouchableOpacity, 
-  Image, TextInput, ActivityIndicator, Keyboard 
+  Image, TextInput, ActivityIndicator, Keyboard, 
+  Alert
 } from 'react-native';
 import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -30,12 +31,19 @@ interface SearchUser {
   last_seen_at?: string | null;
 }
 
+const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://moodify_backend.test/api/';
+
 export default function ChatMainList() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { userValue, setUserValue } = useContext(UserContext);
   const token = userValue?.accessToken;
   const userId = userValue?.user?.id;
+  const authHeaders = {
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
 
   const [conversations, setConversations] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -106,14 +114,26 @@ export default function ChatMainList() {
   const toggleFollow = async (user: SearchUser) => {
     try {
       const updatedStatus = !user.is_following;
-      setSearchResults(prev => prev.map(u => 
-        u.id === user.id ? { ...u, is_following: updatedStatus } : u
-      ));
-      const newHistory = searchHistory.map(u => 
-        u.id === user.id ? { ...u, is_following: updatedStatus } : u
-      );
-      setSearchHistory(newHistory);
-      await SafeStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
+      const endpoint = user.is_following ? 'unfollow' : 'follow';
+      try {
+        const r = await fetch(`${API}community/users/${user.id}/${endpoint}`, { 
+          method: 'POST', 
+          headers: authHeaders 
+        });
+        if (r.ok) {
+          setSearchResults(prev => prev.map(u => 
+            u.id === user.id ? { ...u, is_following: updatedStatus } : u
+          ));
+          const newHistory = searchHistory.map(u => 
+            u.id === user.id ? { ...u, is_following: updatedStatus } : u
+          );
+          setSearchHistory(newHistory);
+          await SafeStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
+          Alert.alert("Éxito", user.is_following ? "Has dejado de seguir" : "Ahora sigues a este usuario");
+        }
+      } catch (e) {
+        console.error("Error", "No se pudo procesar.");
+      }
     } catch (e) { console.error(e); }
   };
 

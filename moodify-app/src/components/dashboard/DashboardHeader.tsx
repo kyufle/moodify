@@ -7,7 +7,7 @@ import { avatarMap } from '../../utils/utils';
 import { useTranslation } from 'react-i18next';
 
 // Asegúrate de que la ruta sea correcta
-import AlertsDrawer from './ActionAlertCard'; 
+import AlertsDrawer from './AlertsDrawer'; 
 
 export const DashboardHeader = () => {
   const { userValue } = React.useContext(UserContext); // Cambiado a useContext por convención

@@ -13,6 +13,7 @@ import { ChatQuickActions } from '@/components/chat/ChatQuickActions';
 import { StaticBottomNavBar } from '@/components/StaticBottomNavBar';
 import { UserContext } from '@/components/user-provider';
 import { ChatSettingsModal } from '@/components/chat/ChatSettingsModals';
+import { useTranslation } from 'react-i18next';
 
 
 interface Message {
@@ -42,6 +43,7 @@ export default function BloomChatScreen() {
       status: 'read'
     },
   ]);
+  const { t, i18n } = useTranslation();
   
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -78,14 +80,15 @@ export default function BloomChatScreen() {
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': `Bearer ${token}` //
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           mensaje: text,
           historial: messages.map(m => ({
             role: m.isAI ? 'assistant' : 'user',
-            content: m.text
-          }))
+            content: m.text,
+          })),
+          idioma: i18n.language,
         }),
       });
 

@@ -83,7 +83,7 @@ export default function HomeScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <FondoClaro width={null} height={null} style={styles.backgroundImage}  />
-          <View id="divasd" style={styles.headerContainer}>
+          <View style={styles.headerContainer}>
             <SafeAreaView edges={['top']} style={styles.safeAreaInternal}>
               <View style={styles.floatingCard}>
                 <ThemedText style={styles.holaText}>{t('panel.hello')}</ThemedText>

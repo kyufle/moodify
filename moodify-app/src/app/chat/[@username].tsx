@@ -2,7 +2,8 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { 
   View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, 
   KeyboardAvoidingView, Platform, SafeAreaView, ActivityIndicator, 
-  AppState, AppStateStatus, Image, ImageBackground
+  AppState, AppStateStatus, Image, ImageBackground,
+  Alert
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
@@ -139,12 +140,23 @@ export default function PersonalChatScreen() {
     };
   }, [recipientId, token]);
 
+  const handleBlockUser = async () => {
+      Alert.alert("Bloquear usuario", `¿Bloquear a ${username}?`, [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Bloquear", style: "destructive", onPress: async () => {
+            try {
+              const r = await fetch(`${process.env.EXPO_PUBLIC_API_URL}community/users/${recipientId}/block`, { method: 'POST',headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }});
+              router.push("/chat");
+            } catch (e) { Alert.alert("Error", "No se pudo bloquear."); }
+        }}
+      ]);
+    };
   const handleSend = async () => {
     if (!inputText.trim() || isSending) return;
     const messageText = inputText;
     setInputText('');
     setIsSending(true);
-
+  
     try {
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}messages`, {
         method: 'POST',
@@ -220,8 +232,8 @@ export default function PersonalChatScreen() {
             </View>
           </View>
           <View style={styles.headerIcons}>
-            <TouchableOpacity style={{ padding: 5 }}>
-              <Feather name="more-vertical" size={22} color="#64748B" />
+            <TouchableOpacity onPress={handleBlockUser} style={{ padding: 5 }}>
+              <Feather name="minus-circle" size={22} color="#c29797" />
             </TouchableOpacity>
           </View>
         </View>
