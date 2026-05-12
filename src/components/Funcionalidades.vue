@@ -1,159 +1,177 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { ref } from "vue";
-
 const router = useRouter();
-const hoveredCard = ref(null);
+const volver   = () => router.push("/bloom");
+const anterior = () => router.push("/descubre");
 
-const volver = () => {
-  router.push("/equip");
-};
-
-const anterior = () => {
-  router.push("/descubre");
-};
+const cards = [
+  {
+    color:  'peach',
+    emoji:  '📅',
+    tip:    'Diari Emocional',
+    desc:   'Registra el teu estat d\'ànim cada dia amb emojis i notes. Visualitza el teu historial en un calendari mensual.',
+  },
+  {
+    color:  'lightblue',
+    emoji:  '📊',
+    tip:    'Gràfics d\'Evolució',
+    desc:   'Estadístiques setmanals i mensuals del teu benestar. Descobreix patrons i tendències al teu estat anímic.',
+  },
+  {
+    color:  'yellow',
+    emoji:  '🏆',
+    tip:    'Sistema d\'Hàbits',
+    desc:   'Crea hàbits personalitzats i fes-ne seguiment diari. Guanya punts i racxes per mantenir la constància.',
+  },
+  {
+    color:  'pink',
+    emoji:  '👥',
+    tip:    'Fòrum Comunitari',
+    desc:   'Comparteix publicacions, dona likes i segueix altres usuaris. Veu l\'estat d\'ànim de les persones que segueixes.',
+  },
+  {
+    color:  'lavender',
+    emoji:  '🌸',
+    tip:    'Chat amb Bloom',
+    desc:   'Parla amb la nostra psicòloga virtual disponible 24/7. Escolta activa, empàtica i totalment privada.',
+  },
+  {
+    color:  'green',
+    emoji:  '😴',
+    tip:    'Seguiment del Son',
+    desc:   'Registra les hores dormides i la qualitat del son. Relaciona el descans amb el teu estat d\'ànim diari.',
+  },
+]
 </script>
 
 <template>
-  <div class="contenedor-funcionalidades">
+  <div class="caja">
+    <h1>Funcionalitats</h1>
+
     <div class="cards">
-      <div
-        v-for="(card, index) in [
-          { color: 'peach', tip: 'Diari emocional', desc: 'Anota emocions i pensaments' },
-          { color: 'lightblue', tip: 'Gràfics d\'evolució', desc: 'Evolució setmanal i mensual' },
-          { color: 'yellow', tip: 'Sistema d\'hàbits', desc: 'Crear hàbits i seguiment' },
-          { color: 'pink', tip: 'Fòrum comunitari', desc: 'Publicacions i moderació' },
-          { color: 'lavender', tip: 'Chat IA integrat', desc: 'Assistent emocional intel·ligent' },
-          { color: 'green', tip: 'Notificacions', desc: 'Recordatoris i resums periòdics' },
-        ]"
-        :key="index"
-        :class="['card', card.color]"
-      >
-        <p class="tip">{{ card.tip }}</p>
-        <p class="second-text">{{ card.desc }}</p>
+      <div v-for="(card, i) in cards" :key="i" class="flip-wrap">
+        <div :class="['flip-inner', card.color]">
+
+          <div class="flip-front">
+            <span class="card-emoji">{{ card.emoji }}</span>
+            <p class="tip">{{ card.tip }}</p>
+          </div>
+
+          <div class="flip-back">
+            <span class="card-emoji small">{{ card.emoji }}</span>
+            <p class="tip">{{ card.tip }}</p>
+            <p class="desc">{{ card.desc }}</p>
+          </div>
+
+        </div>
       </div>
     </div>
+
     <div class="button-group">
       <button @click="anterior" class="btn-primary">
         <i class="pi pi-arrow-left"></i> Enrere
       </button>
-      <button @click="volver" class="btn-primary" style="margin-top: 0">
-        Coneix l'Equip <i class="pi pi-arrow-right"></i>
+      <button @click="volver" class="btn-primary" style="margin-top:0">
+        Coneix a Bloom <i class="pi pi-arrow-right"></i>
       </button>
     </div>
   </div>
 </template>
 
 <style scoped>
-.contenedor-funcionalidades {
-  border: 2px solid var(--accent-border);
-  padding: 40px;
-  border-radius: 24px;
-  height: 100%;
-  max-width: 1100px;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  text-align: center;
-  box-shadow: var(--shadow);
-  margin-top: 40px;
+h1 {
+  font-size: 2rem;
+  color: #111827;
+  margin-bottom: 28px;
 }
 
 .cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 25px;
+  gap: 20px;
+  margin-bottom: 28px;
+  margin-top: 20px;
+  width: 100%;
 }
 
-@media (max-width: 900px) {
-  .cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
+@media (max-width: 700px) {
+  .cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .cards { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 600px) {
-  .cards {
-    grid-template-columns: 1fr;
-  }
+.flip-wrap {
+  perspective: 900px;
+  height: 150px;
 }
 
-/* COLORES BASADOS EN BG-WEB.SVG */
-.cards .peach {
-  background: linear-gradient(135deg, #ffab91, #ffccbc);
-}
-.cards .lightblue {
-  background: linear-gradient(135deg, #d6eaf8, #aed6f1);
-}
-.cards .pink {
-  background: linear-gradient(135deg, #f5b7b1, #fadbd8);
-}
-.cards .yellow {
-  background: linear-gradient(135deg, #fff24a, #fff9ae);
-}
-.cards .lavender {
-  background: linear-gradient(135deg, #e6e6fa, #d8bfd8);
-}
-
-.cards .green {
-  background: linear-gradient(135deg, #b2dfdb, #80cbc4);
-}
-
-/* CARD BASE */
-.cards .card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  height: 120px;
-  border-radius: 18px;
-  color: #1f2937;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.flip-inner {
   position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  cursor: default;
 }
 
-/* HOVER ANIMADO */
-.cards .card::before {
-  content: "";
+.flip-wrap:hover .flip-inner {
+  transform: rotateY(180deg);
+}
+
+/* ── CARAS ────────────────────────────────── */
+.flip-front,
+.flip-back {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.08);
-  opacity: 0;
-  transition: opacity 0.3s ease;
   border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  padding: 14px;
 }
 
-.cards .card:hover::before {
-  opacity: 1; /* glow sutil */
+.flip-back {
+  transform: rotateY(180deg);
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255,255,255,0.7);
 }
 
-.cards .card:hover {
-  transform: translateY(-10px) scale(1.07);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+/* ── COLORES CARA FRONTAL ─────────────────── */
+.peach    { background: linear-gradient(135deg, #ffab91, #ffccbc); }
+.lightblue{ background: linear-gradient(135deg, #d6eaf8, #aed6f1); }
+.yellow   { background: linear-gradient(135deg, #fff176, #fff9ae); }
+.pink     { background: linear-gradient(135deg, #f5b7b1, #fadbd8); }
+.lavender { background: linear-gradient(135deg, #e6e6fa, #d8bfd8); }
+.green    { background: linear-gradient(135deg, #b2dfdb, #80cbc4); }
+
+.card-emoji {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+.card-emoji.small {
+  font-size: 1.4rem;
 }
 
-/* TEXTO ANIMADO */
-.cards .card .tip {
-  font-size: 1.1em;
+.tip {
+  font-size: 1rem;
   font-weight: 700;
-  transition: transform 0.3s ease;
+  color: #1f2937;
+  margin: 0;
 }
 
-.cards .card:hover .tip {
-  transform: translateY(-3px);
+.desc {
+  font-size: 0.78rem;
+  color: #4b5563;
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
 }
-
-.cards .card .second-text {
-  font-size: 0.8em;
-  opacity: 0.9;
-  transition: transform 0.3s ease;
-}
-
-.cards .card:hover .second-text {
-  transform: translateY(-1px);
-}
-
 </style>

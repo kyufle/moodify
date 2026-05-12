@@ -5,6 +5,8 @@ import Funcionalidades from '../components/Funcionalidades.vue'
 import Demo from '../components/Demo.vue'
 
 import Equip from '../components/Equip.vue'
+import Bloom from '../components/Bloom.vue'
+import Tecnologia from '../components/Tecnologia.vue'
 
 const routes = [
   {
@@ -31,6 +33,16 @@ const routes = [
     path: '/demo',
     name: 'Demo',
     component: Demo
+  },
+  {
+    path: '/bloom',
+    name: 'Bloom',
+    component: Bloom
+  },
+  {
+    path: '/tecnologia',
+    name: 'Tecnologia',
+    component: Tecnologia
   }
 ]
 

@@ -1,21 +1,23 @@
 <script setup>
 import "primeicons/primeicons.css";
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 
 const mensaje = " MOODIFY";
 const router = useRouter();
 
 const irADescubre = () => {
-  router.push('/descubre');
+  router.push("/descubre");
 };
 </script>
 
 <template>
   <div class="caja">
-    <h2>{{ mensaje }}</h2>
+    <img src="../assets/moodifyLogo.png" alt="Logo" />
+    <h1>{{ mensaje }}</h1>
     <h3 class="subtitle">~ On les teves emocions cobren forma ~</h3>
     <p>
-      Una aplicació web interactiva centrada en el benestar emocional i la creació d’hàbits saludables.
+      Una aplicació web interactiva centrada en el benestar emocional i la
+      creació d’hàbits saludables.
     </p>
     <div class="authors">
       <span><i class="pi pi-user"></i> Valeria Santana Megia</span>
@@ -29,28 +31,10 @@ const irADescubre = () => {
 </template>
 
 <style scoped>
-.caja {
-  border: 2px solid var(--accent-border);
-  padding: 40px;
-  border-radius: 24px;
-  max-width: 550px;
-  width: 90%;
-  background-color: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  text-align: center;
-  box-shadow: var(--shadow);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-  margin-top: 20px;
-}
-
-.caja:hover {
-  transform: translateY(-8px);
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+img {
+  width: 200px;
+  height: 200px;
+  margin-bottom: 20px;
 }
 
 h2 {
@@ -85,5 +69,4 @@ p {
   font-size: 1rem;
   font-weight: 600;
 }
-
 </style>
