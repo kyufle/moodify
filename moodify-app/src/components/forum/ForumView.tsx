@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState, useCallback, useRef } from 'rea
 import {
   View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity,
   ActivityIndicator, Alert, KeyboardAvoidingView,
-  Platform, StatusBar, Keyboard, Image, FlatList
+  Platform, StatusBar, Keyboard, Image, FlatList,
+  SafeAreaView
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -43,7 +44,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
   const [loadingComments, setLoadingComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [replyingTo, setReplyingTo] = useState<{ id: number, name: string } | null>(null);
-
+  const headerHeight = Platform.OS === 'ios' ? 90 : 90
   const authHeaders = {
     Authorization: `Bearer ${token}`,
     Accept: 'application/json',
@@ -179,6 +180,10 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
   if (selectedPost) {
     return (
       <View style={styles.root}>
+        <KeyboardAvoidingView 
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // En Android 'undefined' suele ser más estable
+        >
         <View style={styles.commentHeader}>
           <TouchableOpacity onPress={() => router.push("/community/feed")}>
             <Feather name="arrow-left" size={24} color="#1E293B" />
@@ -220,11 +225,6 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
             </View>
           )}
         />
-
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-        >
           {replyingTo && (
             <View style={styles.replyInfoBar}>
               <Text style={styles.replyInfoText}>Respondiendo a <Text style={{ fontWeight: 'bold' }}>{replyingTo.name}</Text></Text>
