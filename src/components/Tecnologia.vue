@@ -2,6 +2,7 @@
 import { useRouter } from "vue-router";
 const router = useRouter();
 const anterior = () => router.push("/bloom");
+const siguiente = () => router.push("/demo");
 </script>
 
 <template>
@@ -86,6 +87,9 @@ const anterior = () => router.push("/bloom");
     <div class="button-group">
       <button @click="anterior" class="btn-primary">
         <i class="pi pi-arrow-left"></i> Enrere
+      </button>
+      <button @click="siguiente" class="btn-primary">
+        <i class="pi pi-arrow-right"></i> Conèixer MOODIFY
       </button>
     </div>
   </div>

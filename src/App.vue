@@ -6,11 +6,11 @@ const route  = useRoute()
 
 const slides = [
   { path: '/',              label: 'Inici' },
-  { path: '/descubre',      label: 'El perquè' },
-  { path: '/funcionalidades', label: 'Funcionalitats' },
+  { path: '/equip',         label: 'Equip' },
+  { path: '/descubre',      label: 'Moodify' },
+  { path: '/funcionalitats', label: 'Funcionalitats' },
   { path: '/bloom',         label: 'Bloom IA' },
   { path: '/tecnologia',    label: 'Tecnologia' },
-  { path: '/equip',         label: 'Equip' },
   { path: '/demo',          label: 'Demo' },
 ]
 </script>
