@@ -9,7 +9,7 @@ const { t }  = useI18n()
 
 const slides = [
   { path: '/',                key: 'nav.inici' },
-  { path: '/equip',           key: 'nav.equip' },
+  { path: '/origen',           key: 'nav.origen' },
   { path: '/descubre',        key: 'nav.moodify' },
   { path: '/funcionalidades', key: 'nav.funcionalitats' },
   { path: '/bloom',           key: 'nav.bloom' },

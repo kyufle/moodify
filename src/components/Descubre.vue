@@ -5,21 +5,13 @@ import { useI18n } from "vue-i18n"
 const { t } = useI18n()
 const router = useRouter()
 const siguiente = () => router.push("/funcionalidades")
-const anterior  = () => router.push("/equip")
+const anterior  = () => router.push("/origen")
 </script>
 
 <template>
   <div class="caja">
 
-    <div class="stat-hook">
-      <span class="stat-num">1 de cada 4</span>
-      <span class="stat-label">{{ t('descubre.stat') }}</span>
-    </div>
-
-    <p class="resposta">
-      {{ t('descubre.resposta') }}<br>
-      <strong>{{ t('descubre.strong') }}</strong>
-    </p>
+    <p class="section-label">{{ t('descubre.etim_label') }}</p>
 
     <div class="etimologia">
       <div class="etim-block mood">
@@ -37,6 +29,8 @@ const anterior  = () => router.push("/equip")
         <span class="etim-def">{{ t('descubre.result_def') }}</span>
       </div>
     </div>
+
+    <p class="section-label">{{ t('descubre.pilars_label') }}</p>
 
     <div class="pilars-grid">
       <div class="pilar">
@@ -68,36 +62,15 @@ const anterior  = () => router.push("/equip")
 </template>
 
 <style scoped>
-.stat-hook {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  background: linear-gradient(135deg, rgba(255,171,145,0.2), rgba(230,230,250,0.3));
-  border: 1px solid var(--accent-border);
-  border-radius: 16px;
-  padding: 18px 24px;
-  margin-bottom: 20px;
-}
 
-.stat-num {
-  font-size: 2rem;
-  font-weight: 800;
+.section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
   color: var(--accent-2);
-  letter-spacing: -1px;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.resposta {
-  font-size: 1rem;
-  color: #374151;
-  line-height: 1.6;
-  margin-bottom: 24px;
+  opacity: 0.7;
+  margin: 0;
 }
 
 .etimologia {

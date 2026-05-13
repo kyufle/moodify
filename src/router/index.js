@@ -4,7 +4,7 @@ import Descubre from '../components/Descubre.vue'
 import Funcionalidades from '../components/Funcionalidades.vue'
 import Demo from '../components/Demo.vue'
 
-import Equip from '../components/Equip.vue'
+import Origen from '../components/Origen.vue'
 import Bloom from '../components/Bloom.vue'
 import Tecnologia from '../components/Tecnologia.vue'
 
@@ -25,9 +25,9 @@ const routes = [
     component: Funcionalidades
   },
   {
-    path: '/equip',
-    name: 'Equip',
-    component: Equip
+    path: '/origen',
+    name: 'Origen',
+    component: Origen
   },
   {
     path: '/demo',

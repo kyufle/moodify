@@ -10,84 +10,90 @@ const volver = () => router.push("/")
 
 <template>
   <div class="caja">
-    <div class="icon-wrapper">
-      <i class="pi pi-heart-fill hero-icon"></i>
+
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      {{ t('demo.badge') }}
     </div>
 
-    <h1>{{ t('demo.title') }}</h1>
+    <div class="phone-icon">📱</div>
 
+    <h1>{{ t('demo.title') }}</h1>
     <p class="subtitle">{{ t('demo.subtitle') }}</p>
 
     <button @click="volver" class="btn-primary">
-      <i class="pi pi-home"></i>
-      {{ t('btn.home') }}
+      <i class="pi pi-home"></i> {{ t('demo.home') }}
     </button>
+
   </div>
 </template>
 
 <style scoped>
-.card {
-  width: 100%;
-  max-width: 560px;
-  background: white;
-  border-radius: 28px;
-  padding: 48px 36px;
-  text-align: center;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
-  animation: fadeIn 0.45s ease;
-}
-
-.icon-wrapper {
-  width: 90px;
-  height: 90px;
-  margin: 0 auto 24px;
-  border-radius: 50%;
-  background: #fff7ed;
+.caja {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 40px;
 }
-
-.hero-icon { font-size: 2.5rem; color: #f59e0b; }
 
 h1 {
-  font-size: 2.3rem;
-  color: #111827;
-  font-weight: 700;
-  margin-bottom: 18px;
+  margin: 0;
+  font-size: 2.2rem;
 }
 
 .subtitle {
-  color: #4b5563;
-  font-size: 1.08rem;
-  line-height: 1.7;
-  margin-bottom: 36px;
+  margin: 0;
 }
 
-.message-box {
-  display: flex;
+.live-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 16px 20px;
-  border-radius: 16px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  color: #374151;
-  font-weight: 500;
-  margin-bottom: 32px;
+  gap: 8px;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: #dc2626;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 999px;
 }
 
-.message-icon { color: #10b981; font-size: 1.2rem; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: #dc2626;
+  border-radius: 50%;
+  animation: pulse 1.2s infinite;
+  flex-shrink: 0;
 }
 
-@media (max-width: 640px) {
-  .card { padding: 36px 24px; }
-  h1 { font-size: 1.9rem; }
-  .subtitle { font-size: 1rem; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.8); }
 }
+
+.phone-icon {
+  font-size: 4rem;
+  line-height: 1;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+h1 {
+  color: #111827;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
 </style>

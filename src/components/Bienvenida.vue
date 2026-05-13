@@ -6,7 +6,7 @@ import { useI18n } from "vue-i18n"
 const { t } = useI18n()
 const router = useRouter()
 
-const irADescubre = () => router.push("/equip")
+const irADescubre = () => router.push("/origen")
 </script>
 
 <template>
