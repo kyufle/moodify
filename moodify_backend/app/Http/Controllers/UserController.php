@@ -22,7 +22,7 @@ class UserController extends Controller
                 $user->points += 3;
                 $user->last_streak_day = $clientDate;
                 $user->save();
-                return response()->json(['user' => $user], 200);
+                return response()->json(['ok' => true, 'message' => 'Registrado correctamente', 'user' => $user], 200);
             }
 
             $todayStr = $clientDate->format('Y-m-d');
