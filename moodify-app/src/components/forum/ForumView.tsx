@@ -23,7 +23,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
   const { userValue } = useContext(UserContext);
   const token = userValue?.accessToken;
   const currentUserAvatar = userValue?.user?.image_id;
-
+  const { unreadCount } = useContext(UserContext);
   // const [activeTab, setActiveTab] = useState<>('feed');
   const setActiveTab = (newTab: 'feed' | 'personas') => {
     if(newTab === 'feed')
@@ -325,7 +325,10 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
           ) : <DiscoverPeople />}
         </ScrollView>
       </KeyboardAvoidingView>
-      <StaticBottomNavBar activeTab="community/feed" />
+      <StaticBottomNavBar 
+              activeTab="community/feed" 
+              hasNotifications={unreadCount > 0} 
+            />
     </View>
   );
 };

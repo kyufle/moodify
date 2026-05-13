@@ -44,7 +44,7 @@ export default function BloomChatScreen() {
     },
   ]);
   const { t, i18n } = useTranslation();
-  
+  const { unreadCount } = useContext(UserContext);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
@@ -242,7 +242,10 @@ export default function BloomChatScreen() {
         onToggleBlock={() => setIsBlocked(!isBlocked)}
       />
       
-      <StaticBottomNavBar activeTab="chat" />
+       <StaticBottomNavBar 
+              activeTab="chat" 
+              hasNotifications={unreadCount > 0} 
+            />
     </View>
   );
 }

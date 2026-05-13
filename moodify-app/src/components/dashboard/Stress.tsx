@@ -15,7 +15,7 @@ const { width } = Dimensions.get('window');
 const Stress = ({ navigation }: any) => {
   const {t, i18n } = useTranslation();
   const { userValue } = useContext(UserContext);
-
+  const { unreadCount } = useContext(UserContext);
   const [view, setView] = useState<'LOADING' | 'ROCO' | 'INTRO' | 'QUIZ' | 'CALCULATING'>('LOADING');
   const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -206,7 +206,10 @@ if (view === 'ROCO') {
         >
           <Text style={styles.btnSecondaryText}>{t('dashboard.repeatTest')}</Text>
         </TouchableOpacity>
-        <StaticBottomNavBar activeTab="home" />
+        <StaticBottomNavBar 
+            activeTab="home" 
+            hasNotifications={unreadCount > 0} 
+          />
       </ScrollView>
     );
   }

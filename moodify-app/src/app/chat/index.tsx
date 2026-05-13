@@ -34,6 +34,7 @@ interface SearchUser {
 const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://moodify_backend.test/api/';
 
 export default function ChatMainList() {
+  const { unreadCount } = useContext(UserContext);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { userValue, setUserValue } = useContext(UserContext);
@@ -341,7 +342,10 @@ export default function ChatMainList() {
       )}
 
       {/* Navegación inferior fija */}
-      {!isFullSearchView && <StaticBottomNavBar activeTab="chat" />}
+      {!isFullSearchView &&  <StaticBottomNavBar 
+              activeTab="chat" 
+              hasNotifications={unreadCount > 0} 
+            />}
       
       <ChatCustomizer 
         currentTheme={getUserThemeFromContext(userValue)}

@@ -19,10 +19,9 @@ import { AchievementsBar } from '@/components/profile/AchievementsBar';
 
 const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://moodify_backend.test/api/';
 
-// --- COMPONENTE SUB-MODAL CENTRADO ---
+// --- COMPONENTE SUB-MODAL ---
 const SettingsModal = ({ visible, title, onClose, onSave, loading, showSave = true, children }: any) => {
   const { t } = useTranslation();
-
   return (
     <Modal visible={visible} animationType="fade" transparent={true} onRequestClose={onClose} statusBarTranslucent={true}>
       <View style={styles.modalOverlay}>
@@ -51,19 +50,17 @@ const SettingsModal = ({ visible, title, onClose, onSave, loading, showSave = tr
 };
 
 export default function ProfileScreen() {
-  const { userValue, logout, setUserValue } = useContext(UserContext);
+  const { userValue, logout, setUserValue, unreadCount } = useContext(UserContext);
   const { t, i18n } = useTranslation();
 
   const user = userValue?.user ?? { id: null, name: 'Usuario', email: '', username: '', streak: 0, points: 0, language: 'es', image_id: null };
   const token = userValue?.accessToken ?? null;
 
   const [activeTab, setActiveTab] = useState<'perfil' | 'ajustes'>('perfil');
-  const [activeModal, setActiveModal] = useState<'perfil' | 'seguridad' | 'idioma' | 'avatar' | 'bloqueados' | null>(null);
+  const [activeModal, setActiveModal] = useState<'perfil' | 'avatar' | 'bloqueados' | 'password' | 'idioma' | null>(null);
   const [loading, setLoading] = useState(false);
   
-  const [selectedLang, setSelectedLang] = useState(user.language || i18n.language);
   const [blockedUsers, setBlockedUsers] = useState<any[]>([]);
-
   const [habitsData, setHabitsData] = useState<any[]>([]);
   const [challengesData, setChallengesData] = useState<any[]>([]);
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
@@ -74,7 +71,16 @@ export default function ProfileScreen() {
     email: user.email,
     username: user.username 
   });
-  const [formPass, setFormPass] = useState({ current_password: '', new_password: '' });
+
+  const [formPassword, setFormPassword] = useState({
+    current_password: '',
+    password: '',
+    password_confirmation: ''
+  });
+
+  useEffect(() => {
+    setFormProfile({ name: user.name, email: user.email, username: user.username });
+  }, [userValue]);
 
   const authHeaders = {
     'Content-Type': 'application/json',
@@ -82,13 +88,6 @@ export default function ProfileScreen() {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
-  const languages = [
-    { code: 'es', label: 'Español', flag: '🇪🇸' },
-    { code: 'en', label: 'English', flag: '🇺🇸' },
-    { code: 'ca', label: 'Català', flag: '🚩' },
-  ];
-
-  // --- LÓGICA DE BLOQUEADOS ---
   const fetchBlockedUsers = useCallback(async () => {
     if (!token) return;
     setLoading(true);
@@ -107,23 +106,69 @@ export default function ProfileScreen() {
     if (activeModal === 'bloqueados') fetchBlockedUsers();
   }, [activeModal, fetchBlockedUsers]);
 
-  const handleUnblockUser = async (targetId: number) => {
+  const handleUnblock = async (blockedUserId: number) => {
+  setLoading(true);
+  try {
+    const res = await fetch(`${API}community/users/${blockedUserId}/unblock`, {
+      method: 'POST',
+      headers: authHeaders,
+    });
+
+    if (res.ok) {
+      // Filtramos el usuario de la lista local para que desaparezca de la vista
+      setBlockedUsers((prev) => prev.filter(user => user.id !== blockedUserId));
+      Alert.alert(t('exito'), t('Usuario desbloqueado'));
+    } else {
+      Alert.alert("Error", "No se pudo desbloquear al usuario");
+    }
+  } catch (e) {
+    console.error("Error unblocking user", e);
+    Alert.alert("Error", "Error de conexión");
+  } finally {
+    setLoading(false);
+  }
+};
+  const handleUpdateInfo = async () => {
+    Keyboard.dismiss();
+    setLoading(true);
     try {
-      const res = await fetch(`${API}community/users/${targetId}/unblock`, { 
-        method: 'POST', 
-        headers: authHeaders 
+      const res = await fetch(`${API}profile/update`, {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify(formProfile),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUserValue({ ...userValue, user: data.user });
+        setActiveModal(null);
+        Alert.alert(t('exito'), t('perfil_actualizado'));
+      }
+    } catch (e) {
+        Alert.alert("Error", "No se pudo actualizar");
+    } finally { setLoading(false); }
+  };
+
+  const handleChangePassword = async () => {
+    Keyboard.dismiss();
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}profile/change-password`, {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify(formPassword),
       });
       if (res.ok) {
-        setBlockedUsers(prev => prev.filter(u => u.id !== targetId));
+        setActiveModal(null);
+        setFormPassword({ current_password: '', password: '', password_confirmation: '' });
+        Alert.alert(t('exito'), t('contrasena_actualizada'));
       } else {
-        Alert.alert("Error", "No se pudo desbloquear al usuario");
+        Alert.alert("Error", t('error_contrasena'));
       }
     } catch (e) {
       Alert.alert("Error", "Error de conexión");
-    }
+    } finally { setLoading(false); }
   };
 
-  // --- ACTUALIZACIONES DE PERFIL ---
   const handleUpdateAvatar = async (selectedAvatarId: string) => {
     setLoading(true);
     try {
@@ -141,86 +186,69 @@ export default function ProfileScreen() {
     finally { setLoading(false); }
   };
 
-  const handleUpdateInfo = async () => {
-    Keyboard.dismiss();
-    setLoading(true);
-    try {
-      const res = await fetch(`${API}profile/update`, {
-        method: 'POST',
-        headers: authHeaders,
-        body: JSON.stringify({ ...formProfile }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUserValue({ ...userValue, user: data.user });
-        setActiveModal(null);
-        setTimeout(() => Alert.alert(t('exito'), t('perfil_actualizado')), 400);
-      }
-    } finally { setLoading(false); }
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setActiveModal(null);
   };
-
-  // --- LOGROS Y DATOS ---
-  const fetchUnlockedAchievements = useCallback(async () => {
-    if (!token) return;
-    try {
-      const res = await fetch(`${API}achievements`, { method: 'GET', headers: authHeaders });
-      const data = await res.json();
-      if (res.ok) setUnlockedIds(data.unlocked_ids || []);
-    } catch (e) { console.error(e); }
-  }, [token]);
-
-  useEffect(() => { fetchUnlockedAchievements(); }, [fetchUnlockedAchievements]);
 
   return (
     <View style={{ flex: 1 }}>
       <DashboardBackground>
         <View style={styles.topBar}><Text style={styles.topBarTitle}>{t('profile.myProfile')}</Text></View>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          
           <LinearGradient colors={['#c2c3eca9', '#8a5cf69c', '#a955f785']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroCard}>
             <View style={styles.avatarContainer}>
               <View style={styles.avatarRing}>
-                <Image source={user.image_id ? avatarMap[user.image_id] : { uri: 'https://i.pravatar.cc/150?img=12' }} style={styles.avatar} resizeMode="cover" />
+                <Image 
+                  source={user.image_id ? avatarMap[user.image_id] : { uri: 'https://i.pravatar.cc/150?img=12' }} 
+                  style={styles.avatar} 
+                />
               </View>
-              <TouchableOpacity style={styles.editAvatarBtn} onPress={() => setActiveModal('avatar')} activeOpacity={0.8}>
-                <Feather name="camera" size={14} color="#c6c6f0" />
+              <TouchableOpacity style={styles.editAvatarBtn} onPress={() => setActiveModal('avatar')}>
+                <Feather name="camera" size={14} color="#6366f1" />
               </TouchableOpacity>
             </View>
             <Text style={styles.heroName}>{user.name}</Text>
             <View style={styles.statsRow}>
-              <View style={styles.statItem}><Text style={styles.statNum}>{user.streak}</Text><Text style={styles.statLbl}>{t('profile.streak')}</Text></View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}><Text style={styles.statNum}>{user.points}</Text><Text style={styles.statLbl}>{t('profile.points')}</Text></View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}><Text style={styles.statNum}>{unlockedIds.length}</Text><Text style={styles.statLbl}>{t('profile.achievements')}</Text></View>
+               <View style={styles.statItem}><Text style={styles.statNum}>{user.streak}</Text><Text style={styles.statLbl}>{t('profile.streak')}</Text></View>
+               <View style={styles.statDivider} />
+               <View style={styles.statItem}><Text style={styles.statNum}>{user.points}</Text><Text style={styles.statLbl}>{t('profile.points')}</Text></View>
+               <View style={styles.statDivider} />
+               <View style={styles.statItem}><Text style={styles.statNum}>{unlockedIds.length}</Text><Text style={styles.statLbl}>{t('profile.achievements')}</Text></View>
             </View>
           </LinearGradient>
 
           <View style={styles.tabBar}>
-            {['perfil', 'ajustes'].map((tab: any) => (
-              <TouchableOpacity key={tab} style={[styles.tabBtn, activeTab === tab && styles.tabBtnActive]} onPress={() => setActiveTab(tab as any)}>
-                <Text style={[styles.tabBtnText, activeTab === tab && styles.tabBtnTextActive]}>{tab === 'perfil' ? t('profile.profile') : t('profile.settings')}</Text>
+            {['perfil', 'ajustes'].map((tab) => (
+              <TouchableOpacity 
+                key={tab} 
+                style={[styles.tabBtn, activeTab === tab && styles.tabBtnActive]} 
+                onPress={() => setActiveTab(tab as any)}
+              >
+                <Text style={[styles.tabBtnText, activeTab === tab && styles.tabBtnTextActive]}>
+                    {tab === 'perfil' ? t('profile.profile') : t('profile.settings')}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
 
           {activeTab === 'perfil' ? (
             <View style={styles.card}>
-              <HabitProgress onDataLoaded={(d) => setHabitsData(d)} onWeeklyLoaded={(d) => setWeeklyData(d)} />
-              <ChallengesSection onDataLoaded={(d) => setChallengesData(d)} />
+              <HabitProgress onDataLoaded={setHabitsData} onWeeklyLoaded={setWeeklyData} />
+              <ChallengesSection onDataLoaded={setChallengesData} />
               <AchievementsBar habits={habitsData} challenges={challengesData} weeklyStatus={weeklyData} unlockedIds={unlockedIds} />
             </View>
           ) : (
             <View style={styles.card}>
               <Text style={styles.sectionLabel}>{t('profile.account')}</Text>
               <SettingRow icon="user" label={t('profile.editarPerfil')} onPress={() => setActiveModal('perfil')} />
-              <SettingRow icon="lock" label={t('profile.changePassword')} onPress={() => setActiveModal('seguridad')} />
+              <SettingRow icon="lock" label={t('profile.cambiarPassword')} onPress={() => setActiveModal('password')} />
+              <SettingRow icon="globe" label={t('profile.language')} onPress={() => setActiveModal('idioma')} />
               
               <Text style={styles.sectionLabel}>{t('profile.privacy')}</Text>
               <SettingRow icon="slash" label={t('profile.usuariosBloqueados')} onPress={() => setActiveModal('bloqueados')} color="#EF4444" />
 
-              <Text style={styles.sectionLabel}>{t('profile.preferences')}</Text>
-              <SettingRow icon="globe" label={t('idioma')} onPress={() => setActiveModal('idioma')} color="#10B981" />
-              
               <TouchableOpacity style={[styles.settingRow, { marginTop: 20, borderBottomWidth: 0 }]} onPress={logout}>
                 <View style={[styles.settingIcon, { backgroundColor: '#FEF2F2' }]}><Feather name="log-out" size={18} color="#EF4444" /></View>
                 <Text style={[styles.settingLabel, { color: '#EF4444' }]}>{t('profile.closeSession')}</Text>
@@ -229,6 +257,62 @@ export default function ProfileScreen() {
           )}
         </ScrollView>
       </DashboardBackground>
+
+      {/* MODAL PERFIL */}
+      <SettingsModal visible={activeModal === 'perfil'} title={t('profile.editarPerfil')} onClose={() => setActiveModal(null)} onSave={handleUpdateInfo} loading={loading}>
+          <Text style={styles.inputLabel}>{t('profile.username')} (@)</Text>
+          <View style={styles.inputWithPrefix}>
+            <Text style={styles.prefixText}>@</Text>
+            <TextInput 
+                style={[styles.input, { flex: 1, marginTop: 0, borderWidth: 0 }]} 
+                value={formProfile.username} 
+                onChangeText={(text) => setFormProfile({...formProfile, username: text})} 
+                autoCapitalize="none" 
+            />
+          </View>
+          <Text style={styles.inputLabel}>{t('profile.name')}</Text>
+          <TextInput style={styles.input} value={formProfile.name} onChangeText={(text) => setFormProfile({...formProfile, name: text})} />
+          <Text style={styles.inputLabel}>{t('profile.email')}</Text>
+          <TextInput style={styles.input} value={formProfile.email} onChangeText={(text) => setFormProfile({...formProfile, email: text})} keyboardType="email-address" autoCapitalize="none" />
+      </SettingsModal>
+
+      {/* MODAL PASSWORD */}
+      <SettingsModal visible={activeModal === 'password'} title={t('profile.cambiarPassword')} onClose={() => setActiveModal(null)} onSave={handleChangePassword} loading={loading}>
+          <Text style={styles.inputLabel}>{t('profile.current_password')}</Text>
+          <TextInput style={styles.input} secureTextEntry value={formPassword.current_password} onChangeText={(text) => setFormPassword({...formPassword, current_password: text})} />
+          <Text style={styles.inputLabel}>{t('profile.new_password')}</Text>
+          <TextInput style={styles.input} secureTextEntry value={formPassword.password} onChangeText={(text) => setFormPassword({...formPassword, password: text})} />
+          <Text style={styles.inputLabel}>{t('profile.confirm_password')}</Text>
+          <TextInput style={styles.input} secureTextEntry value={formPassword.password_confirmation} onChangeText={(text) => setFormPassword({...formPassword, password_confirmation: text})} />
+      </SettingsModal>
+
+      {/* MODAL IDIOMA */}
+      <SettingsModal visible={activeModal === 'idioma'} title={t('profile.language')} onClose={() => setActiveModal(null)} showSave={false}>
+        <TouchableOpacity style={styles.langOption} onPress={() => changeLanguage('es')}>
+          <Text style={[styles.langText, i18n.language === 'es' && styles.langTextActive]}>Español</Text>
+          {i18n.language === 'es' && <Feather name="check" size={18} color="#8a5cf6" />}
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.langOption} onPress={() => changeLanguage('en')}>
+          <Text style={[styles.langText, i18n.language === 'en' && styles.langTextActive]}>English</Text>
+          {i18n.language === 'en' && <Feather name="check" size={18} color="#8a5cf6" />}
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.langOption} onPress={() => changeLanguage('ca')}>
+          <Text style={[styles.langText, i18n.language === 'ca' && styles.langTextActive]}>Català</Text>
+          {i18n.language === 'ca' && <Feather name="check" size={18} color="#8a5cf6" />}
+        </TouchableOpacity>
+      </SettingsModal>
+
+      {/* MODAL AVATAR */}
+      <SettingsModal visible={activeModal === 'avatar'} title={t('seleccionar_avatar')} onClose={() => setActiveModal(null)} showSave={false}>
+        <View style={styles.avatarGrid}>
+          {Object.keys(avatarMap).map((key) => (
+            <TouchableOpacity key={key} style={[styles.avatarOption, user.image_id === key && styles.avatarOptionActive]} onPress={() => handleUpdateAvatar(key)}>
+              <Image source={avatarMap[key]} style={styles.avatarImage} />
+              {user.image_id === key && <View style={styles.checkBadge}><Feather name="check" size={12} color="white" /></View>}
+            </TouchableOpacity>
+          ))}
+        </View>
+      </SettingsModal>
 
       {/* MODAL BLOQUEADOS */}
       <SettingsModal visible={activeModal === 'bloqueados'} title={t('profile.usuariosBloqueados')} onClose={() => setActiveModal(null)} showSave={false}>
@@ -247,7 +331,7 @@ export default function ProfileScreen() {
                 <Text style={styles.blockedName}>{item.name}</Text>
                 <Text style={styles.blockedUsername}>@{item.username}</Text>
               </View>
-              <TouchableOpacity style={styles.btnUnblock} onPress={() => handleUnblockUser(item.id)}>
+              <TouchableOpacity style={styles.btnUnblock} onPress={() =>handleUnblock((item.id))}>
                 <Text style={styles.btnUnblockText}>{t('profile.unblock')}</Text>
               </TouchableOpacity>
             </View>
@@ -255,32 +339,7 @@ export default function ProfileScreen() {
         )}
       </SettingsModal>
 
-      {/* MODAL PERFIL */}
-      <SettingsModal visible={activeModal === 'perfil'} title={t('profile.editarPerfil')} onClose={() => setActiveModal(null)} onSave={handleUpdateInfo} loading={loading}>
-          <Text style={styles.inputLabel}>{t('profile.username')} (@)</Text>
-          <View style={styles.inputWithPrefix}>
-            <Text style={styles.prefixText}>@</Text>
-            <TextInput style={[styles.input, { flex: 1, marginTop: 0, borderWidth: 0 }]} value={formProfile.username} onChangeText={(text) => setFormProfile({...formProfile, username: text})} autoCapitalize="none" />
-          </View>
-          <Text style={styles.inputLabel}>{t('profile.name')}</Text>
-          <TextInput style={styles.input} value={formProfile.name} onChangeText={(text) => setFormProfile({...formProfile, name: text})} />
-          <Text style={styles.inputLabel}>{t('profile.email')}</Text>
-          <TextInput style={styles.input} value={formProfile.email} onChangeText={(text) => setFormProfile({...formProfile, email: text})} keyboardType="email-address" autoCapitalize="none" />
-      </SettingsModal>
-
-      {/* OTROS MODALES (Simplificados para brevedad, manten tus funciones handleUpdatePassword, etc) */}
-      <SettingsModal visible={activeModal === 'avatar'} title={t('seleccionar_avatar')} onClose={() => setActiveModal(null)} showSave={false}>
-        <View style={styles.avatarGrid}>
-          {Object.keys(avatarMap).map((key) => (
-            <TouchableOpacity key={key} style={[styles.avatarOption, user.image_id === key && styles.avatarOptionActive]} onPress={() => handleUpdateAvatar(key)}>
-              <Image source={avatarMap[key]} style={styles.avatarImage} />
-              {user.image_id === key && <View style={styles.checkBadge}><Feather name="check" size={12} color="white" /></View>}
-            </TouchableOpacity>
-          ))}
-        </View>
-      </SettingsModal>
-
-      <StaticBottomNavBar activeTab="user" />
+      <StaticBottomNavBar activeTab="user" hasNotifications={unreadCount > 0} />
     </View>
   );
 }
@@ -301,7 +360,7 @@ const styles = StyleSheet.create({
   avatarContainer: { position: 'relative', marginBottom: 10 },
   avatarRing: { width: 90, height: 90, borderRadius: 45, borderWidth: 3, borderColor: 'white', overflow: 'hidden' },
   avatar: { width: '100%', height: '100%' },
-  editAvatarBtn: { position: 'absolute', bottom: 0, right: 0, backgroundColor: 'white', width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center', elevation: 4, shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 3 },
+  editAvatarBtn: { position: 'absolute', bottom: 0, right: 0, backgroundColor: 'white', width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center', elevation: 4 },
   heroName: { fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
   statsRow: { flexDirection: 'row', marginTop: 15, gap: 20, backgroundColor: 'rgba(255,255,255,0.2)', padding: 15, borderRadius: 20 },
   statItem: { alignItems: 'center' },
@@ -335,12 +394,13 @@ const styles = StyleSheet.create({
   avatarOptionActive: { borderColor: '#8a5cf69c' },
   avatarImage: { width: '100%', height: '100%', borderRadius: 40 },
   checkBadge: { position: 'absolute', right: -2, bottom: -2, backgroundColor: '#8a5cf69c', width: 20, height: 20, borderRadius: 10, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: 'white' },
-  
-  // BLOQUEADOS
   blockedItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', padding: 12, borderRadius: 18, marginBottom: 10, borderWidth: 1, borderColor: '#E2E8F0' },
   blockedAvatar: { width: 44, height: 44, borderRadius: 22 },
   blockedName: { fontSize: 15, fontWeight: '700', color: '#1E293B' },
   blockedUsername: { fontSize: 12, color: '#64748B' },
   btnUnblock: { backgroundColor: '#EEF2FF', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12 },
   btnUnblockText: { color: '#8a5cf69c', fontWeight: '700', fontSize: 13 },
+  langOption: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
+  langText: { fontSize: 16, color: '#64748B', fontWeight: '600' },
+  langTextActive: { color: '#8a5cf6', fontWeight: '700' },
 });

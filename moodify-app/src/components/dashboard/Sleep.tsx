@@ -25,7 +25,7 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
   const [endAngle, setEndAngle] = useState((6 / 24) * (2 * Math.PI));
   const [startTimeText, setStartTimeText] = useState("00:00");
   const [endTimeText, setEndTimeText] = useState("06:00");
-
+  const { unreadCount } = useContext(UserContext);
   const isInitialLoad = useRef(true);
   const svgRef = useRef<View>(null);
   const [svgLayout, setSvgLayout] = useState({ x: 0, y: 0 });
@@ -280,7 +280,10 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
             </View>
           </View>
         </DashboardBackground>
-        <StaticBottomNavBar activeTab="home" />
+        <StaticBottomNavBar 
+                activeTab="home" 
+                hasNotifications={unreadCount > 0} 
+              />
       </View>
     </GestureHandlerRootView>
   );
