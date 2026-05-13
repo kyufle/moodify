@@ -100,7 +100,7 @@ export const Sleep = ({ onBack }: { onBack: () => void }) => {
 
   const handleSave = async () => {
     if (!isTimeValid(startTimeText) || !isTimeValid(endTimeText)) {
-      Alert.alert("Formato incorrecto", "Asegúrate de que las horas sean válidas.");
+      Alert.alert(t('dashboard.incorrectFormat'), t('dashboard.incorrectFormatMessage'));
       return;
     }
 

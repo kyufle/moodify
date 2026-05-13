@@ -1,7 +1,7 @@
 import { useRouter, useSegments } from "expo-router";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const getUserThemeFromContext = (userValue: any) => ({
     bgName: userValue?.user?.bg_image,
@@ -26,42 +26,41 @@ export default function UserProvider({ children }: { children: ReactNode }) {
     
     const [userValue, setUserValue] = useState(defaultUserValue);
     const [unreadCount, setUnreadCount] = useState(0);
-    // const [isLoaded, setIsLoaded] = useState(false);
-    const isLoaded = true;
+    const [isLoaded, setIsLoaded] = useState(false);
 
-    // useEffect(() => {
-    //     const loadStorageData = async () => {
-    //         try {
-    //             const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
-    //             if (jsonValue != null) {
-    //                 const savedData = JSON.parse(jsonValue);
-    //                 setUserValue(savedData);
-    //                 router.replace('/dashboard');
-    //             }
-    //         } catch (e) {
-    //             console.error("Failed to load session", e);
-    //         } finally {
-    //             setIsLoaded(true);
-    //         }
-    //     };
-    //     loadStorageData();
-    // }, []);
+    useEffect(() => {
+        const loadStorageData = async () => {
+            try {
+                const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
+                if (jsonValue != null) {
+                    const savedData = JSON.parse(jsonValue);
+                    setUserValue(savedData);
+                    router.replace('/dashboard');
+                }
+            } catch (e) {
+                console.error("Failed to load session", e);
+            } finally {
+                setIsLoaded(true);
+            }
+        };
+        loadStorageData();
+    }, []);
 
-    // useEffect(() => {
-    //     const saveStorageData = async () => {
-    //         if (isLoaded) {
-    //             if (userValue.accessToken) {
-    //                 await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(userValue));
-    //             } else {
-    //                 await AsyncStorage.removeItem(STORAGE_KEY);
-    //             }
-    //         }
-    //     };
-    //     saveStorageData();
-    // }, [userValue, isLoaded]);
+    useEffect(() => {
+        const saveStorageData = async () => {
+            if (isLoaded) {
+                if (userValue.accessToken) {
+                    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(userValue));
+                } else {
+                    await AsyncStorage.removeItem(STORAGE_KEY);
+                }
+            }
+        };
+        saveStorageData();
+    }, [userValue, isLoaded]);
 
     const logout = async () => {
-        // await AsyncStorage.removeItem(STORAGE_KEY);
+        await AsyncStorage.removeItem(STORAGE_KEY);
         router.replace('/');
         setUserValue(defaultUserValue);
     };

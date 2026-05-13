@@ -7,6 +7,7 @@ import {
   TouchableOpacity, 
   Platform, 
   Dimensions,
+  ImageBackground,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,8 +16,8 @@ import { ThemedView } from '@/components/themed-view';
 import CreateUser from '@/components/CreateUser';
 import Login from '@/components/Login';
 import { useTranslation } from 'react-i18next';
-import { StatusBar } from 'expo-status-bar';
-import FondoClaro from '@/assets/images/fondo_claro.svg';
+// import FondoClaro from '@/assets/images/fondo_claro.svg';
+const backgroundSource = require('@/assets/images/fondo_claro.jpg')
 import FondoFirstTime  from '@/assets/images/fondofirsttime.svg';
 
 const { width, height } = Dimensions.get('window');
@@ -30,7 +31,6 @@ export default function HomeScreen() {
   if (showWelcome) {
     return (
       <ThemedView style={styles.welcomeContainer}>
-        <StatusBar style="dark" /> 
         <SafeAreaView style={styles.safeAreaFull}>
           <View style={styles.welcomeContent}>
             <View style={styles.welcomeTextSection}>
@@ -68,13 +68,12 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <StatusBar style="dark" />
-      <View style={styles.statusBarOverlay} />
-
+      {/* <FondoClaro width={null} height={null} style={styles.backgroundImage}  /> */}
+      
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 40}
       >
         <ScrollView 
           contentContainerStyle={styles.scrollContent} 
@@ -82,35 +81,35 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <FondoClaro width={null} height={null} style={styles.backgroundImage}  />
-          <View style={styles.headerContainer}>
-            <SafeAreaView edges={['top']} style={styles.safeAreaInternal}>
-              <View style={styles.floatingCard}>
-                <ThemedText style={styles.holaText}>{t('panel.hello')}</ThemedText>
-                <ThemedText style={styles.bienvenidoText}>{t('panel.welcome')}</ThemedText>
-                
-                <View style={styles.tabContainer}>
-                  <TouchableOpacity 
-                    style={[styles.tabButton, isLogin && styles.activeTab]}
-                    onPress={() => setIsLogin(true)}
-                  >
-                    <ThemedText style={[styles.tabText, isLogin && styles.activeTabText]}>
-                      {t('panel.enter')}
-                    </ThemedText>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.tabButton, !isLogin && styles.activeTab]}
-                    onPress={() => setIsLogin(false)}
-                  >
-                    <ThemedText style={[styles.tabText, !isLogin && styles.activeTabText]}>
-                      {t('panel.unite')}
-                    </ThemedText>
-                  </TouchableOpacity>
+          <ImageBackground resizeMode="cover" source={backgroundSource}>
+            <View style={styles.headerContainer}>
+              <SafeAreaView edges={['top']} style={styles.safeAreaInternal}>
+                <View style={styles.floatingCard}>
+                  <ThemedText style={styles.holaText}>{t('panel.hello')}</ThemedText>
+                  <ThemedText style={styles.bienvenidoText}>{t('panel.welcome')}</ThemedText>
+                  
+                  <View style={styles.tabContainer}>
+                    <TouchableOpacity 
+                      style={[styles.tabButton, isLogin && styles.activeTab]}
+                      onPress={() => setIsLogin(true)}
+                    >
+                      <ThemedText style={[styles.tabText, isLogin && styles.activeTabText]}>
+                        {t('panel.enter')}
+                      </ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={[styles.tabButton, !isLogin && styles.activeTab]}
+                      onPress={() => setIsLogin(false)}
+                    >
+                      <ThemedText style={[styles.tabText, !isLogin && styles.activeTabText]}>
+                        {t('panel.unite')}
+                      </ThemedText>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            </SafeAreaView>
-          </View>
-
+              </SafeAreaView>
+            </View>
+          </ImageBackground>
           <View style={styles.formWrapper}>
             {isLogin ? (
               <Login onChangePage={() => setIsLogin(false)} />
@@ -132,7 +131,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0, left: 0, right: 0,
     height: Platform.OS === 'ios' ? 50 : 35, 
-    backgroundColor: 'rgba(0, 0, 0, 0.05)', 
+    backgroundColor: 'rgb(0, 0, 0)', 
     zIndex: 100,
   },
   headerContainer: { 
@@ -204,7 +203,7 @@ const styles = StyleSheet.create({
     marginTop: -20 
   },
   floatingCard: { 
-    backgroundColor: 'rgba(165, 173, 176, 0.5)',
+    backgroundColor: 'rgb(186, 209, 216)',
     width: '85%', 
     maxWidth: 340, 
     borderRadius: 28, 

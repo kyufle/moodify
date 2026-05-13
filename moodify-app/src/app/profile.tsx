@@ -89,6 +89,17 @@ export default function ProfileScreen() {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
+  const fetchUnlockedAchievements = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API}achievements`, { method: 'GET', headers: authHeaders });
+      const data = await res.json();
+      if (res.ok) setUnlockedIds(data.unlocked_ids || []);
+    } catch (e) { console.error(e); }
+  }, [token]);
+
+  useEffect(() => { fetchUnlockedAchievements(); }, [fetchUnlockedAchievements]);
+
   const fetchBlockedUsers = useCallback(async () => {
     if (!token) return;
     setLoading(true);

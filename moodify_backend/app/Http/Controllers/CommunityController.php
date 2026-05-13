@@ -62,8 +62,15 @@ class CommunityController extends Controller
     {
         try {
             $userId = Auth::id();
-            
-            // Verificamos si la tabla de bloqueos existe para evitar el error 500
+
+            $followingIds = [];
+            if (Schema::hasTable('followed_follower')) {
+                $followingIds = DB::table('followed_follower')
+                    ->where('follower_id', $userId)
+                    ->pluck('followed_id')
+                    ->toArray();
+            }
+
             $blockedIds = [];
             if (Schema::hasTable('user_blocks')) {
                 $blockedIds = DB::table('user_blocks')
@@ -75,7 +82,10 @@ class CommunityController extends Controller
             $postsQuery = DB::table('publications')
                 ->join('users', 'publications.user_id', '=', 'users.id');
 
-            // Solo aplicamos el filtro si hay usuarios bloqueados
+            // Incluimos al propio usuario para que pueda ver sus propios posts (opcional)
+            $allowedUserIds = array_merge($followingIds, [$userId]);
+            $postsQuery->whereIn('publications.user_id', $allowedUserIds);
+
             if (!empty($blockedIds)) {
                 $postsQuery->whereNotIn('publications.user_id', $blockedIds);
             }
@@ -92,7 +102,7 @@ class CommunityController extends Controller
                 ->orderByDesc('publications.date')
                 ->get();
 
-            $result = $posts->map(function ($post) use ($userId) {
+            $result = $posts->map(function ($post) use ($userId, $followingIds) {
                 $likesCount = DB::table('post_likes')->where('publication_id', $post->id)->count();
                 
                 $isLiked = DB::table('post_likes')
@@ -102,14 +112,9 @@ class CommunityController extends Controller
 
                 $commentsCount = DB::table('comments')->where('publication_id', $post->id)->count();
 
-                // Verificamos si seguimos al autor
-                $isFollowing = false;
-                if (Schema::hasTable('followed_follower')) {
-                    $isFollowing = DB::table('followed_follower')
-                        ->where('follower_id', $userId)
-                        ->where('followed_id', $post->user_id)
-                        ->exists();
-                }
+                // Como ya filtramos por seguidos arriba, sabemos que si el user_id 
+                // está en el array $followingIds, lo estamos siguiendo.
+                $isFollowing = in_array($post->user_id, $followingIds);
 
                 return array_merge((array) $post, [
                     'likes_count'    => $likesCount,

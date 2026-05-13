@@ -219,7 +219,7 @@ export default function ChatMainList() {
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       {!isFullSearchView && (
         <View style={styles.header}>
-          <Text style={styles.whatsappTitle}>Moodify chat</Text>
+          <Text style={styles.whatsappTitle}>Moodify {t('conversation.chatTitle')}</Text>
           <View style={styles.headerIcons}>
             <TouchableOpacity 
                 onPress={() => setCustomizerVisible(true)}
@@ -260,7 +260,7 @@ export default function ChatMainList() {
             keyboardShouldPersistTaps="always"
             ListEmptyComponent={
               !isSearching && searchQuery.length > 0 ? (
-                <Text style={{textAlign: 'center', marginTop: 20, color: '#64748B'}}>No se encontraron resultados</Text>
+                <Text style={{textAlign: 'center', marginTop: 20, color: '#64748B'}}>{t('conversation.dontResult')}</Text>
               ) : null
             }
           />

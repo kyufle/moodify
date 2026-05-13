@@ -16,7 +16,7 @@ class PsicologoService
         ];
         $idiomaNombre = $nombresIdiomas[$idioma] ?? 'español';
 
-        $host = env('OLLAMA_HOST', 'http://127.0.0.1:11434');
+        $host = env('OLLAMA_HOST', 'http://192.168.1.24:11434');
         $instrucciones = "Tu nombre es Bloom. Eres una psicóloga con un corazón enorme, "
             . "extremadamente dulce, paciente y buena persona. Tu tono es cálido, como un abrazo en palabras. "
             . "Usa siempre la ESCUCHA ACTIVA: antes de proponer nada, abraza emocionalmente al usuario, "

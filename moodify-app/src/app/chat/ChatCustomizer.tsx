@@ -26,8 +26,8 @@ export const ChatCustomizer = ({ visible, onClose, onSave, currentTheme }: any) 
   const {t} = useTranslation();
   const tokenString = userValue?.accessToken;
   const PRESET_THEMES = [
-  { id: '1', name: t('conversation.classic'), bgName: ALL_BACKGROUNDS[0].id, myMsgColor: '#F472B6', otherMsgColor: '#FFFFFF', textColorOther: '#FFFFFF', textColorOwn: '#FFFFFF'},
-  { id: '2', name: t('conversation.pinkPuppies'), bgName: ALL_BACKGROUNDS[1].id, myMsgColor: '#F472B6', otherMsgColor: '#FFFFFF', textColorOther: '#FFFFFF', textColorOwn: '#FFFFFF' },
+  { id: '1', name: t('conversation.classic'), bgName: ALL_BACKGROUNDS[0].id, myMsgColor: '#F472B6', otherMsgColor: '#FFFFFF', textColorOther: '#000000', textColorOwn: '#FFFFFF'},
+  { id: '2', name: t('conversation.pinkPuppies'), bgName: ALL_BACKGROUNDS[1].id, myMsgColor: '#F472B6', otherMsgColor: '#FFFFFF', textColorOther: '#000000', textColorOwn: '#FFFFFF' },
   { id: '3', name: t('conversation.frogMode'), bgName: ALL_BACKGROUNDS[2].id, myMsgColor: '#128C7E', otherMsgColor: '#E2E8F0', textColorOther: '#000000', textColorOwn: '#FFFFFF' },
 ];
   const [view, setView] = useState<'presets' | 'customize'>('presets');
@@ -158,7 +158,7 @@ export const ChatCustomizer = ({ visible, onClose, onSave, currentTheme }: any) 
               <View style={styles.row}>
                 {['#FFFFFF', '#000000'].map(c => (
                   <TouchableOpacity key={`txt-global-${c}`} style={[styles.chip, theme.textColorOwn === c && styles.activeChip]} onPress={() => setTheme({ ...theme, textColorOwn: c })}>
-                    <Text style={{ color: theme.textColorOwn === c ? '#FFF' : '#000', fontWeight: 'bold' }}>{c === '#FFFFFF' ? 'Blanco' : 'Negro'}</Text>
+                    <Text style={{ color: theme.textColorOwn === c ? '#FFF' : '#000', fontWeight: 'bold' }}>{c === '#FFFFFF' ? t('conversation.write') : t('conversation.black')}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -167,7 +167,7 @@ export const ChatCustomizer = ({ visible, onClose, onSave, currentTheme }: any) 
               <View style={styles.row}>
                 {['#FFFFFF', '#000000'].map(c => (
                   <TouchableOpacity key={`txt-global-${c}`} style={[styles.chip, theme.textColorOther === c && styles.activeChip]} onPress={() => setTheme({ ...theme, textColorOther: c })}>
-                    <Text style={{ color: theme.textColorOther === c ? '#FFF' : '#000', fontWeight: 'bold' }}>{c === '#FFFFFF' ? 'Blanco' : 'Negro'}</Text>
+                    <Text style={{ color: theme.textColorOther === c ? '#FFF' : '#000', fontWeight: 'bold' }}>{c === '#FFFFFF' ? t('conversation.write') : t('conversation.black')}</Text>
                   </TouchableOpacity>
                 ))}
               </View>

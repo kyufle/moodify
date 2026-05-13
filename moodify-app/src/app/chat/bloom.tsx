@@ -159,7 +159,7 @@ export default function BloomChatScreen() {
                   <View>
                     <Text style={[styles.aiName, { color: chatTheme }]}>Bloom</Text>
                     <Text style={styles.aiStatus}>
-                      {isBlocked ? 'Chat pausado' : 'En línea'}
+                      {isBlocked ? 'Chat pausado' : t('conversation.online')}
                     </Text>
                   </View>
                 </View>
@@ -191,7 +191,7 @@ export default function BloomChatScreen() {
                 {isTyping && (
                   <View style={styles.typingContainer}>
                     <ActivityIndicator size="small" color={chatTheme} />
-                    <Text style={[styles.typingText, { color: chatTheme }]}>Bloom está escribiendo...</Text>
+                    <Text style={[styles.typingText, { color: chatTheme }]}>{t('bloom.bloomWriting')}</Text>
                   </View>
                 )}
               </ScrollView>

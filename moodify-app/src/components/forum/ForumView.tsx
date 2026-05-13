@@ -2,8 +2,7 @@ import React, { useContext, useEffect, useState, useCallback, useRef } from 'rea
 import {
   View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity,
   ActivityIndicator, Alert, KeyboardAvoidingView,
-  Platform, StatusBar, Keyboard, Image, FlatList,
-  SafeAreaView
+  Platform, Keyboard, Image, FlatList,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -252,7 +251,6 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <LinearGradient colors={['#fde3e9', '#fde3e9']} style={styles.header}>
           <View style={styles.headerInner}>
@@ -307,8 +305,8 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
                 posts.length === 0 ? (
                     <View style={styles.emptyFeedContainer}>
                       <Feather name="users" size={40} color="#CBD5E1" />
-                      <Text style={styles.emptyFeedText}>Aún no sigues a nadie. ¡Descubre personas!</Text>
-                      <TouchableOpacity style={styles.discoverBtn} onPress={() => setActiveTab('personas')}><Text style={styles.discoverBtnText}>Explorar personas</Text></TouchableOpacity>
+                      <Text style={styles.emptyFeedText}>{t('forum.notFollowingAnyoneYet')}</Text>
+                      <TouchableOpacity style={styles.discoverBtn} onPress={() => setActiveTab('personas')}><Text style={styles.discoverBtnText}>{t('forum.explorePeople')}</Text></TouchableOpacity>
                     </View>
                   ) : posts.map(post => (
                       <PostCard 

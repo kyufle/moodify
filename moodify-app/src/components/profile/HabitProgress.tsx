@@ -136,9 +136,9 @@ export const HabitProgress = () => {
   };
 
   const deleteHabit = (habitId: number) => {
-    Alert.alert("Eliminar", "¿Borrar este hábito para siempre?", [
-      { text: "No" },
-      { text: "Borrar", style: "destructive", onPress: async () => {
+    Alert.alert(t('forum.erase'), t('forum.deleteHabit'), [
+      { text: t('forum.no') },
+      { text: t('forum.erase'), style: "destructive", onPress: async () => {
           try {
             await fetch(`${process.env.EXPO_PUBLIC_API_URL}habits/${habitId}`, {
               method: 'DELETE',

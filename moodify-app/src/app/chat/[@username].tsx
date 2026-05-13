@@ -214,7 +214,7 @@ export default function PersonalChatScreen() {
       <KeyboardAvoidingView 
   behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
   style={{ flex: 1 }}
-  keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0} 
+  keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 35} 
 >
         <View style={styles.header}>
           <View style={styles.headerLeft}>

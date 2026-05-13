@@ -14,7 +14,7 @@ const ca = {
     fieldRequiredMessageFull: 'A un pas! Sembla que falta algun camp per omplir per poder continuar.',
     fieldRequired: 'Ups! Sembla que has oblidat completar aquest camp.',
     fieldError: 'Quasi ho tens! Revisa els detalls marcats en vermell per continuar.',
-    correctRegister: 'Ja gairebé ets part de Moodify! 🌈 Només un pas més: verifica el teu compte des del correu que t’acabem d’enviar.',
+    correctRegister: 'S\'ha creat el compte correctament.',
     correctLogin: 'Benvingut/da a casa. Tot està tal com ho vas deixar.',
     incorrectCredentials: 'Credencials incorrectes',
     notVerified: 'Encara no has verificat el compte',
@@ -61,6 +61,9 @@ const ca = {
     totalPoints: 'Punts totals',
     actualState: 'El teu estat actual és:',
     repeatTest: 'Repetir anàlisi',
+    incorrectFormat: 'Format incorrecte',
+    incorrectFormatMessage: 'Assegureu-vos que les hores siguin vàlides'
+
   },
   calendarGrid:{
     howFeelNow: 'Com et sents?',
@@ -82,7 +85,7 @@ const ca = {
     until: 'fins',
     sleptTotal: 'Has dormit un total de:',
     saveRegister: 'Desa registre',
-    correctSaveTitle: 'Éxito',
+    correctSaveTitle: 'Èxit',
     correctSave: 'Registre de son sincronitzat',
     errorSave: 'No s\'ha pogut desar el registre.',
     error: 'Error',
@@ -157,14 +160,16 @@ const ca = {
     dontBlocked: 'No tens usuaris bloquejats',
     currentPassword: 'Contrasenya actual',
     newPassword: 'Nova contrasenya',
-    confirmPassword: 'Confirma la nova contrasenya'
-
+    confirmPassword: 'Confirma la nova contrasenya',
+    delete: 'Esborrar',
   },
   alert:{
     like: 'li ha donat m\'agrada a la teva publicació',
     comment: 'ha comentat al teu post',
     follow: 'ha començat a seguir-te',
-    at: "a les"
+    at: "a les",
+    notifications: 'Notificacions',
+    noNotifications: 'Encara no tens notificacions.'
   },
   months: [
     "gen.", "febr.", "març", "abr.", "maig", "juny", 
@@ -207,6 +212,8 @@ const ca = {
     unfollowed: 'Has deixat de seguir',
     nowFollowing: 'Ara segueixes aquest usuari',
     loadingChats: 'Carregant xats...',
+    chatTitle: 'xat',
+    dontResult: 'No s\'han trobat resultats', 
     you: 'Tu',
     themes: 'Temes',
     designer: 'Dissenyador',
@@ -228,7 +235,9 @@ const ca = {
     blockUser: 'Bloquejar usuari',
     blockName: 'Bloquejar a',
     block: 'Bloquejar',
-    errorBlock: "No se pudo bloquear."
+    errorBlock: "No se pudo bloquear.",
+    white: 'Blanc',
+    black: 'Negre'
   },
   forum:{
     official: 'OFICIAL',
@@ -279,18 +288,25 @@ const ca = {
     results: 'Resultats',
     mayKnow: 'Persones que potser coneguis',
     noUsersFound: 'No s\'han trobat usuaris',
-    noNewSuggestions: 'No hi ha suggeriments nous'
-  },
-  alert:{
-    notifications: 'Notificacions',
-    noNotifications: 'Encara no tens notificacions.'
+    noNewSuggestions: 'No hi ha suggeriments nous',
+    deleteHabit: 'Esborrar aquest hàbit per sempre?',
+    deleteChallengeTitle: 'Esborrar repte',
+    deleteChallenge: 'Esborrar aquest repte per sempre?',
+    no: 'No',
+    congratulations: 'Felicitats!',
+    dayCompleted: 'Dia completat',
+    advice: 'Avís',
+    todaysAdvice: 'Ja registrat avui',
+    activeChanllenge: 'No tens reptes actius',
+    notFollowingAnyoneYet: 'Encara no segueixes ningú. Descobreix persones!',
+    explorePeople: 'Explorar persones'
   },
   bloom:{
     bloom:'Hola! Sóc Bloom, el teu assistent de benestar. En què et puc ajudar avui?',
     input: 'Explica\'m alguna cosa...',
     challenge: 'Sugerir Repte',
     weImprove: 'Com millorar avui?',
-
+    bloomWriting: 'Bloom està escrivint...'
   }
 }
 export default ca;
