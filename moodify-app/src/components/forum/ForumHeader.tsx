@@ -17,7 +17,7 @@ export const ForumHeader = ({ onSearchPress }: ForumHeaderProps) => {
   return (
     <View style={styles.header}>
       <View>
-        <Text style={styles.greeting}>Hola, {firstName} 👋</Text>
+        <Text style={styles.greeting}>Hola, {firstName}</Text>
         <Text style={styles.subtitle}>Conecta y comparte con tu comunidad</Text>
       </View>
 

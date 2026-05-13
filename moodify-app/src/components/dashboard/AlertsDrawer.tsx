@@ -250,7 +250,7 @@ const formatDateTime = (dateString: string | null, type: 'like' | 'comment' | 'f
         
         <Animated.View style={[styles.drawer, { transform: [{ translateX: slideAnim }] }]}>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Notificaciones</Text>
+            <Text style={styles.headerTitle}>{t('alert.notifications')}</Text>
             <TouchableOpacity onPress={onClose} hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
               <Feather name="x" size={24} color="#94A3B8" />
             </TouchableOpacity>
@@ -268,7 +268,7 @@ const formatDateTime = (dateString: string | null, type: 'like' | 'comment' | 'f
               ListEmptyComponent={
                 <View style={styles.emptyContainer}>
                   <Feather name="bell-off" size={40} color="#CBD5E1" />
-                  <Text style={styles.emptyText}>No tienes notificaciones aún.</Text>
+                  <Text style={styles.emptyText}>{t('alert.noNotifications')}</Text>
                 </View>
               }
             />

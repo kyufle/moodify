@@ -99,5 +99,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/getAnnouncements', [StaffAnnouncementController::class, 'index']);
     Route::post('/storeAnnouncement', [StaffAnnouncementController::class, 'store']);
+    Route::delete('/deleteAnnouncement/{id}', [StaffAnnouncementController::class, 'destroy']);
 
     });

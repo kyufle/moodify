@@ -222,6 +222,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
             <Text style={styles.heroName}>{user.name}</Text>
+            <Text style={styles.username}>@{user.username}</Text>
             <View style={styles.statsRow}>
                <View style={styles.statItem}><Text style={styles.statNum}>{user.streak}</Text><Text style={styles.statLbl}>{t('profile.streak')}</Text></View>
                <View style={styles.statDivider} />
@@ -256,11 +257,11 @@ export default function ProfileScreen() {
             <View style={styles.card}>
               <Text style={styles.sectionLabel}>{t('profile.account')}</Text>
               <SettingRow icon="user" label={t('profile.editarPerfil')} onPress={() => setActiveModal('perfil')} />
-              <SettingRow icon="lock" label={t('profile.cambiarPassword')} onPress={() => setActiveModal('password')} />
+              <SettingRow icon="lock" label={t('profile.changePassword')} onPress={() => setActiveModal('password')} />
               <SettingRow icon="globe" label={t('profile.language')} onPress={() => setActiveModal('idioma')} />
               
               <Text style={styles.sectionLabel}>{t('profile.privacy')}</Text>
-              <SettingRow icon="slash" label={t('profile.usuariosBloqueados')} onPress={() => setActiveModal('bloqueados')} color="#EF4444" />
+              <SettingRow icon="slash" label={t('profile.userBlocked')} onPress={() => setActiveModal('bloqueados')} color="#EF4444" />
 
               <TouchableOpacity style={[styles.settingRow, { marginTop: 20, borderBottomWidth: 0 }]} onPress={logout}>
                 <View style={[styles.settingIcon, { backgroundColor: '#FEF2F2' }]}><Feather name="log-out" size={18} color="#EF4444" /></View>
@@ -290,12 +291,12 @@ export default function ProfileScreen() {
       </SettingsModal>
 
       {/* MODAL PASSWORD */}
-      <SettingsModal visible={activeModal === 'password'} title={t('profile.cambiarPassword')} onClose={() => setActiveModal(null)} onSave={handleChangePassword} loading={loading}>
-          <Text style={styles.inputLabel}>{t('profile.current_password')}</Text>
+      <SettingsModal visible={activeModal === 'password'} title={t('profile.changePassword')} onClose={() => setActiveModal(null)} onSave={handleChangePassword} loading={loading}>
+          <Text style={styles.inputLabel}>{t('profile.currentPassword')}</Text>
           <TextInput style={styles.input} secureTextEntry value={formPassword.current_password} onChangeText={(text) => setFormPassword({...formPassword, current_password: text})} />
-          <Text style={styles.inputLabel}>{t('profile.new_password')}</Text>
+          <Text style={styles.inputLabel}>{t('profile.newPassword')}</Text>
           <TextInput style={styles.input} secureTextEntry value={formPassword.password} onChangeText={(text) => setFormPassword({...formPassword, password: text})} />
-          <Text style={styles.inputLabel}>{t('profile.confirm_password')}</Text>
+          <Text style={styles.inputLabel}>{t('profile.confirmPassword')}</Text>
           <TextInput style={styles.input} secureTextEntry value={formPassword.password_confirmation} onChangeText={(text) => setFormPassword({...formPassword, password_confirmation: text})} />
       </SettingsModal>
 
@@ -328,13 +329,13 @@ export default function ProfileScreen() {
       </SettingsModal>
 
       {/* MODAL BLOQUEADOS */}
-      <SettingsModal visible={activeModal === 'bloqueados'} title={t('profile.usuariosBloqueados')} onClose={() => setActiveModal(null)} showSave={false}>
+      <SettingsModal visible={activeModal === 'bloqueados'} title={t('profile.userBlocked')} onClose={() => setActiveModal(null)} showSave={false}>
         {loading ? (
           <ActivityIndicator color="#8a5cf6" style={{ marginVertical: 20 }} />
         ) : blockedUsers.length === 0 ? (
           <View style={{ alignItems: 'center', paddingVertical: 30 }}>
             <Feather name="shield" size={40} color="#CBD5E1" />
-            <Text style={{ marginTop: 12, color: '#94A3B8', fontWeight: '600' }}>No tienes usuarios bloqueados</Text>
+            <Text style={{ marginTop: 12, color: '#94A3B8', fontWeight: '600' }}>{t('profile.dontBlocked')}</Text>
           </View>
         ) : (
           blockedUsers.map((item) => (
@@ -374,6 +375,7 @@ const styles = StyleSheet.create({
   avatarRing: { width: 90, height: 90, borderRadius: 45, borderWidth: 3, borderColor: 'white', overflow: 'hidden' },
   avatar: { width: '100%', height: '100%' },
   editAvatarBtn: { position: 'absolute', bottom: 0, right: 0, backgroundColor: 'white', width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center', elevation: 4 },
+  username: { fontSize: 15, fontWeight: '800', color: '#FFFFFF' },
   heroName: { fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
   statsRow: { flexDirection: 'row', marginTop: 15, gap: 20, backgroundColor: 'rgba(255,255,255,0.2)', padding: 15, borderRadius: 20 },
   statItem: { alignItems: 'center' },

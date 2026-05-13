@@ -214,7 +214,7 @@ export const CalendarGrid = () => {
         </View>
 
         <TouchableOpacity style={styles.registerButton} onPress={() => setCurrentView('register')}>
-          <Text style={styles.registerButtonText}>Registrar ánimo de hoy</Text>
+          <Text style={styles.registerButtonText}>{t('calendarGrid.recordTodaysMood')}</Text>
         </TouchableOpacity>
 
         {history.length > 0 && (
@@ -268,19 +268,10 @@ export const CalendarGrid = () => {
               </View>
             )}
 
-            {isTooLittleSleep && (
-              <View style={styles.recommendCard}>
-                <Feather name="moon" size={20} color="#F59E0B" />
-                <Text style={styles.recommendText}>
-                  Dormiste <Text style={{ fontWeight: '800' }}>{sleepData.hours}h {sleepData.minutes}m</Text>. ¡Prueba el resto de 8h!
-                </Text>
-              </View>
-            )}
-
             {config && lastEntry && (
               <View style={[styles.card, { backgroundColor: config.color, marginTop: 15 }]}>
                 <View style={styles.textColumn}>
-                  <Text style={styles.subtitle}>¿Cómo te sientes ahora?</Text>
+                  <Text style={styles.subtitle}>{t('calendarGrid.howFeelNowCalendar')}</Text>
                   <Text style={styles.titleCard}>{t(`moodNames.${lastEntry.mood}`)}</Text>
                   <Text style={styles.description}>{getSafePhrase()}</Text>
                 </View>
@@ -336,7 +327,7 @@ const styles = StyleSheet.create({
   recommendText: { fontSize: 12, color: '#92400E', flex: 1 },
   card: { borderRadius: 20, padding: 20, flexDirection: 'row', overflow: 'hidden' },
   textColumn: { flex: 1, zIndex: 2 },
-  subtitle: { fontSize: 12, fontWeight: '700', opacity: 0.6 },
+  subtitle: { fontSize: 18, fontWeight: '700', opacity: 0.6 },
   titleCard: { fontSize: 20, fontWeight: 'bold', marginVertical: 4 },
   description: { fontSize: 14, lineHeight: 18, opacity: 0.8 },
   cardWatermark: { position: 'absolute', right: 10, bottom: 10, opacity: 0.3 }

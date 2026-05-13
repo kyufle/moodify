@@ -9,12 +9,12 @@ import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { UserContext } from '@/components/user-provider';
 import { StaticBottomNavBar } from '../StaticBottomNavBar';
-import { FriendsMoods } from './FriendsMoods';
 import { DiscoverPeople } from './DiscoverPeople';
 import { StaffAnnouncements } from './StaffAnnouncements';
 import { PostCard, type PostData } from './PostCard';
 import { avatarMap } from '../../utils/utils';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://moodify_backend.test/api/';
 
@@ -37,7 +37,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
   const [inputText, setInputText] = useState('');
   const [postingLoading, setPostingLoading] = useState(false);
   const [inputHeight, setInputHeight] = useState(45); 
-
+  const {t} = useTranslation();
   // @ts-ignore
   const selectedPost = posts?.find(p => p.id == selectedPostId);
   const [comments, setComments] = useState<any[]>([]);
@@ -92,7 +92,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
       });
       if (r.ok) {
         fetchPosts(false);
-        Alert.alert("Éxito", isFollowing ? "Has dejado de seguir" : "Ahora sigues a este usuario");
+        Alert.alert(t('conversation.exit'), isFollowing ? t('conversation.unfollowed') : t('conversation.nowFollowing'));
       }
     } catch (e) {
       Alert.alert("Error", "No se pudo procesar.");
@@ -100,15 +100,15 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
   };
 
   const handleBlockUser = async (targetId: number, targetName: string) => {
-    Alert.alert("Bloquear usuario", `¿Bloquear a ${targetName}?`, [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Bloquear", style: "destructive", onPress: async () => {
+    Alert.alert(t('conversation.blockUser'), `${t('conversation.blockName')} ${targetName}?`, [
+      { text: t('profile.cancel'), style: "cancel" },
+      { text: t('conversation.block'), style: "destructive", onPress: async () => {
           try {
             const r = await fetch(`${API}community/users/${targetId}/block`, { method: 'POST', headers: authHeaders });
             if (r.ok) {
               setPosts(prev => prev.filter(p => p.user_id !== targetId));
             }
-          } catch (e) { Alert.alert("Error", "No se pudo bloquear."); }
+          } catch (e) { Alert.alert(t('sleep.error'), t('conversation.errorBlock')); }
       }}
     ]);
   };
@@ -205,10 +205,10 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
                 onFollowToggle={handleFollowToggle}
               />
               <View style={styles.divider} />
-              <Text style={styles.repliesTitle}>Respuestas</Text>
+              <Text style={styles.repliesTitle}>{t('forum.answers')}</Text>
             </View>
           }
-          ListEmptyComponent={!loadingComments && <Text style={styles.emptyText}>Sé el primero en comentar...</Text>}
+          ListEmptyComponent={!loadingComments && <Text style={styles.emptyText}>{t('forum.firstComment')}</Text>}
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item }) => (
             <View style={[styles.commentCard, item.parent_id && { marginLeft: 45, opacity: 0.8 }]}>
@@ -218,7 +218,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
                 <Text style={styles.text}>{item.content}</Text>
                 {!item.parent_id && (
                   <TouchableOpacity onPress={() => setReplyingTo({ id: item.id, name: item.user_name })}>
-                    <Text style={styles.replyBtnText}>Responder</Text>
+                    <Text style={styles.replyBtnText}>{t('forum.reply')}</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -227,14 +227,14 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
         />
           {replyingTo && (
             <View style={styles.replyInfoBar}>
-              <Text style={styles.replyInfoText}>Respondiendo a <Text style={{ fontWeight: 'bold' }}>{replyingTo.name}</Text></Text>
+              <Text style={styles.replyInfoText}>{t('forum.responding')} <Text style={{ fontWeight: 'bold' }}>{replyingTo.name}</Text></Text>
               <TouchableOpacity onPress={() => setReplyingTo(null)}><Feather name="x-circle" size={16} color="'#FFECF0'" /></TouchableOpacity>
             </View>
           )}
           <View style={styles.commentInputBar}>
             <TextInput
               style={styles.inputField}
-              placeholder="Escribe una respuesta..."
+              placeholder={t('forum.writeMessage')}
               value={commentText}
               onChangeText={setCommentText}
               multiline
@@ -248,7 +248,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
     );
   }
 
-  const feedTitle = posts.length === 0 && !loadingPosts ? "Recomendaciones" : "Publicaciones";
+  const feedTitle = posts.length === 0 && !loadingPosts ? t('forum.recommendations') : t('forum.publications');
 
   return (
     <View style={styles.root}>
@@ -259,17 +259,17 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
             <View style={styles.headerLeft}>
               <View style={styles.headerAvatarContainer}><Image source={avatarMap[currentUserAvatar]} style={styles.avatarImgSmall} /></View>
               <View>
-                <Text style={styles.headerGreeting}>Hola, {userValue?.user?.name?.split(' ')[0]} 👋</Text>
-                <Text style={styles.headerSub}>Comunidad Moodify</Text>
+                <Text style={styles.headerGreeting}>{t('forum.hi')}, {userValue?.user?.name?.split(' ')[0]}</Text>
+                <Text style={styles.headerSub}>{t('forum.community')} Moodify</Text>
               </View>
             </View>
           </View>
           <View style={styles.tabBar}>
             <TouchableOpacity style={[styles.tabItem, activeTab === 'feed' && styles.tabItemActive]} onPress={() => setActiveTab('feed')}>
-              <Text style={[styles.tabText, activeTab === 'feed' && styles.tabTextActive]}>Feed</Text>
+              <Text style={[styles.tabText, activeTab === 'feed' && styles.tabTextActive]}>{t('forum.feed')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.tabItem, activeTab === 'personas' && styles.tabItemActive]} onPress={() => setActiveTab('personas')}>
-              <Text style={[styles.tabText, activeTab === 'personas' && styles.tabTextActive]}>Personas</Text>
+              <Text style={[styles.tabText, activeTab === 'personas' && styles.tabTextActive]}>{t('forum.people')}</Text>
             </TouchableOpacity>
           </View>
         </LinearGradient>
@@ -277,14 +277,15 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           {activeTab === 'feed' ? (
             <>
-              <FriendsMoods onDiscoverPress={() => setActiveTab('personas')} />
               <StaffAnnouncements />
+              <Text style={styles.sectionTitle}>{t('forum.post')}</Text>
               <View style={styles.inlineComposeContainer}>
                 <View style={styles.inlineComposeHeader}>
                   <View style={styles.composeAvatar}><Image source={avatarMap[currentUserAvatar]} style={styles.avatarImgSmall} /></View>
+                  
                   <TextInput
                     style={[styles.inlineInput, { height: Math.max(45, inputHeight) }]}
-                    placeholder="¿Qué tienes en mente?"
+                    placeholder={t('forum.mind')}
                     multiline
                     value={inputText}
                     onChangeText={setInputText}
@@ -294,7 +295,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
                 {inputText.trim().length > 0 && (
                   <View style={styles.inlineActionRow}>
                      <TouchableOpacity style={styles.inlinePublishBtn} onPress={handleAction} disabled={postingLoading}>
-                        {postingLoading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.inlinePublishBtnText}>Publicar</Text>}
+                        {postingLoading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.inlinePublishBtnText}>{t('forum.post')}</Text>}
                      </TouchableOpacity>
                   </View>
                 )}
@@ -334,6 +335,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
 };
 
 const styles = StyleSheet.create({
+  sectionTitle: {fontSize: 18, fontWeight: '800', color: '#7D5A5A', marginLeft: 20 },
   root: { 
     flex: 1, 
     backgroundColor: '#FFF9FB' // Un blanco rosado muy suave

@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { UserContext } from '@/components/user-provider';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -20,17 +21,15 @@ export const ALL_BACKGROUNDS = [
 
 const FULL_COLOR_PALETTE = ['#F472B6', '#E91E63', '#3B82F6', '#2196F3', '#10B981', '#4CAF50', '#F59E0B', '#FF5722', '#8B5CF6', '#000000', '#64748B', '#FFFFFF'];
 
-const PRESET_THEMES = [
-  { id: '1', name: 'Rosa Clásico', bgName: ALL_BACKGROUNDS[0].id, myMsgColor: '#F472B6', otherMsgColor: '#FFFFFF', textColorOther: '#FFFFFF', textColorOwn: '#FFFFFF'},
-  { id: '2', name: 'Perritos Pink', bgName: ALL_BACKGROUNDS[1].id, myMsgColor: '#F472B6', otherMsgColor: '#FFFFFF', textColorOther: '#FFFFFF', textColorOwn: '#FFFFFF' },
-  { id: '3', name: 'Modo Rana', bgName: ALL_BACKGROUNDS[2].id, myMsgColor: '#128C7E', otherMsgColor: '#E2E8F0', textColorOther: '#FFFFFF', textColorOwn: '#FFFFFF' },
-];
-
 export const ChatCustomizer = ({ visible, onClose, onSave, currentTheme }: any) => {
   const { userValue } = useContext(UserContext);
-
+  const {t} = useTranslation();
   const tokenString = userValue?.accessToken;
-
+  const PRESET_THEMES = [
+  { id: '1', name: t('conversation.classic'), bgName: ALL_BACKGROUNDS[0].id, myMsgColor: '#F472B6', otherMsgColor: '#FFFFFF', textColorOther: '#FFFFFF', textColorOwn: '#FFFFFF'},
+  { id: '2', name: t('conversation.pinkPuppies'), bgName: ALL_BACKGROUNDS[1].id, myMsgColor: '#F472B6', otherMsgColor: '#FFFFFF', textColorOther: '#FFFFFF', textColorOwn: '#FFFFFF' },
+  { id: '3', name: t('conversation.frogMode'), bgName: ALL_BACKGROUNDS[2].id, myMsgColor: '#128C7E', otherMsgColor: '#E2E8F0', textColorOther: '#000000', textColorOwn: '#FFFFFF' },
+];
   const [view, setView] = useState<'presets' | 'customize'>('presets');
   const [theme, setTheme] = useState(currentTheme || PRESET_THEMES[1]);
   const [loading, setLoading] = useState(false);
@@ -94,9 +93,9 @@ export const ChatCustomizer = ({ visible, onClose, onSave, currentTheme }: any) 
           <TouchableOpacity onPress={view === 'customize' ? () => setView('presets') : onClose} disabled={loading}>
             <Feather name={view === 'customize' ? "arrow-left" : "x"} size={24} color="#1e293b" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{view === 'presets' ? 'Temas' : 'Diseñador'}</Text>
+          <Text style={styles.headerTitle}>{view === 'presets' ? t('conversation.themes') : t('conversation.designer')}</Text>
           <TouchableOpacity onPress={handleApply} disabled={loading}>
-            {loading ? <ActivityIndicator size="small" color="#3B82F6" /> : <Text style={styles.applyText}>Aplicar</Text>}
+            {loading ? <ActivityIndicator size="small" color="#3B82F6" /> : <Text style={styles.applyText}>{t('conversation.apply')}</Text>}
           </TouchableOpacity>
         </View>
 
@@ -124,7 +123,7 @@ export const ChatCustomizer = ({ visible, onClose, onSave, currentTheme }: any) 
             <View style={styles.footer}>
               <TouchableOpacity style={styles.customizeBtn} onPress={() => setView('customize')}>
                 <Feather name="edit-3" size={18} color="white" style={{marginRight: 8}} />
-                <Text style={styles.customizeBtnText}>Personalizar a mano</Text>
+                <Text style={styles.customizeBtnText}>{t('conversation.customizeByHand')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -132,7 +131,7 @@ export const ChatCustomizer = ({ visible, onClose, onSave, currentTheme }: any) 
           <ScrollView style={{ flex: 1 }} bounces={false}>
             <View style={styles.mainPreviewHolder}>{renderChatPreview(theme)}</View>
             <View style={styles.editorPanel}>
-              <Text style={styles.sectionTitle}>1. Fondo</Text>
+              <Text style={styles.sectionTitle}>{t('conversation.bg')}</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator contentContainerStyle={styles.scrollContentContainer} style={styles.bgPickerRow}>
                 {ALL_BACKGROUNDS.map((item) => (
                   <TouchableOpacity key={item.id} onPress={() => setTheme({ ...theme, bgName: item.id })} style={[styles.bgThumbnail, (theme.bgName === item.id) && styles.activeBgThumbnail]}>
@@ -141,21 +140,21 @@ export const ChatCustomizer = ({ visible, onClose, onSave, currentTheme }: any) 
                 ))}
               </ScrollView>
 
-              <Text style={styles.sectionTitle}>2. Color de tus mensajes (Tú)</Text>
+              <Text style={styles.sectionTitle}>{t('conversation.oursMessages')}</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator contentContainerStyle={styles.scrollContentContainer} style={styles.colorPickerRow}>
                 {FULL_COLOR_PALETTE.map(color => (
                   <TouchableOpacity key={`me-bg-${color}`} style={[styles.colorOption, { backgroundColor: color }, theme.myMsgColor === color && styles.activeColorOption]} onPress={() => setTheme({ ...theme, myMsgColor: color })} />
                 ))}
               </ScrollView>
 
-              <Text style={styles.sectionTitle}>3. Color mensajes otros</Text>
+              <Text style={styles.sectionTitle}>{t('conversation.themMessages')}</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator contentContainerStyle={styles.scrollContentContainer} style={styles.colorPickerRow}>
                 {FULL_COLOR_PALETTE.map(color => (
                   <TouchableOpacity key={`other-bg-${color}`} style={[styles.colorOption, { backgroundColor: color }, theme.otherMsgColor === color && styles.activeColorOption]} onPress={() => setTheme({ ...theme, otherMsgColor: color })} />
                 ))}
               </ScrollView>
 
-              <Text style={styles.sectionTitle}>4. Color del texto (Tus mensajes)</Text>
+              <Text style={styles.sectionTitle}>{t('conversation.textColorYour')}</Text>
               <View style={styles.row}>
                 {['#FFFFFF', '#000000'].map(c => (
                   <TouchableOpacity key={`txt-global-${c}`} style={[styles.chip, theme.textColorOwn === c && styles.activeChip]} onPress={() => setTheme({ ...theme, textColorOwn: c })}>
@@ -164,7 +163,7 @@ export const ChatCustomizer = ({ visible, onClose, onSave, currentTheme }: any) 
                 ))}
               </View>
               <View style={{ height: 40 }} />
-               <Text style={styles.sectionTitle}>4. Color del texto (Otros mensajes)</Text>
+               <Text style={styles.sectionTitle}>{t('conversation.textColorThem')}</Text>
               <View style={styles.row}>
                 {['#FFFFFF', '#000000'].map(c => (
                   <TouchableOpacity key={`txt-global-${c}`} style={[styles.chip, theme.textColorOther === c && styles.activeChip]} onPress={() => setTheme({ ...theme, textColorOther: c })}>

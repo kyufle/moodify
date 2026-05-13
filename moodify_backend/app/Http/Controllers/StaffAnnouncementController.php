@@ -39,5 +39,23 @@ class StaffAnnouncementController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+    public function destroy($id)
+{
+    // Buscamos el anuncio
+    $announcement = StaffAnnouncement::find($id);
+
+    if (!$announcement) {
+        return response()->json(['message' => 'Aviso no encontrado'], 404);
+    }
+
+    // Opcional: Verificar aquí también si el usuario es admin
+    if (auth()->user()->type_user !== 'admin') {
+        return response()->json(['message' => 'No tienes permiso'], 403);
+    }
+
+    $announcement->delete();
+
+    return response()->json(['message' => 'Aviso borrado correctamente'], 200);
+}
 }
 ?>

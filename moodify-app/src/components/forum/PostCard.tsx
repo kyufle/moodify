@@ -3,21 +3,22 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, Image } from 'react-na
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { UserContext } from '@/components/user-provider';
 import { avatarMap } from '../../utils/utils'; 
+import { useTranslation } from 'react-i18next';
 
 const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://moodify_backend.test/api/';
 
-function timeAgo(dateStr: string): string {
+function timeAgo(dateStr: string, t: any): string {
   if (!dateStr) return '';
   const date = new Date(dateStr.replace(' ', 'T'));
   const now = new Date();
   const diffInMs = now.getTime() - date.getTime();
   const mins = Math.floor(diffInMs / 60000);
-  if (mins < 1) return 'Ahora';
-  if (mins < 60) return `Hace ${mins} min`;
+  if (mins < 1) return t('forum.now');
+  if (mins < 60) return `${t('forum.does')} ${mins} min`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `Hace ${hrs}h`;
+  if (hrs < 24) return `${t('forum.does')} ${hrs}h`;
   const days = Math.floor(hrs / 24);
-  if (days < 7) return `Hace ${days}d`;
+  if (days < 7) return `${t('forum.does')} ${days}d`;
   return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
@@ -47,7 +48,7 @@ interface PostCardProps {
 export const PostCard = ({ post, onLikeToggle, onDelete, onCommentPress, onBlockUser, onFollowToggle }: PostCardProps) => {
   const { userValue } = useContext(UserContext);
   const [liking, setLiking] = useState(false);
-
+  const {t} = useTranslation();
   const liked = post.is_liked;
   const likeCount = post.likes_count;
   const isFollowing = post.is_following; 
@@ -58,12 +59,12 @@ export const PostCard = ({ post, onLikeToggle, onDelete, onCommentPress, onBlock
 
     if (isMine) {
       Alert.alert(
-        "Tu publicación",
-        "¿Qué deseas hacer?",
+        t('forum.yourPost'),
+        t('forum.wantDo'),
         [
-          { text: "Cancelar", style: "cancel" },
+          { text: t('profile.cancel'), style: "cancel" },
           { 
-            text: "Borrar publicación", 
+            text: t('forum.deletePost'), 
             style: "destructive", 
             onPress: () => onDelete && onDelete(post.id) 
           }
@@ -71,16 +72,16 @@ export const PostCard = ({ post, onLikeToggle, onDelete, onCommentPress, onBlock
       );
     } else {
       Alert.alert(
-        "Opciones",
-        `Configuración para @${post.username}`,
+        t('forum.options'),
+        `${t('forum.config')} @${post.username}`,
         [
-          { text: "Cancelar", style: "cancel" },
+          { text: t('profile.cancel'), style: "cancel" },
           { 
-            text: isFollowing ? "Dejar de seguir" : "Seguir a este usuario", 
+            text: isFollowing ? t('forum.unfollow') : t('forum.follow'), 
             onPress: () => onFollowToggle && onFollowToggle(post.user_id, !!isFollowing) 
           },
           { 
-            text: "Bloquear usuario", 
+            text: t('forum.block'), 
             style: "destructive", 
             onPress: () => onBlockUser && onBlockUser(post.user_id, post.user_name) 
           }
@@ -129,7 +130,7 @@ export const PostCard = ({ post, onLikeToggle, onDelete, onCommentPress, onBlock
         </View>
         <View style={styles.authorInfo}>
           <Text style={styles.authorName}>{post.user_name}</Text>
-          <Text style={styles.authorMeta}>@{post.username} · {timeAgo(post.date)}</Text>
+          <Text style={styles.authorMeta}>@{post.username} · {timeAgo(post.date, t)}</Text>
         </View>
         <TouchableOpacity style={styles.moreBtn} onPress={handleMorePress}>
           <Feather name="more-horizontal" size={20} color="#CBD5E1" />
@@ -151,10 +152,6 @@ export const PostCard = ({ post, onLikeToggle, onDelete, onCommentPress, onBlock
         <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7} onPress={onCommentPress}>
           <Feather name="message-circle" size={18} color="#94A3B8" />
           <Text style={styles.actionText}>{post.comments_count ?? 0}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7}>
-          <Feather name="share-2" size={18} color="#94A3B8" />
         </TouchableOpacity>
       </View>
     </View>

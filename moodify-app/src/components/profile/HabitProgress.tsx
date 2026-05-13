@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { format, parseISO } from 'date-fns';
-import { es, enUS, ca } from 'date-fns/locale'; // Importamos los idiomas necesarios
+import { es, enUS, ca } from 'date-fns/locale';
 import { UserContext } from '../../components/user-provider';
 import { useTranslation } from 'react-i18next';
 
@@ -230,15 +230,15 @@ export const HabitProgress = () => {
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.overlay}>
           <View style={styles.modal}>
-            <Text style={styles.modalTitle}>Nuevo Hábito</Text>
+            <Text style={styles.modalTitle}>{t('profile.newHabit')}</Text>
             <TextInput 
               style={styles.input} 
-              placeholder="¿Qué vas a hacer hoy?" 
+              placeholder={t('profile.goingToday')}
               value={newName} 
               onChangeText={setNewName}
               placeholderTextColor="#94A3B8"
             />
-            <Text style={styles.label}>Icono</Text>
+            <Text style={styles.label}>{t('profile.icon')}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
               {AVAILABLE_ICONS.map(icon => (
                 <TouchableOpacity 
@@ -250,7 +250,7 @@ export const HabitProgress = () => {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-            <Text style={styles.label}>Color</Text>
+            <Text style={styles.label}>{t('profile.color')}</Text>
             <View style={styles.colorGrid}>
               {AVAILABLE_COLORS.map(c => (
                 <TouchableOpacity 
@@ -262,10 +262,10 @@ export const HabitProgress = () => {
             </View>
             <View style={styles.modalActions}>
               <TouchableOpacity style={styles.btnCancel} onPress={() => setModalVisible(false)}>
-                <Text style={{ color: '#64748B', fontWeight: '700' }}>Cerrar</Text>
+                <Text style={{ color: '#64748B', fontWeight: '700' }}>{t('profile.close')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.btnSave, { backgroundColor: selectedColor }] as ViewStyle[]} onPress={handleCreateHabit}>
-                <Text style={{ color: 'white', fontWeight: '800' }}>Guardar</Text>
+                <Text style={{ color: 'white', fontWeight: '800' }}>{t('profile.save')}</Text>
               </TouchableOpacity>
             </View>
           </View>

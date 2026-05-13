@@ -22,6 +22,7 @@ import { StaticBottomNavBar } from '@/components/StaticBottomNavBar';
 import { ChatListCard } from '@/components/chat/ChatListCard';
 import { getUserThemeFromContext, UserContext } from '@/components/user-provider';
 import { avatarMap } from '@/utils/utils'; 
+import { useTranslation } from 'react-i18next';
 
 interface SearchUser {
   id: string;
@@ -45,7 +46,7 @@ export default function ChatMainList() {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   };
-
+  const {t} = useTranslation();
   const [conversations, setConversations] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
@@ -130,7 +131,7 @@ export default function ChatMainList() {
           );
           setSearchHistory(newHistory);
           await SafeStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
-          Alert.alert("Éxito", user.is_following ? "Has dejado de seguir" : "Ahora sigues a este usuario");
+          Alert.alert(t('conversation.exit'), user.is_following ? t('conversation.unfollowed') : t('conversation.nowFollowing'));
         }
       } catch (e) {
         console.error("Error", "No se pudo procesar.");
@@ -180,7 +181,7 @@ export default function ChatMainList() {
         <TouchableOpacity style={styles.searchInfoArea} onPress={() => goToChat(item)}>
           <Text style={styles.searchUsername}>{item.username}</Text>
           <Text style={{fontSize: 12, color: '#64748B'}}>
-            {item.is_following ? 'Siguiendo' : 'Toca para chatear'}
+            {item.is_following ? t('conversation.follow') : t('conversation.chat')}
           </Text>
         </TouchableOpacity>
         
@@ -209,7 +210,7 @@ export default function ChatMainList() {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#128C7E" />
-        <Text style={{ marginTop: 10, color: '#64748B' }}>Cargando chats...</Text>
+        <Text style={{ marginTop: 10, color: '#64748B' }}>{t('conversation.loadingChats')}</Text>
       </View>
     );
   }
@@ -240,7 +241,7 @@ export default function ChatMainList() {
           )}
           {!isFullSearchView && <Feather name="search" size={20} color="#64748B" />}
           <TextInput
-            placeholder="Buscar usuarios..."
+            placeholder={t('conversation.searchUers')}
             style={styles.input}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -285,7 +286,7 @@ export default function ChatMainList() {
                 messageColor = '#10B981';
                 fontWeight = '600';
               } else if (esMio && item.last_message) {
-                displayMessage = `Tú: ${item.last_message}`;
+                displayMessage = `${t('conversation.you')}: ${item.last_message}`;
               }
 
               const fechaRaw = item.last_message_at || item.updated_at || item.created_at;

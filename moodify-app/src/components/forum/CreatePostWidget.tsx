@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export const CreatePostWidget = () => {
+  const {t} = useTranslation();
   return (
     <View style={styles.container}>
       <View style={styles.inputRow}>
@@ -11,7 +13,7 @@ export const CreatePostWidget = () => {
         </View>
         <TextInput 
           style={styles.input}
-          placeholder="¿Qué tienes en mente?"
+          placeholder={t('forum.mind')}
           placeholderTextColor="#94A3B8"
         />
       </View>

@@ -97,15 +97,13 @@ export const ProgressDashboard: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerTitle}>{t('dashboard.howAmIGoing')}</Text>
-
-      {/* FILA DE RESUMEN: SUEÑO Y ESTRÉS */}
+      <Text style={styles.headerTitle}>{t('profile.howAmIGoing')}</Text>
       <View style={styles.row}>
         <View style={styles.halfCard}>
           <View style={styles.iconCircle}>
             <Feather name="moon" size={20} color="#6e75a4" />
           </View>
-          <Text style={styles.cardLabel}>{t('dashboard.avgSleep')}</Text>
+          <Text style={styles.cardLabel}>{t('profile.avgSleep')}</Text>
           <Text style={[styles.cardValue, { color: sleepInfo.color }]}>
             {sleepInfo.text}
           </Text>
@@ -115,14 +113,13 @@ export const ProgressDashboard: React.FC = () => {
           <View style={[styles.iconCircle, { backgroundColor: '#fdf2f2' }]}>
             <Feather name="activity" size={20} color="#daacac" />
           </View>
-          <Text style={styles.cardLabel}>{t('dashboard.dominantStress')}</Text>
+          <Text style={styles.cardLabel}>{t('profile.dominantStress')}</Text>
           <Text style={[styles.cardValue, { color: stressLevel.color }]}>
             {stressLevel.name}
           </Text>
         </View>
       </View>
 
-      {/* BALANCE MENSUAL DE ÁNIMOS */}
       <View style={styles.moodCard}>
         <View style={styles.cardHeaderRow}>
           <Feather name="pie-chart" size={18} color="#acdaad" />

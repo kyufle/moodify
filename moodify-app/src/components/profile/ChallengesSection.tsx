@@ -75,7 +75,7 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
       if (res.ok) {
         setCreateModalVisible(false);
         setNewName('');
-        setNewDays('30');
+        setNewDays('');
         fetchChallenges();
       }
     } catch (e) { Alert.alert("Error de conexión"); }

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { 
   View, Text, StyleSheet, ScrollView, TextInput, 
   TouchableOpacity, KeyboardAvoidingView, Platform, 
-  ActivityIndicator 
+  ActivityIndicator, Keyboard 
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -14,7 +14,6 @@ import { StaticBottomNavBar } from '@/components/StaticBottomNavBar';
 import { UserContext } from '@/components/user-provider';
 import { ChatSettingsModal } from '@/components/chat/ChatSettingsModals';
 import { useTranslation } from 'react-i18next';
-
 
 interface Message {
   id: string;
@@ -34,26 +33,42 @@ const getCurrentTime = () => {
 
 export default function BloomChatScreen() {
   const router = useRouter();
-  const [messages, setMessages] = useState<Message[]>([
-    { 
-      id: '1', 
-      text: '¡Hola! Soy Bloom, tu asistente de bienestar. ¿En qué puedo ayudarte hoy?', 
-      isAI: true, 
-      time: getCurrentTime(),
-      status: 'read'
-    },
-  ]);
   const { t, i18n } = useTranslation();
   const { unreadCount } = useContext(UserContext);
+  
+  // Estados
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
-  const [chatTheme, setChatTheme] = useState('#F472B6'); // Rosa Bloom por defecto
+  const [chatTheme, setChatTheme] = useState('#F472B6'); 
   const [isBlocked, setIsBlocked] = useState(false);
   
   const scrollViewRef = useRef<ScrollView>(null);
   const userContext = useContext(UserContext);
   const token = userContext?.userValue?.accessToken;
+
+  // 1. Efecto para inicializar el mensaje de bienvenida traducido
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([
+        { 
+          id: '1', 
+          text: t('bloom.bloom'), 
+          isAI: true, 
+          time: getCurrentTime(),
+          status: 'read'
+        },
+      ]);
+    }
+  }, [t]);
+
+  // 2. Efecto para scroll automático al final (Android requiere onContentSizeChange también)
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isBlocked || isTyping) return;
@@ -101,7 +116,7 @@ export default function BloomChatScreen() {
 
         const aiMsg: Message = {
           id: (Date.now() + 1).toString(),
-          text: data.respuesta, //
+          text: data.respuesta,
           isAI: true,
           time: getCurrentTime(),
           status: 'read'
@@ -118,22 +133,18 @@ export default function BloomChatScreen() {
     }
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 150);
-    return () => clearTimeout(timer);
-  }, [messages, isTyping]);
-
   return (
     <View style={styles.mainContainer}>
       <DashboardBackground>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
           <KeyboardAvoidingView 
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            // En Android 'height' es más estable que padding
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.keyboardView}
+            // Offset ajustado para Android y iOS considerando la barra inferior
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
           >
+            {/* Header */}
             <View style={styles.header}>
               <View style={styles.headerLeft}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -148,17 +159,14 @@ export default function BloomChatScreen() {
                   <View>
                     <Text style={[styles.aiName, { color: chatTheme }]}>Bloom</Text>
                     <Text style={styles.aiStatus}>
-                      {isBlocked ? 'Chat pausado' : 'En línea y escuchándote'}
+                      {isBlocked ? 'Chat pausado' : 'En línea'}
                     </Text>
                   </View>
                 </View>
               </View>
-
-              {/* <TouchableOpacity onPress={() => setIsSettingsVisible(true)} style={styles.settingsButton}>
-                <Feather name="more-vertical" size={24} color={chatTheme} />
-              </TouchableOpacity> */}
             </View>
 
+            {/* Área de Chat */}
             <View style={styles.chatContainer}>
               <ScrollView 
                 ref={scrollViewRef}
@@ -166,6 +174,8 @@ export default function BloomChatScreen() {
                 contentContainerStyle={styles.chatContent}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
+                // Crucial para Android: hace scroll cuando el contenido cambia al abrir teclado
+                onContentSizeChange={scrollToBottom}
               >
                 {messages.map((msg) => (
                   <MessageBubble 
@@ -187,8 +197,8 @@ export default function BloomChatScreen() {
               </ScrollView>
             </View>
 
-            {/* Sección de Entrada */}
-            <View style={[styles.inputSection, { marginBottom: 75 }]}>
+            {/* Sección de Entrada (Sin margin fijo abajo) */}
+            <View style={styles.inputSection}>
               {!isBlocked && (
                 <View style={styles.quickActionsArea}>
                   <ChatQuickActions onAction={(label) => sendMessage(label)} />
@@ -198,7 +208,7 @@ export default function BloomChatScreen() {
               <View style={styles.inputRow}>
                 {isBlocked ? (
                   <View style={styles.blockedNotice}>
-                    <Text style={styles.blockedText}>Has bloqueado este chat. Desbloquéalo en ajustes.</Text>
+                    <Text style={styles.blockedText}>Chat bloqueado</Text>
                   </View>
                 ) : (
                   <>
@@ -208,7 +218,7 @@ export default function BloomChatScreen() {
                     
                     <TextInput 
                       style={styles.input}
-                      placeholder="Cuéntame algo..."
+                      placeholder={t('bloom.input') || "Escribe aquí..."}
                       value={inputText}
                       onChangeText={setInputText}
                       multiline
@@ -242,10 +252,11 @@ export default function BloomChatScreen() {
         onToggleBlock={() => setIsBlocked(!isBlocked)}
       />
       
-       <StaticBottomNavBar 
-              activeTab="chat" 
-              hasNotifications={unreadCount > 0} 
-            />
+      {/* El BottomNav se queda fuera del KeyboardAvoidingView para no estorbar */}
+      <StaticBottomNavBar 
+        activeTab="chat" 
+        hasNotifications={unreadCount > 0} 
+      />
     </View>
   );
 }
@@ -267,7 +278,6 @@ const styles = StyleSheet.create({
   },
   headerLeft: { flexDirection: 'row', alignItems: 'center' },
   backButton: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-  settingsButton: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
   aiPersona: { flexDirection: 'row', alignItems: 'center', gap: 12, marginLeft: 5 },
   avatarBox: {
     width: 40, height: 40, borderRadius: 20,
@@ -294,6 +304,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FCE7F3',
     elevation: 8,
+    paddingBottom: Platform.OS === 'android' ? 65 : 20, // Compensamos la altura de la Nav Bar
   },
   quickActionsArea: {
     paddingVertical: 10,
@@ -303,7 +314,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#FFF1F2',
   },
-  inputRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 22, gap: 10 },
+  inputRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 15, gap: 10 },
   blockedNotice: { flex: 1, alignItems: 'center', padding: 10 },
   blockedText: { color: '#EF4444', fontSize: 13, fontWeight: '600', textAlign: 'center' },
   attachButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#FFF1F2', justifyContent: 'center', alignItems: 'center' },
