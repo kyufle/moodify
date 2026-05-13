@@ -6,7 +6,7 @@ const mensaje = " MOODIFY";
 const router = useRouter();
 
 const irADescubre = () => {
-  router.push("/descubre");
+  router.push("/equip");
 };
 </script>
 

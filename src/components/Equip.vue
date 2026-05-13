@@ -1,8 +1,8 @@
 <script setup>
 import { useRouter } from "vue-router";
 const router = useRouter();
-const anterior  = () => router.push("/tecnologia");
-const anarADemo = () => router.push("/demo");
+const anterior  = () => router.push("/");
+const siguiente = () => router.push("/descubre");
 </script>
 
 <template>
@@ -33,8 +33,8 @@ const anarADemo = () => router.push("/demo");
       <button @click="anterior" class="btn-primary">
         <i class="pi pi-arrow-left"></i> Enrere
       </button>
-      <button @click="anarADemo" class="btn-primary">
-        Provar la Demo <i class="pi pi-arrow-right"></i>
+      <button @click="siguiente" class="btn-primary">
+        Descobreix Moodify <i class="pi pi-arrow-right"></i>
       </button>
     </div>
   </div>

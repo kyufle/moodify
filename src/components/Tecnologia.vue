@@ -2,7 +2,6 @@
 import { useRouter } from "vue-router";
 const router = useRouter();
 const anterior = () => router.push("/bloom");
-const volver  = () => router.push("/equip");
 </script>
 
 <template>
@@ -87,9 +86,6 @@ const volver  = () => router.push("/equip");
     <div class="button-group">
       <button @click="anterior" class="btn-primary">
         <i class="pi pi-arrow-left"></i> Enrere
-      </button>
-      <button @click="volver" class="btn-primary">
-        Coneix l'Equip <i class="pi pi-arrow-right"></i>
       </button>
     </div>
   </div>

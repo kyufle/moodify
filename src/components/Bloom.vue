@@ -4,7 +4,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 
 const router = useRouter();
 
-const volver = () => router.push("/tecnologia");
+const siguiente = () => router.push("/tecnologia");
 const anterior = () => router.push("/funcionalidades");
 
 const messages = [
@@ -68,7 +68,7 @@ onUnmounted(() => clearInterval(interval));
       <button @click="anterior" class="btn-primary">
         <i class="pi pi-arrow-left"></i> Enrere
       </button>
-      <button @click="volver" class="btn-primary">
+      <button @click="siguiente" class="btn-primary">
         Coneix la tecnologia <i class="pi pi-arrow-right"></i>
       </button>
     </div>

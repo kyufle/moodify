@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
-const volver   = () => router.push("/bloom");
+const siguiente   = () => router.push("/bloom");
 const anterior = () => router.push("/descubre");
 
 const flipped = ref(new Set());
@@ -79,7 +79,7 @@ const cards = [
       <button @click="anterior" class="btn-primary">
         <i class="pi pi-arrow-left"></i> Enrere
       </button>
-      <button @click="volver" class="btn-primary">
+      <button @click="siguiente" class="btn-primary">
         Coneix a Bloom <i class="pi pi-arrow-right"></i>
       </button>
     </div>
