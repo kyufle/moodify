@@ -1,21 +1,23 @@
 <script setup>
-import { useRouter } from "vue-router";
-const router = useRouter();
-const anterior = () => router.push("/bloom");
-const siguiente = () => router.push("/demo");
+import { useRouter } from "vue-router"
+import { useI18n } from "vue-i18n"
+
+const { t } = useI18n()
+const router = useRouter()
+const anterior = () => router.push("/bloom")
+const siguiente = () => router.push("/demo")
 </script>
 
 <template>
   <div class="caja">
-    <h1>Arquitectura Tècnica</h1>
+    <h1>{{ t('tecnologia.title') }}</h1>
 
     <div class="diagrama">
 
-      <!-- CAPA 1: CLIENT -->
       <div class="capa">
         <div class="node mobile">
           <span class="node-icon">📱</span>
-          <strong>App Mòbil</strong>
+          <strong>{{ t('tecnologia.mobile') }}</strong>
           <span>React Native + Expo</span>
         </div>
       </div>
@@ -26,9 +28,8 @@ const siguiente = () => router.push("/demo");
         <span class="arrow-tip">▼</span>
       </div>
 
-      <!-- CAPA 2: SERVIDOR -->
       <div class="capa servidor">
-        <div class="servidor-label">Servidor Proxmox · Ubuntu 22.04</div>
+        <div class="servidor-label">{{ t('tecnologia.servidor') }}</div>
         <div class="servidor-inner">
 
           <div class="node apache">
@@ -56,11 +57,10 @@ const siguiente = () => router.push("/demo");
               <span class="arrow-line-v"></span>
               <span class="arrow-tip-v">▼</span>
             </div>
-
             <div class="node mysql">
               <span class="node-icon">🗄️</span>
               <strong>MySQL</strong>
-              <span>Base de dades</span>
+              <span>{{ t('tecnologia.mysql') }}</span>
             </div>
             <div class="node ollama">
               <span class="node-icon">🤖</span>
@@ -74,7 +74,6 @@ const siguiente = () => router.push("/demo");
 
     </div>
 
-    <!-- BADGES TECH -->
     <div class="tech-row">
       <span class="tbadge rn">React Native</span>
       <span class="tbadge laravel">Laravel 13</span>
@@ -86,36 +85,31 @@ const siguiente = () => router.push("/demo");
 
     <div class="button-group">
       <button @click="anterior" class="btn-primary">
-        <i class="pi pi-arrow-left"></i> Enrere
+        <i class="pi pi-arrow-left"></i> {{ t('btn.back') }}
       </button>
       <button @click="siguiente" class="btn-primary">
-        <i class="pi pi-arrow-right"></i> Conèixer MOODIFY
+        {{ t('btn.next_demo') }} <i class="pi pi-arrow-right"></i>
       </button>
     </div>
   </div>
 </template>
 
 <style scoped>
-
-
 h1 {
   font-size: 2rem;
   color: #111827;
   margin-bottom: 28px;
 }
 
-/* ── DIAGRAMA ─────────────────────────────── */
 .diagrama {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
   margin-bottom: 28px;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-/* ── NODOS ────────────────────────────────── */
 .node {
   display: flex;
   flex-direction: column;
@@ -129,7 +123,7 @@ h1 {
 }
 .node:hover { transform: translateY(-4px); }
 
-.node-icon { font-size: 1.8rem; line-height: 1; }
+.node-icon   { font-size: 1.8rem; line-height: 1; }
 .node strong { font-size: 0.95rem; color: #111827; }
 .node span   { font-size: 0.72rem; color: #6b7280; }
 
@@ -139,7 +133,6 @@ h1 {
 .node.mysql   { background: linear-gradient(135deg, #d1fae5, #a7f3d0); border: 1px solid #34d399; }
 .node.ollama  { background: linear-gradient(135deg, #ede9fe, #ddd6fe); border: 1px solid #a78bfa; }
 
-/* ── FLECHAS HORIZONTALES ─────────────────── */
 .arrow-h {
   display: flex;
   flex-direction: column;
@@ -148,18 +141,8 @@ h1 {
   gap: 2px;
   padding: 0 4px;
 }
-.arrow-line {
-  display: block;
-  width: 40px;
-  height: 2px;
-  background: #9ca3af;
-}
-.arrow-tip {
-  color: #9ca3af;
-  font-size: 0.85rem;
-  margin-top: -6px;
-  margin-left: 34px;
-}
+.arrow-line { display: block; width: 40px; height: 2px; background: #9ca3af; }
+.arrow-tip  { color: #9ca3af; font-size: 0.85rem; margin-top: -6px; margin-left: 34px; }
 .arrow-label {
   font-size: 0.62rem;
   color: #4b5563;
@@ -172,12 +155,7 @@ h1 {
 .arrow-h.small .arrow-line { width: 24px; }
 .arrow-h.small .arrow-tip  { margin-left: 18px; }
 
-/* ── SERVIDOR (caja contenedora) ─────────── */
-.servidor {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
+.servidor { display: flex; flex-direction: column; align-items: stretch; }
 .servidor-label {
   font-size: 0.7rem;
   font-weight: 700;
@@ -201,7 +179,6 @@ h1 {
   background: rgba(255,255,255,0.3);
 }
 
-/* ── GRUPO DERECHA (mysql + ollama) ────────── */
 .right-group {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -210,59 +187,26 @@ h1 {
   align-items: center;
 }
 
-/* las dos flechas verticales van en la primera fila */
-.arrow-v {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-}
-.arrow-line-v {
-  display: block;
-  width: 2px;
-  height: 20px;
-  background: #9ca3af;
-}
-.arrow-tip-v {
-  color: #9ca3af;
-  font-size: 0.75rem;
-  margin-top: -4px;
-}
+.arrow-v { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.arrow-line-v { display: block; width: 2px; height: 20px; background: #9ca3af; }
+.arrow-tip-v  { color: #9ca3af; font-size: 0.75rem; margin-top: -4px; }
 
-/* ── MÓVIL ────────────────────────────────── */
 @media (max-width: 600px) {
   h1 { font-size: 1.5rem; margin-bottom: 16px; }
-
   .diagrama { flex-direction: column; align-items: center; }
-
-  .arrow-h {
-    flex-direction: row;
-    gap: 4px;
-  }
+  .arrow-h { flex-direction: row; gap: 4px; }
   .arrow-line { width: 2px; height: 28px; }
   .arrow-tip  { margin: 0; font-size: 0.85rem; }
   .arrow-label { display: none; }
-
-  .servidor-inner {
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-  }
-
+  .servidor-inner { flex-direction: column; align-items: center; gap: 6px; }
   .arrow-h.small { flex-direction: row; }
   .arrow-h.small .arrow-line { width: 2px; height: 20px; }
-
-  .right-group {
-    grid-template-columns: 1fr 1fr;
-    width: 100%;
-  }
-
+  .right-group { grid-template-columns: 1fr 1fr; width: 100%; }
   .node { min-width: 80px; padding: 10px 12px; }
   .node-icon { font-size: 1.4rem; }
   .node strong { font-size: 0.8rem; }
 }
 
-/* ── BADGES ───────────────────────────────── */
 .tech-row {
   display: flex;
   flex-wrap: wrap;
@@ -270,12 +214,7 @@ h1 {
   gap: 8px;
   margin-bottom: 20px;
 }
-.tbadge {
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
+.tbadge { padding: 5px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
 .tbadge.rn      { background: rgba(147,197,253,0.3); color: #1e40af; border: 1px solid #93c5fd; }
 .tbadge.laravel { background: rgba(248,113,113,0.2); color: #991b1b; border: 1px solid #f87171; }
 .tbadge.mysql   { background: rgba(52,211,153,0.2);  color: #065f46; border: 1px solid #34d399; }

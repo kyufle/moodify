@@ -1,31 +1,27 @@
 <script setup>
-import "primeicons/primeicons.css";
-import { useRouter } from "vue-router";
+import "primeicons/primeicons.css"
+import { useRouter } from "vue-router"
+import { useI18n } from "vue-i18n"
 
-const mensaje = " MOODIFY";
-const router = useRouter();
+const { t } = useI18n()
+const router = useRouter()
 
-const irADescubre = () => {
-  router.push("/equip");
-};
+const irADescubre = () => router.push("/equip")
 </script>
 
 <template>
   <div class="caja">
     <img src="../assets/moodifyLogo.png" alt="Logo" />
-    <h1>{{ mensaje }}</h1>
-    <h3 class="subtitle">~ On les teves emocions cobren forma ~</h3>
-    <p>
-      Una aplicació web interactiva centrada en el benestar emocional i la
-      creació d’hàbits saludables.
-    </p>
+    <h1>MOODIFY</h1>
+    <h3 class="subtitle">{{ t('bienvenida.subtitle') }}</h3>
+    <p>{{ t('bienvenida.desc') }}</p>
     <div class="authors">
       <span><i class="pi pi-user"></i> Valeria Santana Megia</span>
       <span><i class="pi pi-user"></i> Ruth Romero Carretero</span>
     </div>
     <div class="button-group">
       <button @click="irADescubre" class="btn-primary">
-        Dona un cop d'ull <i class="pi pi-arrow-right"></i>
+        {{ t('btn.cta') }} <i class="pi pi-arrow-right"></i>
       </button>
     </div>
   </div>

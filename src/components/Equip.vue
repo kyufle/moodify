@@ -1,40 +1,35 @@
 <script setup>
-import { useRouter } from "vue-router";
-const router = useRouter();
-const anterior  = () => router.push("/");
-const siguiente = () => router.push("/descubre");
+import { useRouter } from "vue-router"
+import { useI18n } from "vue-i18n"
+
+const { t } = useI18n()
+const router = useRouter()
+const anterior  = () => router.push("/")
+const siguiente = () => router.push("/descubre")
 </script>
 
 <template>
   <div class="caja">
-    <h1>El Nostre Equip</h1>
-    <p class="intro">
-      Estudiants de <strong>Desenvolupament d'Aplicacions Web (DAW2)</strong>
-      a l'Institut Esteve Terrades i Illa.
-    </p>
+    <h1>{{ t('equip.title') }}</h1>
+    <p class="intro" v-html="t('equip.intro')"></p>
 
     <div class="team-grid">
-
-      <!-- ── VALERIA ── -->
       <div class="member">
         <div class="avatar valeria">V</div>
         <strong>Valeria Santana Megia</strong>
       </div>
-
-      <!-- ── RUTH ── -->
       <div class="member">
         <div class="avatar ruth">R</div>
         <strong>Ruth Romero Carretero</strong>
       </div>
-
     </div>
 
     <div class="button-group">
       <button @click="anterior" class="btn-primary">
-        <i class="pi pi-arrow-left"></i> Enrere
+        <i class="pi pi-arrow-left"></i> {{ t('btn.back') }}
       </button>
       <button @click="siguiente" class="btn-primary">
-        Descobreix Moodify <i class="pi pi-arrow-right"></i>
+        {{ t('btn.next_equip') }} <i class="pi pi-arrow-right"></i>
       </button>
     </div>
   </div>
@@ -53,7 +48,6 @@ h1 {
   margin-bottom: 32px;
 }
 
-/* ── GRID ─────────────────────────────────── */
 .team-grid {
   display: flex;
   justify-content: center;
@@ -65,7 +59,6 @@ h1 {
   .team-grid { flex-direction: column; align-items: center; }
 }
 
-/* ── CARD MEMBRE ──────────────────────────── */
 .member {
   display: flex;
   flex-direction: column;
@@ -86,7 +79,6 @@ h1 {
   box-shadow: 0 16px 32px rgba(0,0,0,0.1);
 }
 
-/* ── AVATAR INICIAL ───────────────────────── */
 .avatar {
   width: 76px;
   height: 76px;
@@ -102,15 +94,9 @@ h1 {
   letter-spacing: -1px;
 }
 
-.avatar.valeria {
-  background: linear-gradient(135deg, #ffab91, #ff7043);
-}
+.avatar.valeria { background: linear-gradient(135deg, #ffab91, #ff7043); }
+.avatar.ruth    { background: linear-gradient(135deg, #9e9ec9, #6c63ff); }
 
-.avatar.ruth {
-  background: linear-gradient(135deg, #9e9ec9, #6c63ff);
-}
-
-/* ── TEXTOS ───────────────────────────────── */
 .member strong {
   font-size: 1.05rem;
   color: #111827;
@@ -125,7 +111,6 @@ h1 {
   min-height: 1em;
 }
 
-/* ── CONTRIBUCIONS ────────────────────────── */
 .contrib {
   list-style: none;
   padding: 0;

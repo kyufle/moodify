@@ -1,33 +1,35 @@
 <script setup>
-import { useRouter } from "vue-router";
-import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router"
+import { ref, computed, onMounted, onUnmounted } from "vue"
+import { useI18n } from "vue-i18n"
 
-const router = useRouter();
+const { t } = useI18n()
+const router = useRouter()
 
-const siguiente = () => router.push("/tecnologia");
-const anterior = () => router.push("/funcionalidades");
+const siguiente = () => router.push("/tecnologia")
+const anterior  = () => router.push("/funcionalidades")
 
-const messages = [
-  { from: "user", text: "Em sento molt cansat últimament... com si res tingués sentit." },
-  { from: "bloom", text: "T'escolto, i gràcies per compartir-ho amb mi. 💛 Sentir-se així és molt dur. Vols explicar-me una mica més com ha estat el teu dia?" },
-  { from: "user", text: "Tinc molt d'estrès a la feina i no dormo bé." },
-  { from: "bloom", text: "Té molt de sentit que et sentis esgotat amb tot això. L'estrès i el son van molt de la mà. ¿Et semblaria bé si provéssim un petit gest de cura abans de dormir aquesta nit? 🌙" },
-];
+const messages = computed(() => [
+  { from: "user",  text: t('bloom.m1u') },
+  { from: "bloom", text: t('bloom.m1b') },
+  { from: "user",  text: t('bloom.m2u') },
+  { from: "bloom", text: t('bloom.m2b') },
+])
 
-const visibleCount = ref(0);
-let interval = null;
+const visibleCount = ref(0)
+let interval = null
 
 onMounted(() => {
   interval = setInterval(() => {
-    if (visibleCount.value < messages.length) {
-      visibleCount.value++;
+    if (visibleCount.value < messages.value.length) {
+      visibleCount.value++
     } else {
-      visibleCount.value = 0;
+      visibleCount.value = 0
     }
-  }, 2500);
-});
+  }, 2500)
+})
 
-onUnmounted(() => clearInterval(interval));
+onUnmounted(() => clearInterval(interval))
 </script>
 
 <template>
@@ -36,10 +38,10 @@ onUnmounted(() => clearInterval(interval));
       <div class="bloom-avatar">🌸</div>
       <div class="bloom-info">
         <strong>Bloom</strong>
-        <span>Psicòloga virtual · sempre disponible</span>
+        <span>{{ t('bloom.role') }}</span>
       </div>
       <div class="bloom-status">
-        <span class="dot"></span> En línia
+        <span class="dot"></span> {{ t('bloom.online') }}
       </div>
     </div>
 
@@ -61,15 +63,15 @@ onUnmounted(() => clearInterval(interval));
     </div>
 
     <p class="tagline">
-      Basada en <strong>Ollama IA</strong> · executada localment · les teves dades no surten del servidor
+      {{ t('bloom.tagline') }}
     </p>
 
     <div class="button-group">
       <button @click="anterior" class="btn-primary">
-        <i class="pi pi-arrow-left"></i> Enrere
+        <i class="pi pi-arrow-left"></i> {{ t('btn.back') }}
       </button>
       <button @click="siguiente" class="btn-primary">
-        Coneix la tecnologia <i class="pi pi-arrow-right"></i>
+        {{ t('btn.next_tech') }} <i class="pi pi-arrow-right"></i>
       </button>
     </div>
   </div>
@@ -91,7 +93,6 @@ onUnmounted(() => clearInterval(interval));
   margin-bottom: 40px;
 }
 
-/* HEADER */
 .bloom-header {
   display: flex;
   align-items: center;
@@ -103,26 +104,11 @@ onUnmounted(() => clearInterval(interval));
   text-align: left;
 }
 
-.bloom-avatar {
-  font-size: 2.2rem;
-  line-height: 1;
-}
+.bloom-avatar { font-size: 2.2rem; line-height: 1; }
 
-.bloom-info {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.bloom-info strong {
-  font-size: 1.1rem;
-  color: #111827;
-}
-
-.bloom-info span {
-  font-size: 0.8rem;
-  color: #6b7280;
-}
+.bloom-info { display: flex; flex-direction: column; flex: 1; }
+.bloom-info strong { font-size: 1.1rem; color: #111827; }
+.bloom-info span   { font-size: 0.8rem; color: #6b7280; }
 
 .bloom-status {
   display: flex;
@@ -143,10 +129,9 @@ onUnmounted(() => clearInterval(interval));
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  50%       { opacity: 0.3; }
 }
 
-/* CHAT */
 .chat-window {
   background: rgba(255,255,255,0.5);
   border-radius: 16px;
@@ -160,20 +145,10 @@ onUnmounted(() => clearInterval(interval));
   border: 1px solid rgba(255,171,145,0.2);
 }
 
-.bubble-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-}
+.bubble-row { display: flex; align-items: flex-end; gap: 8px; }
+.bubble-row.user { flex-direction: row-reverse; }
 
-.bubble-row.user {
-  flex-direction: row-reverse;
-}
-
-.mini-avatar {
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
+.mini-avatar { font-size: 1.3rem; flex-shrink: 0; }
 
 .bubble {
   max-width: 78%;
@@ -196,7 +171,6 @@ onUnmounted(() => clearInterval(interval));
   border-bottom-right-radius: 4px;
 }
 
-/* TYPING */
 .typing {
   display: flex;
   align-items: center;
@@ -222,19 +196,12 @@ onUnmounted(() => clearInterval(interval));
 
 @keyframes bounce {
   0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-6px); }
+  30%           { transform: translateY(-6px); }
 }
 
-/* ENTRADA MENSAJES */
-.msg-enter-active {
-  transition: all 0.4s ease;
-}
-.msg-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
-}
+.msg-enter-active { transition: all 0.4s ease; }
+.msg-enter-from   { opacity: 0; transform: translateY(10px); }
 
-/* TAGLINE */
 .tagline {
   font-size: 0.78rem;
   color: #4b5563;

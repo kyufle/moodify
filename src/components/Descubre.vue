@@ -1,67 +1,67 @@
 <script setup>
-import { useRouter } from "vue-router";
-const router = useRouter();
-const siguiente   = () => router.push("/funcionalidades");
-const anterior = () => router.push("/equip");
+import { useRouter } from "vue-router"
+import { useI18n } from "vue-i18n"
+
+const { t } = useI18n()
+const router = useRouter()
+const siguiente = () => router.push("/funcionalidades")
+const anterior  = () => router.push("/equip")
 </script>
 
 <template>
   <div class="caja">
 
-    <!-- ESTADÍSTICA -->
     <div class="stat-hook">
       <span class="stat-num">1 de cada 4</span>
-      <span class="stat-label">joves pateix ansietat o estrès crònic</span>
+      <span class="stat-label">{{ t('descubre.stat') }}</span>
     </div>
 
     <p class="resposta">
-      En una societat accelerada, no sempre tenim espai per expressar com ens sentim.<br>
-      <strong>Moodify és aquest espai.</strong>
+      {{ t('descubre.resposta') }}<br>
+      <strong>{{ t('descubre.strong') }}</strong>
     </p>
 
-    <!-- NOMBRE AAP -->
     <div class="etimologia">
       <div class="etim-block mood">
         <span class="etim-word">Mood</span>
-        <span class="etim-def">Estat d'ànim</span>
+        <span class="etim-def">{{ t('descubre.mood_def') }}</span>
       </div>
       <span class="etim-op">+</span>
       <div class="etim-block modify">
         <span class="etim-word">Modify</span>
-        <span class="etim-def">Transformació</span>
+        <span class="etim-def">{{ t('descubre.modify_def') }}</span>
       </div>
       <span class="etim-op">=</span>
       <div class="etim-block result">
         <span class="etim-word">MOODIFY</span>
-        <span class="etim-def">El teu canvi</span>
+        <span class="etim-def">{{ t('descubre.result_def') }}</span>
       </div>
     </div>
 
-    <!-- PILARS -->
     <div class="pilars-grid">
       <div class="pilar">
         <span class="pilar-emoji">🧠</span>
-        <strong>Mentalitat</strong>
-        <span>Autoconeixement emocional diari</span>
+        <strong>{{ t('descubre.p1') }}</strong>
+        <span>{{ t('descubre.p1_desc') }}</span>
       </div>
       <div class="pilar">
         <span class="pilar-emoji">🔁</span>
-        <strong>Hàbits</strong>
-        <span>Rutines de valor amb seguiment</span>
+        <strong>{{ t('descubre.p2') }}</strong>
+        <span>{{ t('descubre.p2_desc') }}</span>
       </div>
       <div class="pilar">
         <span class="pilar-emoji">📈</span>
-        <strong>Progrés</strong>
-        <span>Visualitza la teva evolució</span>
+        <strong>{{ t('descubre.p3') }}</strong>
+        <span>{{ t('descubre.p3_desc') }}</span>
       </div>
     </div>
 
     <div class="button-group">
       <button @click="anterior" class="btn-primary">
-        <i class="pi pi-arrow-left"></i> Enrere
+        <i class="pi pi-arrow-left"></i> {{ t('btn.back') }}
       </button>
       <button @click="siguiente" class="btn-primary">
-        Veure Funcionalitats <i class="pi pi-arrow-right"></i>
+        {{ t('btn.next_func') }} <i class="pi pi-arrow-right"></i>
       </button>
     </div>
   </div>
@@ -119,18 +119,9 @@ const anterior = () => router.push("/equip");
   min-width: 90px;
 }
 
-.etim-block.mood {
-  background: linear-gradient(135deg, #d6eaf8, #aed6f1);
-  border: 1px solid #93c5fd;
-}
-.etim-block.modify {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-  border: 1px solid #a78bfa;
-}
-.etim-block.result {
-  background: linear-gradient(135deg, #ffab91, #ffccbc);
-  border: 1px solid var(--accent-border);
-}
+.etim-block.mood   { background: linear-gradient(135deg, #d6eaf8, #aed6f1); border: 1px solid #93c5fd; }
+.etim-block.modify { background: linear-gradient(135deg, #ede9fe, #ddd6fe); border: 1px solid #a78bfa; }
+.etim-block.result { background: linear-gradient(135deg, #ffab91, #ffccbc); border: 1px solid var(--accent-border); }
 
 .etim-word {
   font-size: 1.05rem;
@@ -150,7 +141,6 @@ const anterior = () => router.push("/equip");
   color: #d1d5db;
 }
 
-/* ── PILARS ───────────────────────────────── */
 .pilars-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -177,20 +167,7 @@ const anterior = () => router.push("/equip");
 
 .pilar:hover { transform: translateY(-5px); }
 
-.pilar-emoji {
-  font-size: 1.9rem;
-  line-height: 1;
-}
-
-.pilar strong {
-  font-size: 1rem;
-  color: #111827;
-}
-
-.pilar span {
-  font-size: 0.78rem;
-  color: #6b7280;
-  text-align: center;
-  line-height: 1.4;
-}
+.pilar-emoji { font-size: 1.9rem; line-height: 1; }
+.pilar strong { font-size: 1rem; color: #111827; }
+.pilar span   { font-size: 0.78rem; color: #6b7280; text-align: center; line-height: 1.4; }
 </style>

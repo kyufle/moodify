@@ -1,60 +1,33 @@
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-const router = useRouter();
-const siguiente   = () => router.push("/bloom");
-const anterior = () => router.push("/descubre");
+import { ref, computed } from "vue"
+import { useRouter } from "vue-router"
+import { useI18n } from "vue-i18n"
 
-const flipped = ref(new Set());
+const { t } = useI18n()
+const router = useRouter()
+const siguiente = () => router.push("/bloom")
+const anterior  = () => router.push("/descubre")
+
+const flipped = ref(new Set())
 const toggle = (i) => {
-  const s = new Set(flipped.value);
-  s.has(i) ? s.delete(i) : s.add(i);
-  flipped.value = s;
-};
+  const s = new Set(flipped.value)
+  s.has(i) ? s.delete(i) : s.add(i)
+  flipped.value = s
+}
 
-const cards = [
-  {
-    color:  'peach',
-    emoji:  '📅',
-    tip:    'Diari Emocional',
-    desc:   'Registra el teu estat d\'ànim cada dia amb emojis i notes. Visualitza el teu historial en un calendari mensual.',
-  },
-  {
-    color:  'lightblue',
-    emoji:  '📊',
-    tip:    'Gràfics d\'Evolució',
-    desc:   'Estadístiques setmanals i mensuals del teu benestar. Descobreix patrons i tendències al teu estat anímic.',
-  },
-  {
-    color:  'yellow',
-    emoji:  '🏆',
-    tip:    'Sistema d\'Hàbits',
-    desc:   'Crea hàbits personalitzats i fes-ne seguiment diari. Guanya punts i racxes per mantenir la constància.',
-  },
-  {
-    color:  'pink',
-    emoji:  '👥',
-    tip:    'Fòrum Comunitari',
-    desc:   'Comparteix publicacions, dona likes i segueix altres usuaris. Veu l\'estat d\'ànim de les persones que segueixes.',
-  },
-  {
-    color:  'lavender',
-    emoji:  '🌸',
-    tip:    'Chat amb Bloom',
-    desc:   'Parla amb la nostra psicòloga virtual disponible 24/7. Escolta activa, empàtica i totalment privada.',
-  },
-  {
-    color:  'green',
-    emoji:  '😴',
-    tip:    'Seguiment del Son',
-    desc:   'Registra les hores dormides i la qualitat del son. Relaciona el descans amb el teu estat d\'ànim diari.',
-  },
-]
+const cards = computed(() => [
+  { color: 'peach',     emoji: '📅', tip: t('funcionalitats.c1'), desc: t('funcionalitats.c1d') },
+  { color: 'lightblue', emoji: '📊', tip: t('funcionalitats.c2'), desc: t('funcionalitats.c2d') },
+  { color: 'yellow',    emoji: '🏆', tip: t('funcionalitats.c3'), desc: t('funcionalitats.c3d') },
+  { color: 'pink',      emoji: '👥', tip: t('funcionalitats.c4'), desc: t('funcionalitats.c4d') },
+  { color: 'lavender',  emoji: '🌸', tip: t('funcionalitats.c5'), desc: t('funcionalitats.c5d') },
+  { color: 'green',     emoji: '😴', tip: t('funcionalitats.c6'), desc: t('funcionalitats.c6d') },
+])
 </script>
 
 <template>
   <div class="caja">
-    <h1>Funcionalitats</h1>
+    <h1>{{ t('funcionalitats.title') }}</h1>
 
     <div class="cards">
       <div v-for="(card, i) in cards" :key="i" class="flip-wrap" @click="toggle(i)">
@@ -77,10 +50,10 @@ const cards = [
 
     <div class="button-group">
       <button @click="anterior" class="btn-primary">
-        <i class="pi pi-arrow-left"></i> Enrere
+        <i class="pi pi-arrow-left"></i> {{ t('btn.back') }}
       </button>
       <button @click="siguiente" class="btn-primary">
-        Coneix a Bloom <i class="pi pi-arrow-right"></i>
+        {{ t('btn.next_bloom') }} <i class="pi pi-arrow-right"></i>
       </button>
     </div>
   </div>
@@ -102,12 +75,8 @@ h1 {
   width: 100%;
 }
 
-@media (max-width: 700px) {
-  .cards { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 480px) {
-  .cards { grid-template-columns: 1fr; }
-}
+@media (max-width: 700px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .cards { grid-template-columns: 1fr; } }
 
 .flip-wrap {
   perspective: 900px;
@@ -126,11 +95,8 @@ h1 {
 }
 
 .flip-wrap:hover .flip-inner,
-.flip-inner.flipped {
-  transform: rotateY(180deg);
-}
+.flip-inner.flipped { transform: rotateY(180deg); }
 
-/* ── CARAS ────────────────────────────────── */
 .flip-front,
 .flip-back {
   position: absolute;
@@ -153,7 +119,6 @@ h1 {
   border: 2px solid rgba(255,255,255,0.7);
 }
 
-/* ── COLORES CARA FRONTAL ─────────────────── */
 .peach    { background: linear-gradient(135deg, #ffab91, #ffccbc); }
 .lightblue{ background: linear-gradient(135deg, #d6eaf8, #aed6f1); }
 .yellow   { background: linear-gradient(135deg, #fff176, #fff9ae); }
@@ -161,26 +126,8 @@ h1 {
 .lavender { background: linear-gradient(135deg, #e6e6fa, #d8bfd8); }
 .green    { background: linear-gradient(135deg, #b2dfdb, #80cbc4); }
 
-.card-emoji {
-  font-size: 2.2rem;
-  line-height: 1;
-}
-.card-emoji.small {
-  font-size: 1.4rem;
-}
-
-.tip {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-}
-
-.desc {
-  font-size: 0.78rem;
-  color: #4b5563;
-  line-height: 1.5;
-  margin: 0;
-  text-align: center;
-}
+.card-emoji       { font-size: 2.2rem; line-height: 1; }
+.card-emoji.small { font-size: 1.4rem; }
+.tip  { font-size: 1rem;   font-weight: 700; color: #1f2937; margin: 0; }
+.desc { font-size: 0.78rem; color: #4b5563; line-height: 1.5; margin: 0; text-align: center; }
 </style>

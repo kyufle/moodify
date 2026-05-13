@@ -1,22 +1,26 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import LangSelector from './components/LangSelector.vue'
 
 const router = useRouter()
 const route  = useRoute()
+const { t }  = useI18n()
 
 const slides = [
-  { path: '/',              label: 'Inici' },
-  { path: '/equip',         label: 'Equip' },
-  { path: '/descubre',      label: 'Moodify' },
-  { path: '/funcionalitats', label: 'Funcionalitats' },
-  { path: '/bloom',         label: 'Bloom IA' },
-  { path: '/tecnologia',    label: 'Tecnologia' },
-  { path: '/demo',          label: 'Demo' },
+  { path: '/',                key: 'nav.inici' },
+  { path: '/equip',           key: 'nav.equip' },
+  { path: '/descubre',        key: 'nav.moodify' },
+  { path: '/funcionalidades', key: 'nav.funcionalitats' },
+  { path: '/bloom',           key: 'nav.bloom' },
+  { path: '/tecnologia',      key: 'nav.tecnologia' },
+  { path: '/demo',            key: 'nav.demo' },
 ]
 </script>
 
 <template>
   <div id="center">
+    <LangSelector />
     <router-view />
 
     <nav class="dot-nav">
@@ -24,7 +28,7 @@ const slides = [
         v-for="slide in slides"
         :key="slide.path"
         :class="['dot', { active: route.path === slide.path }]"
-        :title="slide.label"
+        :title="t(slide.key)"
         @click="router.push(slide.path)"
       />
     </nav>
