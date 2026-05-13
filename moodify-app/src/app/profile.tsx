@@ -16,6 +16,7 @@ import { avatarMap } from '../utils/utils';
 import { HabitProgress } from '@/components/profile/HabitProgress';
 import { ChallengesSection } from '@/components/profile/ChallengesSection';
 import { AchievementsBar } from '@/components/profile/AchievementsBar';
+import { ProgressDashboard } from '@/components/calendar/ProgressDashboard';
 
 const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://moodify_backend.test/api/';
 
@@ -237,6 +238,7 @@ export default function ProfileScreen() {
             <View style={styles.card}>
               <HabitProgress onDataLoaded={setHabitsData} onWeeklyLoaded={setWeeklyData} />
               <ChallengesSection onDataLoaded={setChallengesData} />
+              <ProgressDashboard />
               <AchievementsBar habits={habitsData} challenges={challengesData} weeklyStatus={weeklyData} unlockedIds={unlockedIds} />
             </View>
           ) : (

@@ -228,7 +228,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
           {replyingTo && (
             <View style={styles.replyInfoBar}>
               <Text style={styles.replyInfoText}>Respondiendo a <Text style={{ fontWeight: 'bold' }}>{replyingTo.name}</Text></Text>
-              <TouchableOpacity onPress={() => setReplyingTo(null)}><Feather name="x-circle" size={16} color="#6366F1" /></TouchableOpacity>
+              <TouchableOpacity onPress={() => setReplyingTo(null)}><Feather name="x-circle" size={16} color="'#FFECF0'" /></TouchableOpacity>
             </View>
           )}
           <View style={styles.commentInputBar}>
@@ -240,7 +240,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
               multiline
             />
             <TouchableOpacity onPress={handleSendComment} disabled={!commentText.trim() || postingLoading}>
-              {postingLoading ? <ActivityIndicator size="small" color="#6366F1" /> : <Feather name="send" size={24} color={commentText.trim() ? "#6366F1" : "#CBD5E1"} />}
+              {postingLoading ? <ActivityIndicator size="small" color="'#FFECF0'" /> : <Feather name="send" size={24} color={commentText.trim() ? "'#FFECF0'" : "#CBD5E1"} />}
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -254,7 +254,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
     <View style={styles.root}>
       <StatusBar barStyle="light-content" />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <LinearGradient colors={['#4F46E5', '#7C3AED']} style={styles.header}>
+        <LinearGradient colors={['#fde3e9', '#fde3e9']} style={styles.header}>
           <View style={styles.headerInner}>
             <View style={styles.headerLeft}>
               <View style={styles.headerAvatarContainer}><Image source={avatarMap[currentUserAvatar]} style={styles.avatarImgSmall} /></View>
@@ -302,7 +302,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
 
               <View style={styles.feedHeader}><Text style={styles.feedTitle}>{feedTitle}</Text></View>
 
-              {loadingPosts && posts.length === 0 ? <ActivityIndicator color="#6366F1" style={{ marginVertical: 40 }} /> : (
+              {loadingPosts && posts.length === 0 ? <ActivityIndicator color="'#FFECF0'" style={{ marginVertical: 40 }} /> : (
                 posts.length === 0 ? (
                     <View style={styles.emptyFeedContainer}>
                       <Feather name="users" size={40} color="#CBD5E1" />
@@ -333,51 +333,272 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
   );
 };
 
-// ... estilos sin cambios
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#F8FAFC' },
-  header: { paddingTop: 60, paddingHorizontal: 20, paddingBottom: 15 },
-  headerInner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  headerAvatarContainer: { width: 40, height: 40, borderRadius: 20, overflow: 'hidden' },
-  avatarImgSmall: { width: '100%', height: '100%', resizeMode: 'cover' },
-  headerGreeting: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  headerSub: { color: '#fff', opacity: 0.7, fontSize: 12 },
-  tabBar: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 12, marginTop: 20, padding: 4 },
-  tabItem: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 10 },
-  tabItemActive: { backgroundColor: '#fff' },
-  tabText: { color: '#fff', fontWeight: '600' },
-  tabTextActive: { color: '#4F46E5' },
-  scrollContent: { paddingBottom: 120 },
-  inlineComposeContainer: { backgroundColor: '#fff', marginHorizontal: 20, marginTop: 15, borderRadius: 20, padding: 12, elevation: 2 },
-  inlineComposeHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  composeAvatar: { width: 38, height: 38, borderRadius: 19, overflow: 'hidden', marginTop: 2 },
-  inlineInput: { flex: 1, fontSize: 16, color: '#1E293B', paddingTop: 10, textAlignVertical: 'top', minHeight: 45 },
-  inlineActionRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: 10 },
-  inlinePublishBtn: { backgroundColor: '#6366F1', paddingHorizontal: 20, paddingVertical: 8, borderRadius: 12 },
-  inlinePublishBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
-  feedHeader: { paddingHorizontal: 20, marginTop: 20, marginBottom: 10 },
-  feedTitle: { fontSize: 18, fontWeight: 'bold', color: '#1E293B' },
-  emptyFeedContainer: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40, marginTop: 40 },
-  emptyFeedText: { textAlign: 'center', color: '#94A3B8', marginTop: 15, fontSize: 14, lineHeight: 20 },
-  discoverBtn: { marginTop: 20, backgroundColor: '#EEF2FF', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 12 },
-  discoverBtnText: { color: '#6366F1', fontWeight: '700' },
-  commentHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 60, paddingBottom: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
-  commentHeaderTitle: { fontSize: 16, fontWeight: 'bold', color: '#1E293B' },
-  divider: { height: 1, backgroundColor: '#F1F5F9', marginVertical: 10 },
-  repliesTitle: { fontSize: 14, fontWeight: 'bold', color: '#64748B', marginLeft: 20, marginBottom: 15 },
-  commentCard: { flexDirection: 'row', marginBottom: 20, paddingHorizontal: 20, gap: 12 },
-  avatar: { width: 35, height: 35, borderRadius: 17.5 },
-  avatarSmall: { width: 28, height: 28, borderRadius: 14 },
-  commentContent: { flex: 1, backgroundColor: '#F8FAFC', padding: 12, borderRadius: 15 },
-  author: { fontWeight: 'bold', marginBottom: 2, fontSize: 13 },
-  text: { color: '#334155', fontSize: 14 },
-  replyBtnText: { color: '#6366F1', fontSize: 12, fontWeight: '700', marginTop: 5 },
-  replyInfoBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 8, backgroundColor: '#EEF2FF' },
-  replyInfoText: { fontSize: 12, color: '#4F46E5' },
-  commentInputBar: { flexDirection: 'row', alignItems: 'center', padding: 12, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#F1F5F9', gap: 10 },
-  inputField: { flex: 1, backgroundColor: '#F8FAFC', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8, maxHeight: 100 },
-  emptyText: { textAlign: 'center', marginTop: 20, color: '#94A3B8' },
+  root: { 
+    flex: 1, 
+    backgroundColor: '#FFF9FB' // Un blanco rosado muy suave
+  },
+  header: { 
+    paddingTop: 60, 
+    paddingHorizontal: 20, 
+    paddingBottom: 15,
+    backgroundColor: '#FFDDE4' // Rosa pastel suave
+  },
+  headerInner: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center' 
+  },
+  headerLeft: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 12 
+  },
+  headerAvatarContainer: { 
+    width: 44, 
+    height: 44, 
+    borderRadius: 22, 
+    borderWidth: 2, 
+    borderColor: '#FFF', 
+    overflow: 'hidden' 
+  },
+  avatarImgSmall: { 
+    width: '100%', 
+    height: '100%', 
+    resizeMode: 'cover' 
+  },
+  headerGreeting: { 
+    color: '#7D5A5A', // Marrón suave para mejor contraste Kawaii
+    fontSize: 18, 
+    fontWeight: '800' 
+  },
+  headerSub: { 
+    color: '#7D5A5A', 
+    opacity: 0.6, 
+    fontSize: 13,
+    fontWeight: '600'
+  },
+  tabBar: { 
+    flexDirection: 'row', 
+    backgroundColor: 'rgba(255,255,255,0.4)', 
+    borderRadius: 20, 
+    marginTop: 20, 
+    padding: 5 
+  },
+  tabItem: { 
+    flex: 1, 
+    paddingVertical: 10, 
+    alignItems: 'center', 
+    borderRadius: 15 
+  },
+  tabItemActive: { 
+    backgroundColor: '#FFF',
+    // Sombra suave para que parezca "flotante"
+    shadowColor: '#FFB7C5',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  tabText: { 
+    color: '#A28B8B', 
+    fontWeight: '600' 
+  },
+  tabTextActive: { 
+    color: '#FF8DA1' // Rosa vibrante pero dulce
+  },
+  scrollContent: { 
+    paddingBottom: 120 
+  },
+  inlineComposeContainer: { 
+    backgroundColor: '#FFF', 
+    marginHorizontal: 20, 
+    marginTop: 15, 
+    borderRadius: 25, 
+    padding: 15, 
+    borderWidth: 2,
+    borderColor: '#FFECF0'
+  },
+  inlineComposeHeader: { 
+    flexDirection: 'row', 
+    alignItems: 'flex-start', 
+    gap: 10 
+  },
+  composeAvatar: { 
+    width: 40, 
+    height: 40, 
+    borderRadius: 20, 
+    overflow: 'hidden'
+  },
+  inlineInput: { 
+    flex: 1, 
+    fontSize: 16, 
+    color: '#7D5A5A', 
+    paddingTop: 10, 
+    textAlignVertical: 'top', 
+    minHeight: 45 
+  },
+  inlineActionRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'flex-end', 
+    marginTop: 10, 
+    borderTopWidth: 1.5, 
+    borderTopColor: '#FFECF0', 
+    paddingTop: 10 
+  },
+  inlinePublishBtn: { 
+    backgroundColor: '#B2E2F2', // Azul cielo pastel
+    paddingHorizontal: 22, 
+    paddingVertical: 10, 
+    borderRadius: 15 
+  },
+  inlinePublishBtnText: { 
+    color: '#5A808D', 
+    fontWeight: '800', 
+    fontSize: 14 
+  },
+  feedHeader: { 
+    paddingHorizontal: 20, 
+    marginTop: 25, 
+    marginBottom: 10 
+  },
+  feedTitle: { 
+    fontSize: 20, 
+    fontWeight: '900', 
+    color: '#7D5A5A' 
+  },
+  emptyFeedContainer: { 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    paddingHorizontal: 40, 
+    marginTop: 40 
+  },
+  emptyFeedText: { 
+    textAlign: 'center', 
+    color: '#B8A1A1', 
+    marginTop: 15, 
+    fontSize: 15, 
+    lineHeight: 22 
+  },
+  discoverBtn: { 
+    marginTop: 20, 
+    backgroundColor: '#E2F0CB', // Verde menta suave
+    paddingHorizontal: 25, 
+    paddingVertical: 12, 
+    borderRadius: 18 
+  },
+  discoverBtnText: { 
+    color: '#7B8D5A', 
+    fontWeight: '800' 
+  },
+  commentHeader: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between', 
+    paddingHorizontal: 20, 
+    paddingTop: 60, 
+    paddingBottom: 20, 
+    backgroundColor: '#FFF', 
+    borderBottomWidth: 2, 
+    borderBottomColor: '#FFECF0' 
+  },
+  commentHeaderTitle: { 
+    fontSize: 18, 
+    fontWeight: '800', 
+    color: '#7D5A5A' 
+  },
+  divider: { 
+    height: 2, 
+    backgroundColor: '#FFECF0', 
+    marginVertical: 12 
+  },
+  repliesTitle: { 
+    fontSize: 14, 
+    fontWeight: '800', 
+    color: '#D4A5A5', 
+    marginLeft: 20, 
+    marginBottom: 15 
+  },
+  commentCard: { 
+    flexDirection: 'row', 
+    marginBottom: 20, 
+    paddingHorizontal: 20, 
+    gap: 12 
+  },
+  avatar: { 
+    width: 40, 
+    height: 40, 
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#FFDDE4'
+  },
+  avatarSmall: { 
+    width: 30, 
+    height: 30, 
+    borderRadius: 15 
+  },
+  commentContent: { 
+    flex: 1, 
+    backgroundColor: '#FFF0F3', // Rosa nube muy claro
+    padding: 15, 
+    borderRadius: 20,
+    borderTopLeftRadius: 5 // Estilo burbuja de chat
+  },
+  author: { 
+    fontWeight: '800', 
+    marginBottom: 4, 
+    fontSize: 14, 
+    color: '#7D5A5A' 
+  },
+  text: { 
+    color: '#8A6E6E', 
+    fontSize: 15,
+    lineHeight: 20
+  },
+  replyBtnText: { 
+    color: '#FF8DA1', 
+    fontSize: 13, 
+    fontWeight: '800', 
+    marginTop: 8 
+  },
+  replyInfoBar: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    paddingHorizontal: 20, 
+    paddingVertical: 10, 
+    backgroundColor: '#FFF0F3' 
+  },
+  replyInfoText: { 
+    fontSize: 13, 
+    color: '#D4A5A5',
+    fontWeight: '600'
+  },
+  commentInputBar: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: 15, 
+    backgroundColor: '#FFF', 
+    borderTopWidth: 2, 
+    borderTopColor: '#FFECF0', 
+    gap: 12 
+  },
+  inputField: { 
+    flex: 1, 
+    backgroundColor: '#FFF9FB', 
+    borderRadius: 25, 
+    paddingHorizontal: 20, 
+    paddingVertical: 10, 
+    maxHeight: 100,
+    borderWidth: 1.5,
+    borderColor: '#FFECF0',
+    color: '#7D5A5A'
+  },
+  emptyText: { 
+    textAlign: 'center', 
+    marginTop: 20, 
+    color: '#D4A5A5',
+    fontWeight: '600'
+  },
 });
 
 export default ForumView;

@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\HabitController;
 use App\Http\Controllers\MoodRegisterController;
+use App\Http\Controllers\StaffAnnouncementController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommunityController;
@@ -24,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/streakRegister', [UserController::class, 'streakRegister']);
     Route::post('/actionAlert', [UserController::class, 'actionAlert']);
     Route::post('/saveSleepLog', [UserController::class, 'saveSleepLog']);
+    Route::get('/averageSleep', [UserController::class, 'getMonthlySleepAverage']);
     Route::post('/fillInHours', [UserController::class, 'fillInHours']);
     Route::post('/update-profile', [UserController::class, 'updateProfile']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
@@ -34,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Estrés y Estado
     Route::get('/getStatus', [StressController::class, 'getStatus']);
     Route::post('/store', [StressController::class, 'store']);
+    Route::get('/stressSummary', [StressController::class, 'getMonthlyDominantEmotion']);
 
     // Estados de Ánimo (Moods)
     Route::post('/save-mood', [MoodRegisterController::class, 'saveMood']);
@@ -93,4 +96,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('community/users/{id}/unblock', [CommunityController::class, 'unblockUser']);
     Route::get('/user/alerts', [CommunityController::class, 'getAlerts']);
     Route::post('/user/alerts/dismiss', [CommunityController::class, 'dismissAlert']);
-});
+
+Route::get('/getAnnouncements', [StaffAnnouncementController::class, 'index']);
+    Route::post('/storeAnnouncement', [StaffAnnouncementController::class, 'store']);
+
+    });

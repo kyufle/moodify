@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'pablo',
             'email' => 'pablo@gmail.com',
             'password' => Hash::make('test'),
-            'type_user' => 'admin',
+            'type_user' => 'user',
             'username' => 'pablo',
             'image_id' => 'avatar26'
         ]);

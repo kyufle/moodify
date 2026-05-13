@@ -209,6 +209,15 @@ return new class extends Migration {
         $table->unsignedBigInteger('reference_id'); // El ID del post_like, comment, o followed_id
         $table->timestamps();
     });
+    Schema::create('staff_announcements', function (Blueprint $table) {
+    $table->id();
+    $table->string('title');
+    $table->text('content');
+    $table->string('tag'); // OFICIAL, AVISO, CONSEJO
+    $table->string('icon');
+    $table->json('colors'); // Guardaremos el array de colores
+    $table->timestamps();
+});
     }
 
     /**
