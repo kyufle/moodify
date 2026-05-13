@@ -173,14 +173,51 @@ return new class extends Migration {
             $table->timestamp('date');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
         });
+        Schema::create('comments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('publication_id')->constrained('publications')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->text('text_comments');
+            $table->timestamp('date');
+            $table->foreignId('parent_id')->nullable()->constrained('comments')->onDelete('cascade');
+        });
+        Schema::create('post_likes', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('publication_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+            $table->unique(['user_id', 'publication_id']);
+        });
 
-
+        Schema::create('user_blocks', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('blocker_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('blocked_id')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+            $table->unique(['blocker_id', 'blocked_id']);
+        });
         Schema::create('followed_follower', function (Blueprint $table) {
             $table->foreignId('follower_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('followed_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
             $table->primary(['follower_id', 'followed_id']);
         });
+        Schema::create('dismissed_alerts', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        $table->string('alert_type'); // Guardará 'like', 'comment', o 'follow'
+        $table->unsignedBigInteger('reference_id'); // El ID del post_like, comment, o followed_id
+        $table->timestamps();
+    });
+    Schema::create('staff_announcements', function (Blueprint $table) {
+    $table->id();
+    $table->string('title');
+    $table->text('content');
+    $table->string('tag'); // OFICIAL, AVISO, CONSEJO
+    $table->string('icon');
+    $table->json('colors'); // Guardaremos el array de colores
+    $table->timestamps();
+});
     }
 
     /**

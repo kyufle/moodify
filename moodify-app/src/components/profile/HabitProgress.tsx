@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { format, parseISO } from 'date-fns';
-import { es, enUS, ca } from 'date-fns/locale'; // Importamos los idiomas necesarios
+import { es, enUS, ca } from 'date-fns/locale';
 import { UserContext } from '../../components/user-provider';
 import { useTranslation } from 'react-i18next';
 
@@ -136,9 +136,9 @@ export const HabitProgress = () => {
   };
 
   const deleteHabit = (habitId: number) => {
-    Alert.alert("Eliminar", "¿Borrar este hábito para siempre?", [
-      { text: "No" },
-      { text: "Borrar", style: "destructive", onPress: async () => {
+    Alert.alert(t('forum.erase'), t('forum.deleteHabit'), [
+      { text: t('forum.no') },
+      { text: t('forum.erase'), style: "destructive", onPress: async () => {
           try {
             await fetch(`${process.env.EXPO_PUBLIC_API_URL}habits/${habitId}`, {
               method: 'DELETE',
@@ -168,13 +168,13 @@ export const HabitProgress = () => {
           <Feather name="plus" size={24} color="white" />
         </TouchableOpacity>
       </View>
-
       {/* 2. WEEKLY STRIP - TRADUCIDO DINÁMICAMENTE */}
       <View style={styles.weeklyStrip}>
         {weeklyStatus.map((item, index) => {
           // Parseamos la fecha que viene de la API para obtener el nombre del día en el idioma actual
           const dayNameLocal = format(parseISO(item.date), 'EEEEEE', { locale: currentLocale });
-          const dayNumber = item.date.split('-').pop();
+          
+          const dayNumber = parseISO(item.date)?.getDate();
 
           return (
             <View key={index} style={styles.dayCol}>
@@ -230,15 +230,15 @@ export const HabitProgress = () => {
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.overlay}>
           <View style={styles.modal}>
-            <Text style={styles.modalTitle}>Nuevo Hábito</Text>
+            <Text style={styles.modalTitle}>{t('profile.newHabit')}</Text>
             <TextInput 
               style={styles.input} 
-              placeholder="¿Qué vas a hacer hoy?" 
+              placeholder={t('profile.goingToday')}
               value={newName} 
               onChangeText={setNewName}
               placeholderTextColor="#94A3B8"
             />
-            <Text style={styles.label}>Icono</Text>
+            <Text style={styles.label}>{t('profile.icon')}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
               {AVAILABLE_ICONS.map(icon => (
                 <TouchableOpacity 
@@ -250,7 +250,7 @@ export const HabitProgress = () => {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-            <Text style={styles.label}>Color</Text>
+            <Text style={styles.label}>{t('profile.color')}</Text>
             <View style={styles.colorGrid}>
               {AVAILABLE_COLORS.map(c => (
                 <TouchableOpacity 
@@ -260,14 +260,14 @@ export const HabitProgress = () => {
                 />
               ))}
             </View>
-            <div style={styles.modalActions}>
+            <View style={styles.modalActions}>
               <TouchableOpacity style={styles.btnCancel} onPress={() => setModalVisible(false)}>
-                <Text style={{ color: '#64748B', fontWeight: '700' }}>Cerrar</Text>
+                <Text style={{ color: '#64748B', fontWeight: '700' }}>{t('profile.close')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.btnSave, { backgroundColor: selectedColor }] as ViewStyle[]} onPress={handleCreateHabit}>
-                <Text style={{ color: 'white', fontWeight: '800' }}>Guardar</Text>
+                <Text style={{ color: 'white', fontWeight: '800' }}>{t('profile.save')}</Text>
               </TouchableOpacity>
-            </div>
+            </View>
           </View>
         </View>
       </Modal>

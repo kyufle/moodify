@@ -138,7 +138,7 @@ export default function CreateUser({ onChangePage }) {
               <View style={styles.inputWrapper}>
                 <TouchableOpacity activeOpacity={1} onPress={() => userRef.current?.focus()} style={styles.styledInputContainer}>
                   <View style={{ marginLeft: 20 }} pointerEvents="none">
-                    <Icon name="at" type="material-community" color="#FF9A7B" size={28} />
+                    <Icon name="at" type="material-community" color="#a1a1a1" size={28} />
                   </View>
                   <TextInput
                     ref={userRef}
@@ -154,7 +154,7 @@ export default function CreateUser({ onChangePage }) {
                     }}
                     style={styles.textInput}
                     placeholder={t('loginRegister.user')}
-                    placeholderTextColor="#FFB7A1"
+                    placeholderTextColor="#a1a1a1"
                     autoCapitalize="none"
                     returnKeyType="next"
                     onSubmitEditing={() => nameRef.current?.focus()}
@@ -164,15 +164,15 @@ export default function CreateUser({ onChangePage }) {
 
                 <TouchableOpacity activeOpacity={1} onPress={() => nameRef.current?.focus()} style={styles.styledInputContainer}>
                   <View style={{ marginLeft: 20 }} pointerEvents="none">
-                    <Icon name="account-outline" type="material-community" color="#FF9A7B" size={28} />
+                    <Icon name="account-outline" type="material-community" color="#a1a1a1" size={28} />
                   </View>
-                  <TextInput ref={nameRef} value={userData.fullName} onChangeText={(text) => setUserData({ ...userData, fullName: text })} style={styles.textInput} placeholder={t('loginRegister.completeName')} placeholderTextColor="#FFB7A1" returnKeyType="next" onSubmitEditing={() => emailRef.current?.focus()} />
+                  <TextInput ref={nameRef} value={userData.fullName} onChangeText={(text) => setUserData({ ...userData, fullName: text })} style={styles.textInput} placeholder={t('loginRegister.completeName')} placeholderTextColor="#a1a1a1" returnKeyType="next" onSubmitEditing={() => emailRef.current?.focus()} />
                 </TouchableOpacity>
                 {!!error.fullName && <HelperText type="error" visible>{t(error.fullName)}</HelperText>}
 
                 <TouchableOpacity activeOpacity={1} onPress={() => emailRef.current?.focus()} style={styles.styledInputContainer}>
                   <View style={{ marginLeft: 20 }} pointerEvents="none">
-                    <Icon name="email-outline" type="material-community" color="#FF9A7B" size={28} />
+                    <Icon name="email-outline" type="material-community" color="#a1a1a1" size={28} />
                   </View>
                   <TextInput
                     ref={emailRef}
@@ -180,7 +180,7 @@ export default function CreateUser({ onChangePage }) {
                     onChangeText={(text) => setUserData({ ...userData, email: text.toLowerCase() })}
                     style={styles.textInput}
                     placeholder={t('loginRegister.email')}
-                    placeholderTextColor="#FFB7A1"
+                    placeholderTextColor="#a1a1a1"
                     keyboardType="email-address"
                     autoCapitalize="none"
                     returnKeyType="next"
@@ -191,22 +191,22 @@ export default function CreateUser({ onChangePage }) {
 
                 <TouchableOpacity activeOpacity={1} onPress={() => passRef.current?.focus()} style={styles.styledInputContainer}>
                   <View style={{ marginLeft: 20 }} pointerEvents="none">
-                    <Icon name="lock-outline" type="material-community" color="#FF9A7B" size={26} />
+                    <Icon name="lock-outline" type="material-community" color="#a1a1a1" size={26} />
                   </View>
-                  <TextInput ref={passRef} value={userData.password} onChangeText={(text) => setUserData({ ...userData, password: text })} style={styles.textInput} secureTextEntry={!isPasswordVisible} placeholder={t('loginRegister.password')} placeholderTextColor="#FFB7A1" returnKeyType="next" onSubmitEditing={() => confirmRef.current?.focus()} />
+                  <TextInput ref={passRef} value={userData.password} onChangeText={(text) => setUserData({ ...userData, password: text })} style={styles.textInput} secureTextEntry={!isPasswordVisible} placeholder={t('loginRegister.password')} placeholderTextColor="#a1a1a1" returnKeyType="next" onSubmitEditing={() => confirmRef.current?.focus()} />
                   <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={{ marginRight: 20 }}>
-                    <Icon name={isPasswordVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
+                    <Icon name={isPasswordVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#a1a1a1" size={24} />
                   </TouchableOpacity>
                 </TouchableOpacity>
                 {!!error.password && <HelperText type="error" visible>{t(error.password)}</HelperText>}
 
                 <TouchableOpacity activeOpacity={1} onPress={() => confirmRef.current?.focus()} style={styles.styledInputContainer}>
                   <View style={{ marginLeft: 20 }} pointerEvents="none">
-                    <Icon name="lock-check-outline" type="material-community" color="#FF9A7B" size={26} />
+                    <Icon name="lock-check-outline" type="material-community" color="#a1a1a1" size={26} />
                   </View>
-                  <TextInput ref={confirmRef} value={userData.password_confirmation} onChangeText={(text) => setUserData({ ...userData, password_confirmation: text })} style={styles.textInput} secureTextEntry={!isConfirmVisible} placeholder={t('loginRegister.repeatPassword')} placeholderTextColor="#FFB7A1" returnKeyType="done" onSubmitEditing={handleFetch} />
+                  <TextInput ref={confirmRef} value={userData.password_confirmation} onChangeText={(text) => setUserData({ ...userData, password_confirmation: text })} style={styles.textInput} secureTextEntry={!isConfirmVisible} placeholder={t('loginRegister.repeatPassword')} placeholderTextColor="#a1a1a1" returnKeyType="done" onSubmitEditing={handleFetch} />
                   <TouchableOpacity onPress={() => setIsConfirmVisible(!isConfirmVisible)} style={{ marginRight: 20 }}>
-                    <Icon name={isConfirmVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
+                    <Icon name={isConfirmVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#a1a1a1" size={24} />
                   </TouchableOpacity>
                 </TouchableOpacity>
                 {!!error.password_confirmation ? <HelperText type="error" visible>{t(error.password_confirmation)}</HelperText> : (passwordsMatchError || errorForRepeatPassword) ? <HelperText type="error" visible>{t('loginRegister.passwordsDontMatch')}</HelperText> : null}
@@ -232,12 +232,12 @@ export default function CreateUser({ onChangePage }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
   scrollContainer: { flexGrow: 1, justifyContent: 'center' },
-  formSection: { paddingHorizontal: 30, paddingVertical: 20, alignItems: 'center' },
+  formSection: { paddingHorizontal: 30,  alignItems: 'center' },
   inputWrapper: { width: '100%', marginBottom: 10 },
-  styledInputContainer: { backgroundColor: '#FFE5D9', height: 65, borderRadius: 20, flexDirection: 'row', alignItems: 'center', width: '100%', marginTop: 10 },
+  styledInputContainer: { backgroundColor: '#e3e3ff', height: 65, borderRadius: 20, flexDirection: 'row', alignItems: 'center', width: '100%', marginTop: 10 },
   textInput: { flex: 1, paddingHorizontal: 15, fontSize: 16, color: '#333', fontWeight: '500', fontFamily: Fonts.sans },
   mainButtonContainer: { width: '100%', marginTop: 20 },
-  mainButton: { backgroundColor: '#a5adb0', height: 60, borderRadius: 20 },
+  mainButton: { backgroundColor: 'rgb(186, 209, 216)', height: 60, borderRadius: 20 },
   mainButtonText: { fontSize: 18, fontWeight: '600', color: '#FFFFFF' },
   footerContainer: { marginTop: 20, paddingBottom: 20 },
   footerText: { fontSize: 15, color: '#333' },

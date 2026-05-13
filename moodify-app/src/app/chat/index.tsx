@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { 
   View, Text, StyleSheet, FlatList, TouchableOpacity, 
-  Image, TextInput, ActivityIndicator, Keyboard 
+  Image, TextInput, ActivityIndicator, Keyboard, 
+  Alert
 } from 'react-native';
 import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -21,6 +22,7 @@ import { StaticBottomNavBar } from '@/components/StaticBottomNavBar';
 import { ChatListCard } from '@/components/chat/ChatListCard';
 import { getUserThemeFromContext, UserContext } from '@/components/user-provider';
 import { avatarMap } from '@/utils/utils'; 
+import { useTranslation } from 'react-i18next';
 
 interface SearchUser {
   id: string;
@@ -30,13 +32,21 @@ interface SearchUser {
   last_seen_at?: string | null;
 }
 
+const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://moodify_backend.test/api/';
+
 export default function ChatMainList() {
+  const { unreadCount } = useContext(UserContext);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { userValue, setUserValue } = useContext(UserContext);
   const token = userValue?.accessToken;
   const userId = userValue?.user?.id;
-
+  const authHeaders = {
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
+  const {t} = useTranslation();
   const [conversations, setConversations] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
@@ -106,14 +116,26 @@ export default function ChatMainList() {
   const toggleFollow = async (user: SearchUser) => {
     try {
       const updatedStatus = !user.is_following;
-      setSearchResults(prev => prev.map(u => 
-        u.id === user.id ? { ...u, is_following: updatedStatus } : u
-      ));
-      const newHistory = searchHistory.map(u => 
-        u.id === user.id ? { ...u, is_following: updatedStatus } : u
-      );
-      setSearchHistory(newHistory);
-      await SafeStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
+      const endpoint = user.is_following ? 'unfollow' : 'follow';
+      try {
+        const r = await fetch(`${API}community/users/${user.id}/${endpoint}`, { 
+          method: 'POST', 
+          headers: authHeaders 
+        });
+        if (r.ok) {
+          setSearchResults(prev => prev.map(u => 
+            u.id === user.id ? { ...u, is_following: updatedStatus } : u
+          ));
+          const newHistory = searchHistory.map(u => 
+            u.id === user.id ? { ...u, is_following: updatedStatus } : u
+          );
+          setSearchHistory(newHistory);
+          await SafeStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
+          Alert.alert(t('conversation.exit'), user.is_following ? t('conversation.unfollowed') : t('conversation.nowFollowing'));
+        }
+      } catch (e) {
+        console.error("Error", "No se pudo procesar.");
+      }
     } catch (e) { console.error(e); }
   };
 
@@ -159,7 +181,7 @@ export default function ChatMainList() {
         <TouchableOpacity style={styles.searchInfoArea} onPress={() => goToChat(item)}>
           <Text style={styles.searchUsername}>{item.username}</Text>
           <Text style={{fontSize: 12, color: '#64748B'}}>
-            {item.is_following ? 'Siguiendo' : 'Toca para chatear'}
+            {item.is_following ? t('conversation.follow') : t('conversation.chat')}
           </Text>
         </TouchableOpacity>
         
@@ -188,7 +210,7 @@ export default function ChatMainList() {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#128C7E" />
-        <Text style={{ marginTop: 10, color: '#64748B' }}>Cargando chats...</Text>
+        <Text style={{ marginTop: 10, color: '#64748B' }}>{t('conversation.loadingChats')}</Text>
       </View>
     );
   }
@@ -197,7 +219,7 @@ export default function ChatMainList() {
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       {!isFullSearchView && (
         <View style={styles.header}>
-          <Text style={styles.whatsappTitle}>Moodify chat</Text>
+          <Text style={styles.whatsappTitle}>Moodify {t('conversation.chatTitle')}</Text>
           <View style={styles.headerIcons}>
             <TouchableOpacity 
                 onPress={() => setCustomizerVisible(true)}
@@ -219,7 +241,7 @@ export default function ChatMainList() {
           )}
           {!isFullSearchView && <Feather name="search" size={20} color="#64748B" />}
           <TextInput
-            placeholder="Buscar usuarios..."
+            placeholder={t('conversation.searchUers')}
             style={styles.input}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -238,7 +260,7 @@ export default function ChatMainList() {
             keyboardShouldPersistTaps="always"
             ListEmptyComponent={
               !isSearching && searchQuery.length > 0 ? (
-                <Text style={{textAlign: 'center', marginTop: 20, color: '#64748B'}}>No se encontraron resultados</Text>
+                <Text style={{textAlign: 'center', marginTop: 20, color: '#64748B'}}>{t('conversation.dontResult')}</Text>
               ) : null
             }
           />
@@ -264,7 +286,7 @@ export default function ChatMainList() {
                 messageColor = '#10B981';
                 fontWeight = '600';
               } else if (esMio && item.last_message) {
-                displayMessage = `Tú: ${item.last_message}`;
+                displayMessage = `${t('conversation.you')}: ${item.last_message}`;
               }
 
               const fechaRaw = item.last_message_at || item.updated_at || item.created_at;
@@ -321,7 +343,10 @@ export default function ChatMainList() {
       )}
 
       {/* Navegación inferior fija */}
-      {!isFullSearchView && <StaticBottomNavBar activeTab="chat" />}
+      {!isFullSearchView &&  <StaticBottomNavBar 
+              activeTab="chat" 
+              hasNotifications={unreadCount > 0} 
+            />}
       
       <ChatCustomizer 
         currentTheme={getUserThemeFromContext(userValue)}

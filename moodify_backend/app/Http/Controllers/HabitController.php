@@ -29,7 +29,7 @@ class HabitController extends Controller
 
             $status[] = [
                 'day_label' => $date->translatedFormat('D'),
-                'date' => $date->format('d'),
+                'date' => $date,
                 'is_today' => $date->isToday(),
                 'full_completed' => ($totalHabitsCount > 0 && $logsCount >= $totalHabitsCount)
             ];

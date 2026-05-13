@@ -5,15 +5,13 @@ import { StyleSheet } from 'react-native';
 
 export default function DashboardScreen() {
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <DashboardView />
-    </SafeAreaView>
+      <DashboardView />
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    // backgroundColor: '#F8FAFC',
   }
 });

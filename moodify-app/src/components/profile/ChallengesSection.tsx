@@ -35,7 +35,7 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
 
   const [newName, setNewName] = useState('');
-  const [newDays, setNewDays] = useState('30');
+  const [newDays, setNewDays] = useState('');
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
   const [selectedIcon, setSelectedIcon] = useState(ICONS[0]);
 
@@ -75,7 +75,7 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
       if (res.ok) {
         setCreateModalVisible(false);
         setNewName('');
-        setNewDays('30');
+        setNewDays('');
         fetchChallenges();
       }
     } catch (e) { Alert.alert("Error de conexión"); }
@@ -91,17 +91,17 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
       if (res.ok) {
         fetchChallenges();
         setSelectedChallenge(data);
-        Alert.alert("¡Bravo!", "Día completado");
+        Alert.alert(t('forum.congratulations'), t('forum.dayCompleted'));
       } else {
-        Alert.alert("Aviso", data.error || "Ya registrado hoy");
+        Alert.alert(t('forum.advice'), data.error || t('forum.todaysAdvice'));
       }
     } catch (e) { Alert.alert("Error"); }
   };
 
   const deleteChallenge = (id: string) => {
-    Alert.alert("Borrar Reto", "¿Eliminar permanentemente?", [
-      { text: "No" },
-      { text: "Borrar", style: 'destructive', onPress: async () => {
+    Alert.alert(t('forum.deleteChallengeTitle'), t('forum.deleteChallenge'), [
+      { text: t('forum.no') },
+      { text: t('forum.erase'), style: 'destructive', onPress: async () => {
           await fetch(`${process.env.EXPO_PUBLIC_API_URL}challenges/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${userValue.accessToken}` }
@@ -124,7 +124,7 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
       </View>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {challenges.length === 0 && <Text style={styles.emptyText}>No tienes retos activos</Text>}
+        {challenges.length === 0 && <Text style={styles.emptyText}>{t('forum.activeChanllenge')}</Text>}
         {challenges.map(item => (
           <TouchableOpacity 
             key={item.id} 
@@ -185,7 +185,7 @@ export const ChallengesSection = ({ onDataLoaded }: { onDataLoaded?: (data: Chal
             <Text style={styles.modalTitleText}>{t('profile.newChallenges')}</Text>
             
             <TextInput style={styles.input} placeholderTextColor="#64748B" placeholder={t('profile.nameChallenges')} value={newName} onChangeText={setNewName} />
-            <TextInput style={styles.input} placeholderTextColor="#64748B" placeholder={t('profile.daysPlaceholder')} keyboardType="numeric" value={newDays} onChangeText={setNewDays} />
+            <TextInput style={styles.input} placeholderTextColor="#64748B" placeholder={t('profile.daysPlaceholder')} keyboardType="numeric" maxLength={3} value={newDays} onChangeText={setNewDays} />
 
             <Text style={styles.label}>{t('profile.selectIcon')}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.selectorScroll}>

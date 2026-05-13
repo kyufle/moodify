@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 // Habilitar animaciones en Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const ACTIONS = [
-  { id: '1', label: 'Sugerir Reto', icon: 'zap', color: '#F59E0B' },
-  { id: '2', label: '¿Cómo mejorar hoy?', icon: 'smile', color: '#10B981' },
-  { id: '3', label: 'Duda sobre racha', icon: 'help-circle', color: '#6366F1' },
-  { id: '4', label: 'Reportar problema', icon: 'alert-circle', color: '#EF4444' },
-];
-
 export const ChatQuickActions = ({ onAction }: { onAction: (label: string) => void }) => {
   const [showActions, setShowActions] = useState(false);
+  const {t} = useTranslation();
+    const ACTIONS = [
+    { id: '1', label: t('bloom.challenge'), icon: 'zap', color: '#F59E0B' },
+    { id: '2', label: t('bloom.weImprove'), icon: 'smile', color: '#10B981' },
+  ];
 
   const toggleActions = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);

@@ -104,7 +104,7 @@ export const ActionAlertCard = () => {
   return (
     <View style={[styles.card, { backgroundColor: config.color, marginHorizontal: 20, marginTop: 20 }]}>
       <View style={styles.textColumn}>
-        <Text style={styles.subtitleCard}>¿CÓMO TE SIENTES AHORA?</Text>
+        <Text style={styles.subtitleCard}>{t('calendarGrid.howFeelNowCalendar')}</Text>
         <Text style={styles.titleCard}>{t(`moodNames.${lastEntry.mood}`)}</Text>
         <Text style={styles.description}>
           {getSafePhrase(config)}
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   subtitleCard: {
-    fontSize: 11,
+    fontSize: 15,
     fontWeight: '800',
     color: 'rgba(0,0,0,0.5)',
     marginBottom: 2,

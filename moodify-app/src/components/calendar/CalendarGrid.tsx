@@ -10,6 +10,7 @@ import { MOOD_CONFIG } from '../../utils/utils';
 import { UserContext } from '../user-provider';
 import { useTranslation } from 'react-i18next';
 import { ThemedView } from '../themed-view';
+import { InfoCards } from './InfoCards';
 
 const { width } = Dimensions.get('window');
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
@@ -73,7 +74,7 @@ export const CalendarGrid = () => {
   const handleSaveMood = async () => {
     if (!selectedMood) return Alert.alert("Aviso", "Selecciona una emoción");
     setLoading(true);
-    
+
     // Capturamos la fecha manual YYYY-MM-DD para evitar desfases de día
     const now = new Date();
     const dateString = now.toLocaleDateString('en-CA'); // Formato YYYY-MM-DD local
@@ -117,75 +118,52 @@ export const CalendarGrid = () => {
 
   if (currentView === 'register') {
     return (
-       <ThemedView style={styles.container}>
-           <KeyboardAvoidingView 
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-              style={{ flex: 1 }}
-              keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-      />
-      <ScrollView style={styles.registerContainer} showsVerticalScrollIndicator={false}>
-        <TouchableOpacity onPress={() => setCurrentView('calendar')} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← {t('calendarGrid.back') || 'Volver'}</Text>
-        </TouchableOpacity>
+      <ThemedView style={styles.container}>
+          <ScrollView>
+            <TouchableOpacity onPress={() => setCurrentView('calendar')} style={styles.backButton}>
+              <Text style={styles.backButtonText}>← {t('calendarGrid.back') || 'Volver'}</Text>
+            </TouchableOpacity>
+            <Text style={styles.title}>{t('calendarGrid.howFeelNow')}</Text>
+            <TextInput
+              placeholder={t('calendarGrid.todaysNote')}
+              style={styles.textArea}
+              multiline
+              value={diaryText}
+              onChangeText={setDiaryText}
+            />
 
-        <Text style={styles.title}>{t('calendarGrid.howFeelNow')}</Text>
+            <View style={styles.moodSelectorGrid}>
+              {Object.keys(MOOD_CONFIG).map((key) => {
+                const MoodConfigIcon = MOOD_CONFIG[key as keyof typeof MOOD_CONFIG].icon;
+                return (
+                  <TouchableOpacity
+                    key={key}
+                    onPress={() => setSelectedMood(key)}
+                    style={[
+                      styles.moodOption,
+                      selectedMood === key && {
+                        backgroundColor: MOOD_CONFIG[key as keyof typeof MOOD_CONFIG].color,
+                        borderColor: '#334155',
+                        borderWidth: 1.5
+                      }
+                    ]}
+                  >
+                    <MoodConfigIcon style={styles.iconSmall} />
+                    <Text style={styles.moodLabelSmall} numberOfLines={1}>
+                      {t(`moodNames.${key}`)}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })}
+            </View>
+            <View style={{ height: 70 }} />
+            <TouchableOpacity style={styles.btnSave} onPress={handleSaveMood} disabled={loading}>
+              {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnTextWhite}>{t('calendarGrid.saveStatus')}</Text>}
+            </TouchableOpacity>
+         <View style={{ height: 70 }} />
+          </ScrollView>
+      </ThemedView>
 
-        <View style={styles.moodSelectorGrid}>
-          {Object.keys(MOOD_CONFIG).map((key) => {
-            const MoodConfigIcon = MOOD_CONFIG[key as keyof typeof MOOD_CONFIG].icon;
-            return (
-              <TouchableOpacity
-                key={key}
-                onPress={() => setSelectedMood(key)}
-                style={[
-                  styles.moodOption,
-                  selectedMood === key && {
-                    backgroundColor: MOOD_CONFIG[key as keyof typeof MOOD_CONFIG].color,
-                    borderColor: '#334155',
-                    borderWidth: 1.5
-                  }
-                ]}
-              >
-                <MoodConfigIcon style={styles.iconSmall} />
-                <Text style={styles.moodLabelSmall} numberOfLines={1}>
-                  {t(`moodNames.${key}`)}
-                </Text>
-              </TouchableOpacity>
-            )
-          })}
-        </View>
-
-        {selectedMood && (
-          <View style={styles.feedbackBox}>
-            <Text style={styles.feedbackText}>
-              {t('calendarGrid.youFeel')}{' '}
-              <Text style={{ fontWeight: 'bold' }}>
-                {t(`moodNames.${selectedMood}`)}
-              </Text>
-            </Text>
-            {(() => {
-                const IconComp = MOOD_CONFIG[selectedMood as keyof typeof MOOD_CONFIG].icon;
-                return <IconComp width={80} height={80} />;
-            })()}
-          </View>
-        )}
-
-        <TextInput
-          placeholder={t('calendarGrid.todaysNote')}
-          style={styles.textArea}
-          multiline
-          value={diaryText}
-          onChangeText={setDiaryText}
-        />
-
-        <TouchableOpacity style={styles.btnSave} onPress={handleSaveMood} disabled={loading}>
-          {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnTextWhite}>{t('calendarGrid.saveStatus')}</Text>}
-        </TouchableOpacity>
-        <View style={{ height: 40 }} />
-      </ScrollView>
-
-       </ThemedView>
-     
     );
   }
 
@@ -236,7 +214,7 @@ export const CalendarGrid = () => {
         </View>
 
         <TouchableOpacity style={styles.registerButton} onPress={() => setCurrentView('register')}>
-          <Text style={styles.registerButtonText}>Registrar ánimo de hoy</Text>
+          <Text style={styles.registerButtonText}>{t('calendarGrid.recordTodaysMood')}</Text>
         </TouchableOpacity>
 
         {history.length > 0 && (
@@ -258,7 +236,7 @@ export const CalendarGrid = () => {
                   if (dateStr && !dateStr.includes('Z') && !dateStr.includes('+')) {
                     dateStr += 'Z';
                   }
-                  
+
                   const dateObj = new Date(dateStr);
                   const isValid = !isNaN(dateObj.getTime());
                   const moodInfo = MOOD_CONFIG[item.mood as keyof typeof MOOD_CONFIG];
@@ -273,8 +251,8 @@ export const CalendarGrid = () => {
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                           <Text style={styles.historyMood}>{t(`moodNames.${item.mood}`)}</Text>
                           <Text style={styles.historyTime}>
-                            {isValid 
-                              ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+                            {isValid
+                              ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
                               : '--:--'}
                           </Text>
                         </View>
@@ -290,19 +268,10 @@ export const CalendarGrid = () => {
               </View>
             )}
 
-            {isTooLittleSleep && (
-              <View style={styles.recommendCard}>
-                <Feather name="moon" size={20} color="#F59E0B" />
-                <Text style={styles.recommendText}>
-                  Dormiste <Text style={{ fontWeight: '800' }}>{sleepData.hours}h {sleepData.minutes}m</Text>. ¡Prueba el resto de 8h!
-                </Text>
-              </View>
-            )}
-
             {config && lastEntry && (
               <View style={[styles.card, { backgroundColor: config.color, marginTop: 15 }]}>
                 <View style={styles.textColumn}>
-                  <Text style={styles.subtitle}>¿Cómo te sientes ahora?</Text>
+                  <Text style={styles.subtitle}>{t('calendarGrid.howFeelNowCalendar')}</Text>
                   <Text style={styles.titleCard}>{t(`moodNames.${lastEntry.mood}`)}</Text>
                   <Text style={styles.description}>{getSafePhrase()}</Text>
                 </View>
@@ -317,6 +286,7 @@ export const CalendarGrid = () => {
           </View>
         )}
       </View>
+      <InfoCards />
     </ScrollView>
   );
 };
@@ -342,7 +312,7 @@ const styles = StyleSheet.create({
   moodLabelSmall: { fontSize: 10, fontWeight: '600', color: '#475569' },
   feedbackBox: { marginVertical: 20, alignItems: 'center', backgroundColor: '#F8FAFC', padding: 20, borderRadius: 24 },
   feedbackText: { fontSize: 16, marginBottom: 10 },
-  textArea: { backgroundColor: '#F1F5F9', borderRadius: 16, padding: 15, height: 100, textAlignVertical: 'top' },
+  textArea: { backgroundColor: '#F1F5F9', borderRadius: 16, padding: 15, marginBottom: 15, height: 100, textAlignVertical: 'top' },
   btnSave: { padding: 16, borderRadius: 16, alignItems: 'center', backgroundColor: '#334155', marginTop: 15 },
   btnTextWhite: { color: 'white', fontWeight: 'bold' },
   collapsibleHeader: { flexDirection: 'row', justifyContent: 'space-between', padding: 15, backgroundColor: '#F8FAFC', borderRadius: 16 },
@@ -357,7 +327,7 @@ const styles = StyleSheet.create({
   recommendText: { fontSize: 12, color: '#92400E', flex: 1 },
   card: { borderRadius: 20, padding: 20, flexDirection: 'row', overflow: 'hidden' },
   textColumn: { flex: 1, zIndex: 2 },
-  subtitle: { fontSize: 12, fontWeight: '700', opacity: 0.6 },
+  subtitle: { fontSize: 18, fontWeight: '700', opacity: 0.6 },
   titleCard: { fontSize: 20, fontWeight: 'bold', marginVertical: 4 },
   description: { fontSize: 14, lineHeight: 18, opacity: 0.8 },
   cardWatermark: { position: 'absolute', right: 10, bottom: 10, opacity: 0.3 }

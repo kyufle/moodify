@@ -61,6 +61,7 @@ class AuthController extends Controller
             'email'    => $request->email,
             'username' => $request->username,
             'password' => Hash::make($request->password),
+            'image_id' => 'avatar25'
         ]);
         $register->email_verified_at = now();
         $register->save();

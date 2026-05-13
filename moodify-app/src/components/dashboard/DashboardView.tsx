@@ -35,7 +35,6 @@ const DashboardView = () => {
           <DashboardHeader />
           <StreakCard />
           <ActionAlertCard />
-          
           <StatsBoard 
             onPressSleep={() => setShowSleep(true)} 
             onPressStress={() => setShowStress(true)} 

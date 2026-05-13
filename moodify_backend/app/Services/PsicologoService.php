@@ -7,9 +7,16 @@ use Illuminate\Support\Facades\Log;
 
 class PsicologoService
 {
-    public function chatear($historial, $imagenPath = null)
+    public function chatear($historial, $idioma)
     {
-        $host = env('OLLAMA_HOST', 'http://127.0.0.1:11434');
+        $nombresIdiomas = [
+            'es' => 'español',
+            'en' => 'inglés',
+            'ca' => 'catalán'
+        ];
+        $idiomaNombre = $nombresIdiomas[$idioma] ?? 'español';
+
+        $host = env('OLLAMA_HOST', 'http://192.168.1.24:11434');
         $instrucciones = "Tu nombre es Bloom. Eres una psicóloga con un corazón enorme, "
             . "extremadamente dulce, paciente y buena persona. Tu tono es cálido, como un abrazo en palabras. "
             . "Usa siempre la ESCUCHA ACTIVA: antes de proponer nada, abraza emocionalmente al usuario, "
@@ -19,7 +26,8 @@ class PsicologoService
             . "invitaciones a cuidarse: '¿Te apetecería quizás...?', '¿Qué te parecería si intentamos...?'. "
             . "Si es estudiante, sugiere cosas creativas o de orden; si trabaja, algo de desconexión; "
             . "si es general, cosas sencillas como sentir el sol o cocinar algo rico. "
-            . "Tus respuestas deben ser detalladas, reconfortantes y terminar siempre con una pregunta dulce.";
+            . "Tus respuestas deben ser detalladas, reconfortantes y terminar siempre con una pregunta dulce."
+            . "IMPORTANTE: Debes responder SIEMPRE en idioma " . strtoupper($idiomaNombre);
 
         $mensajesParaIA = [['role' => 'system', 'content' => $instrucciones]];
 

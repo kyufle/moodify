@@ -22,7 +22,7 @@ class UserController extends Controller
                 $user->points += 3;
                 $user->last_streak_day = $clientDate;
                 $user->save();
-                return response()->json(['user' => $user], 200);
+                return response()->json(['ok' => true, 'message' => 'Registrado correctamente', 'user' => $user], 200);
             }
 
             $todayStr = $clientDate->format('Y-m-d');
@@ -108,6 +108,40 @@ public function actionAlert(Request $request)
             ]
         );
         return response()->json(['message' => 'Sueño guardado']);
+    }
+
+    public function getMonthlySleepAverage(Request $request)
+    {
+        try {
+            $userId = auth()->id();
+            
+            $averageMinutes = DB::table('sleep_logs')
+                ->where('user_id', $userId)
+                ->whereMonth('date', now()->month)
+                ->whereYear('date', now()->year)
+                ->avg('total_minutes');
+
+            if (is_null($averageMinutes)) {
+                return response()->json([
+                    'exists' => false,
+                    'message' => 'No sleep data recorded for this month.'
+                ]);
+            }
+
+            $hours = floor($averageMinutes / 60);
+            $minutes = round($averageMinutes % 60);
+
+            return response()->json([
+                'exists' => true,
+                'average_raw_minutes' => round($averageMinutes, 2),
+                'formatted_average' => "{$hours}h {$minutes}m",
+                'month' => now()->format('F'),
+                'year' => now()->year
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function fillInHours()

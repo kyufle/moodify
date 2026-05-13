@@ -77,9 +77,9 @@ export default function Login({ onChangePage }) {
                             <View style={styles.inputWrapper}>
                                 <TouchableOpacity activeOpacity={1} onPress={() => emailRef.current?.focus()} style={styles.styledInputContainer}>
                                     <View style={styles.iconGroup} pointerEvents="none">
-                                        <Icon name="at" type="material-community" color="#FF9A7B" size={28} />
+                                        <Icon name="at" type="material-community" color="#a1a1a1" size={28} />
                                         <ThemedText style={styles.iconSeparator}>/</ThemedText>
-                                        <Icon name="email-outline" type="material-community" color="#FF9A7B" size={26} />
+                                        <Icon name="email-outline" type="material-community" color="#a1a1a1" size={26} />
                                     </View>
                                     <TextInput
                                         ref={emailRef}
@@ -87,7 +87,7 @@ export default function Login({ onChangePage }) {
                                         onChangeText={(text) => setUserData({ ...userData, emailUsername: text.toLowerCase() })}
                                         style={styles.textInput}
                                         placeholder={t('loginRegister.userOrEmail')}
-                                        placeholderTextColor="#FFB7A1"
+                                        placeholderTextColor="#a1a1a1"
                                         autoCapitalize="none"
                                         returnKeyType="next"
                                         onSubmitEditing={() => passwordRef.current?.focus()}
@@ -95,7 +95,7 @@ export default function Login({ onChangePage }) {
                                 </TouchableOpacity>
                                 <TouchableOpacity activeOpacity={1} onPress={() => passwordRef.current?.focus()} style={styles.styledInputContainer}>
                                     <View style={{ marginLeft: 20 }} pointerEvents="none">
-                                        <Icon name="lock-outline" type="material-community" color="#FF9A7B" size={26} />
+                                        <Icon name="lock-outline" type="material-community" color="#a1a1a1" size={26} />
                                     </View>
                                     <TextInput
                                         ref={passwordRef}
@@ -104,12 +104,12 @@ export default function Login({ onChangePage }) {
                                         style={styles.textInput}
                                         secureTextEntry={!isPasswordVisible}
                                         placeholder={t('loginRegister.password')}
-                                        placeholderTextColor="#FFB7A1"
+                                        placeholderTextColor="#a1a1a1"
                                         returnKeyType="done"
                                         onSubmitEditing={handleFetch}
                                     />
                                     <TouchableOpacity style={{ marginRight: 20 }} onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
-                                        <Icon name={isPasswordVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#FF9A7B" size={24} />
+                                        <Icon name={isPasswordVisible ? "eye-outline" : "eye-off-outline"} type="material-community" color="#a1a1a1" size={24} />
                                     </TouchableOpacity>
                                 </TouchableOpacity>
                             </View>
@@ -136,12 +136,12 @@ const styles = StyleSheet.create({
     notifContainer: { flexDirection: 'row', alignItems: 'center', padding: 15, borderRadius: 18, width: '100%', marginBottom: 20, borderWidth: 1 },
     notifText: { fontWeight: '700', marginLeft: 10, fontSize: 14, flex: 1 },
     inputWrapper: { width: '100%', gap: 12, marginBottom: 20 },
-    styledInputContainer: { backgroundColor: '#FFE5D9', height: 65, borderRadius: 20, flexDirection: 'row', alignItems: 'center', width: '100%' },
+    styledInputContainer: { backgroundColor: '#e3e3ff', height: 65, borderRadius: 20, flexDirection: 'row', alignItems: 'center', width: '100%' },
     iconGroup: { flexDirection: 'row', alignItems: 'center', marginLeft: 20, gap: 4 },
-    iconSeparator: { fontSize: 18, color: '#FF9A7B', fontWeight: '300' },
+    iconSeparator: { fontSize: 18, color: '#a1a1a1', fontWeight: '300' },
     textInput: { flex: 1, paddingHorizontal: 15, fontSize: 16, color: '#333', fontWeight: '500', fontFamily: Fonts.sans },
     mainButtonContainer: { width: '100%', marginTop: 15 },
-    mainButton: { backgroundColor: '#a5adb0', height: 60, borderRadius: 20 },
+    mainButton: { backgroundColor: 'rgb(186, 209, 216)', height: 60, borderRadius: 20 },
     mainButtonText: { fontSize: 18, fontWeight: '600', color: '#FFFFFF' },
     footerContainer: { marginTop: 25, alignItems: 'center' },
     footerText: { fontSize: 15, color: '#333' },

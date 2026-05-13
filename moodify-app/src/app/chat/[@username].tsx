@@ -2,7 +2,8 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { 
   View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, 
   KeyboardAvoidingView, Platform, SafeAreaView, ActivityIndicator, 
-  AppState, AppStateStatus, Image, ImageBackground
+  AppState, AppStateStatus, Image, ImageBackground,
+  Alert
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
@@ -11,8 +12,9 @@ import { MessageBubble } from '@/components/chat/MessageBubble';
 import { avatarMap } from '@/utils/utils';
 import { SafeStorage } from './index'; 
 import { ALL_BACKGROUNDS } from './ChatCustomizer';
+import { useTranslation } from 'react-i18next';
 
-const getDayLabel = (dateString: string) => {
+const getDayLabel = (dateString: string, t: any) => {
   const date = new Date(dateString);
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -20,8 +22,8 @@ const getDayLabel = (dateString: string) => {
   yesterday.setDate(yesterday.getDate() - 1);
   const msgDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
-  if (msgDate.getTime() === today.getTime()) return 'Hoy';
-  if (msgDate.getTime() === yesterday.getTime()) return 'Ayer';
+  if (msgDate.getTime() === today.getTime()) return t('conversation.today');
+  if (msgDate.getTime() === yesterday.getTime()) return t('conversation.yesterday');
   
   return date.toLocaleDateString('es-ES', { 
     day: 'numeric', 
@@ -33,7 +35,7 @@ const getDayLabel = (dateString: string) => {
 export default function PersonalChatScreen() {
   const { "@username": username, id: recipientId, imageKey } = useLocalSearchParams();
   const router = useRouter();
-  
+  const {t} = useTranslation();
   const { userValue } = useContext(UserContext);
   const token = userValue?.accessToken;
   const myId = userValue?.user?.id; 
@@ -139,12 +141,23 @@ export default function PersonalChatScreen() {
     };
   }, [recipientId, token]);
 
+  const handleBlockUser = async () => {
+      Alert.alert(t('conversation.blockUser'), `${t('conversation.blockName')} ${username}?`, [
+        { text: t('profile.cancel'), style: "cancel" },
+        { text: t('conversation.block'), style: "destructive", onPress: async () => {
+            try {
+              const r = await fetch(`${process.env.EXPO_PUBLIC_API_URL}community/users/${recipientId}/block`, { method: 'POST',headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }});
+              router.push("/chat");
+            } catch (e) { Alert.alert(t('sleep.error'), t('conversation.errorBlock')); }
+        }}
+      ]);
+    };
   const handleSend = async () => {
     if (!inputText.trim() || isSending) return;
     const messageText = inputText;
     setInputText('');
     setIsSending(true);
-
+  
     try {
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}messages`, {
         method: 'POST',
@@ -169,7 +182,7 @@ export default function PersonalChatScreen() {
           <View style={styles.dateSeparator}>
             <View style={styles.dateLine} />
             <View style={styles.dateBadge}>
-                <Text style={styles.dateText}>{getDayLabel(item.fullDate)}</Text>
+                <Text style={styles.dateText}>{getDayLabel(item.fullDate, t)}</Text>
             </View>
             <View style={styles.dateLine} />
           </View>
@@ -201,7 +214,7 @@ export default function PersonalChatScreen() {
       <KeyboardAvoidingView 
   behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
   style={{ flex: 1 }}
-  keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0} 
+  keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 35} 
 >
         <View style={styles.header}>
           <View style={styles.headerLeft}>
@@ -214,14 +227,14 @@ export default function PersonalChatScreen() {
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={[styles.statusDot, { backgroundColor: isOnline ? '#10B981' : '#94A3B8' }]} />
                 <Text style={{ fontSize: 12, color: isOnline ? '#10B981' : '#64748B', fontWeight: isOnline ? '600' : '400' }}>
-                  {isOnline ? 'en línea' : 'desconectado'}
+                  {isOnline ? t('conversation.online') : t('conversation.offline')}
                 </Text>
               </View>
             </View>
           </View>
           <View style={styles.headerIcons}>
-            <TouchableOpacity style={{ padding: 5 }}>
-              <Feather name="more-vertical" size={22} color="#64748B" />
+            <TouchableOpacity onPress={handleBlockUser} style={{ padding: 5 }}>
+              <Feather name="minus-circle" size={22} color="#c29797" />
             </TouchableOpacity>
           </View>
         </View>
@@ -242,7 +255,7 @@ export default function PersonalChatScreen() {
             style={styles.input}
             value={inputText}
             onChangeText={setInputText}
-            placeholder="Escribe un mensaje..."
+            placeholder={t('conversation.writeMessage')}
             multiline
             onFocus={() => setTimeout(scrollToBottom, 200)}
           />

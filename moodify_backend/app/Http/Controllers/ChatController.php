@@ -207,7 +207,7 @@ public function getMessagesByUserId($recipientId)
             $conversacion = Conversation::firstOrCreate(['user_id' => $userId, 'type' => 'ai'], ['label' => 'Sesión con Bloom']);
             MessageAi::create(['conversations_id' => $conversacion->id, 'role' => 'user', 'content' => $request->input('mensaje')]);
             $historial = MessageAi::where('conversations_id', $conversacion->id)->orderBy('created_at', 'asc')->get(['role', 'content'])->toArray();
-            $respuestaIA = $this->psicologo->chatear($historial);
+            $respuestaIA = $this->psicologo->chatear($historial, $request->input('idioma'));
             MessageAi::create(['conversations_id' => $conversacion->id, 'role' => 'assistant', 'content' => $respuestaIA]);
             return response()->json(['respuesta' => $respuestaIA, 'status' => 'success']);
         } catch (\Exception $e) {

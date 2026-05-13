@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   container: { marginVertical: 20 },
   header: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, marginBottom: 15 },
   title: { fontSize: 18, fontWeight: '800', color: '#1E293B' },
-  badgeCountContainer: { backgroundColor: '#EEF2FF', paddingHorizontal: 10, borderRadius: 12, justifyContent: 'center' },
+  badgeCountContainer: { backgroundColor: '#EEF2FF', paddingHorizontal: 10, borderRadius: 12, justifyContent: 'center', width: 70, display: 'flex', flexDirection: 'row', paddingTop: 5 },
   countText: { fontSize: 12, fontWeight: '700', color: '#6366F1' },
   scroll: { paddingLeft: 20 },
   badgeCard: { 

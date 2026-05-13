@@ -1,518 +1,604 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity,
-  Modal, Pressable, ActivityIndicator, Alert, KeyboardAvoidingView,
-  Platform, StatusBar,
+  ActivityIndicator, Alert, KeyboardAvoidingView,
+  Platform, Keyboard, Image, FlatList,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { UserContext } from '@/components/user-provider';
 import { StaticBottomNavBar } from '../StaticBottomNavBar';
-import { FriendsMoods } from './FriendsMoods';
 import { DiscoverPeople } from './DiscoverPeople';
 import { StaffAnnouncements } from './StaffAnnouncements';
 import { PostCard, type PostData } from './PostCard';
+import { avatarMap } from '../../utils/utils';
+import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://moodify_backend.test/api/';
 
-type Tab = 'feed' | 'personas';
-
-export const ForumView = () => {
+export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', selectedPostId?: string }> = ({ activeTab, selectedPostId }) => {
+  const router = useRouter();
   const { userValue } = useContext(UserContext);
   const token = userValue?.accessToken;
-
-  const [activeTab, setActiveTab] = useState<Tab>('feed');
-
-  // Posts
-  const [posts,        setPosts]        = useState<PostData[]>([]);
+  const currentUserAvatar = userValue?.user?.image_id;
+  const { unreadCount } = useContext(UserContext);
+  // const [activeTab, setActiveTab] = useState<>('feed');
+  const setActiveTab = (newTab: 'feed' | 'personas') => {
+    if(newTab === 'feed')
+      router.push('/community/feed');
+    else
+      router.push('/community/discover');
+  }
+  const [posts, setPosts] = useState<PostData[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
 
-  // New post modal
-  const [showPostModal,  setShowPostModal]  = useState(false);
-  const [postContent,    setPostContent]    = useState('');
+  const [inputText, setInputText] = useState('');
   const [postingLoading, setPostingLoading] = useState(false);
-
+  const [inputHeight, setInputHeight] = useState(45); 
+  const {t} = useTranslation();
+  // @ts-ignore
+  const selectedPost = posts?.find(p => p.id == selectedPostId);
+  const [comments, setComments] = useState<any[]>([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [replyingTo, setReplyingTo] = useState<{ id: number, name: string } | null>(null);
+  const headerHeight = Platform.OS === 'ios' ? 90 : 90
   const authHeaders = {
     Authorization: `Bearer ${token}`,
     Accept: 'application/json',
     'Content-Type': 'application/json',
   };
 
-  const fetchPosts = async () => {
+  // Función de carga de posts (separada para poder usarla en polling sin loading visual)
+  const fetchPosts = useCallback(async (showLoading = true) => {
     if (!token) { setLoadingPosts(false); return; }
-    setLoadingPosts(true);
+    if (showLoading) setLoadingPosts(true);
     try {
       const r = await fetch(`${API}community/posts`, { headers: authHeaders });
       const data = await r.json();
       if (Array.isArray(data)) {
-        setPosts(data.filter((p): p is PostData => p != null && p.id != null));
+        setPosts(data);
       }
-    } catch {}
-    finally { setLoadingPosts(false); }
+    } catch (e) {
+      console.error("Error fetching posts", e);
+    } finally { 
+      if (showLoading) setLoadingPosts(false); 
+    }
+  }, [token, selectedPost?.id]);
+
+  // 1. POLLING: Actualización cada 5 segundos
+  useEffect(() => {
+    fetchPosts(true); // Carga inicial con spinner
+
+    const interval = setInterval(() => {
+      fetchPosts(false); // Carga silenciosa cada 5 seg
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [token]); // Solo depende del token
+
+  const updatePostState = (id: number, liked: boolean, count: number) => {
+    setPosts(prev => prev.map(p => p.id === id ? { ...p, is_liked: liked, likes_count: count } : p));
   };
 
-  useEffect(() => { fetchPosts(); }, [token]);
+  const handleFollowToggle = async (targetId: number, isFollowing: boolean) => {
+    const endpoint = isFollowing ? 'unfollow' : 'follow';
+    try {
+      const r = await fetch(`${API}community/users/${targetId}/${endpoint}`, { 
+        method: 'POST', 
+        headers: authHeaders 
+      });
+      if (r.ok) {
+        fetchPosts(false);
+        Alert.alert(t('conversation.exit'), isFollowing ? t('conversation.unfollowed') : t('conversation.nowFollowing'));
+      }
+    } catch (e) {
+      Alert.alert("Error", "No se pudo procesar.");
+    }
+  };
 
-  const handleCreatePost = async () => {
-    if (!postContent.trim()) {
-      Alert.alert('Vacío', 'Escribe algo antes de publicar.');
+  const handleBlockUser = async (targetId: number, targetName: string) => {
+    Alert.alert(t('conversation.blockUser'), `${t('conversation.blockName')} ${targetName}?`, [
+      { text: t('profile.cancel'), style: "cancel" },
+      { text: t('conversation.block'), style: "destructive", onPress: async () => {
+          try {
+            const r = await fetch(`${API}community/users/${targetId}/block`, { method: 'POST', headers: authHeaders });
+            if (r.ok) {
+              setPosts(prev => prev.filter(p => p.user_id !== targetId));
+            }
+          } catch (e) { Alert.alert(t('sleep.error'), t('conversation.errorBlock')); }
+      }}
+    ]);
+  };
+
+  const fetchComments = async (postId: number) => {
+    setLoadingComments(true);
+    try {
+      const r = await fetch(`${API}community/posts/${postId}/comments`, { headers: authHeaders });
+      const data = await r.json();
+      setComments(Array.isArray(data) ? data : []);
+    } finally { setLoadingComments(false); }
+  };
+
+  useEffect(() => {
+    if (!selectedPost)
       return;
-    }
-    if (!token) {
-      Alert.alert('Sin sesión', 'Inicia sesión para publicar.');
-      return;
-    }
+    fetchComments(selectedPost?.id);
+  }, [selectedPost]);
+
+  const handleSendComment = async () => {
+    if (!commentText.trim() || !selectedPost) return;
+    setPostingLoading(true);
+    try {
+      const r = await fetch(`${API}community/posts/${selectedPost.id}/comments`, {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({
+          content: commentText.trim(),
+          parent_id: replyingTo?.id || null
+        }),
+      });
+      if (r.ok) {
+        setCommentText('');
+        setReplyingTo(null);
+        // Actualizamos comentarios e inmediatamente posts para ver el contador
+        await fetchComments(selectedPost.id);
+        fetchPosts(false);
+      }
+    } finally { setPostingLoading(false); }
+  };
+
+  const handleAction = async () => {
+    if (!inputText.trim() || !token) return;
     setPostingLoading(true);
     try {
       const r = await fetch(`${API}community/posts`, {
         method: 'POST',
         headers: authHeaders,
-        body: JSON.stringify({ content: postContent.trim() }),
+        body: JSON.stringify({ content: inputText.trim() }),
       });
-      const newPost = await r.json();
-      if (r.ok && newPost?.id != null) {
-        const safe: PostData = {
-          id: newPost.id,
-          user_name: newPost.user_name ?? '',
-          username: newPost.username ?? '',
-          image_id: newPost.image_id ?? null,
-          content: newPost.content ?? '',
-          date: newPost.date ?? new Date().toISOString(),
-          likes_count: newPost.likes_count ?? 0,
-          is_liked: newPost.is_liked ?? false,
-        };
-        setPosts(prev => [safe, ...prev]);
-        setPostContent('');
-        setShowPostModal(false);
-      } else {
-        Alert.alert('Error', newPost.message ?? 'No se pudo publicar.');
+      if (r.ok) {
+        setInputText('');
+        setInputHeight(45); 
+        Keyboard.dismiss();
+        fetchPosts(false);
       }
-    } catch {
-      Alert.alert('Error de red', 'Inténtalo de nuevo.');
-    } finally {
-      setPostingLoading(false);
-    }
+    } finally { setPostingLoading(false); }
   };
 
-  const handleLikeToggle = (id: number, liked: boolean, count: number) => {
-    setPosts(prev =>
-      prev.map(p => p.id === id ? { ...p, is_liked: liked, likes_count: count } : p)
+  const handleDeletePost = async (postId: number) => {
+    try {
+      const r = await fetch(`${API}community/posts/${postId}`, { method: 'DELETE', headers: authHeaders });
+      if (r.ok) {
+        setPosts(prev => prev.filter(p => p.id !== postId));
+      }
+    } catch (e) { Alert.alert("Error", "No se pudo borrar."); }
+  };
+
+  if (selectedPost) {
+    return (
+      <View style={styles.root}>
+        <KeyboardAvoidingView 
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // En Android 'undefined' suele ser más estable
+        >
+        <View style={styles.commentHeader}>
+          <TouchableOpacity onPress={() => router.push("/community/feed")}>
+            <Feather name="arrow-left" size={24} color="#1E293B" />
+          </TouchableOpacity>
+          <Text style={styles.commentHeaderTitle}>Post de {selectedPost.user_name}</Text>
+          <View style={{ width: 24 }} />
+        </View>
+
+        <FlatList
+          data={comments}
+          keyExtractor={(item) => item.id.toString()}
+          ListHeaderComponent={
+            <View style={{ paddingTop: 10 }}>
+              <PostCard
+                post={selectedPost}
+                onDelete={handleDeletePost}
+                onLikeToggle={updatePostState}
+                onBlockUser={handleBlockUser}
+                onFollowToggle={handleFollowToggle}
+              />
+              <View style={styles.divider} />
+              <Text style={styles.repliesTitle}>{t('forum.answers')}</Text>
+            </View>
+          }
+          ListEmptyComponent={!loadingComments && <Text style={styles.emptyText}>{t('forum.firstComment')}</Text>}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          renderItem={({ item }) => (
+            <View style={[styles.commentCard, item.parent_id && { marginLeft: 45, opacity: 0.8 }]}>
+              <Image source={avatarMap[item.image_id]} style={item.parent_id ? styles.avatarSmall : styles.avatar} />
+              <View style={styles.commentContent}>
+                <Text style={styles.author}>{item.user_name}</Text>
+                <Text style={styles.text}>{item.content}</Text>
+                {!item.parent_id && (
+                  <TouchableOpacity onPress={() => setReplyingTo({ id: item.id, name: item.user_name })}>
+                    <Text style={styles.replyBtnText}>{t('forum.reply')}</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          )}
+        />
+          {replyingTo && (
+            <View style={styles.replyInfoBar}>
+              <Text style={styles.replyInfoText}>{t('forum.responding')} <Text style={{ fontWeight: 'bold' }}>{replyingTo.name}</Text></Text>
+              <TouchableOpacity onPress={() => setReplyingTo(null)}><Feather name="x-circle" size={16} color="'#FFECF0'" /></TouchableOpacity>
+            </View>
+          )}
+          <View style={styles.commentInputBar}>
+            <TextInput
+              style={styles.inputField}
+              placeholder={t('forum.writeMessage')}
+              value={commentText}
+              onChangeText={setCommentText}
+              multiline
+            />
+            <TouchableOpacity onPress={handleSendComment} disabled={!commentText.trim() || postingLoading}>
+              {postingLoading ? <ActivityIndicator size="small" color="'#FFECF0'" /> : <Feather name="send" size={24} color={commentText.trim() ? "'#FFECF0'" : "#CBD5E1"} />}
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </View>
     );
-  };
+  }
 
-  const userName = userValue?.user?.name ?? 'Usuario';
-  const firstName = userName.split(' ')[0];
-  const userInitial = firstName[0]?.toUpperCase() ?? '?';
+  const feedTitle = posts.length === 0 && !loadingPosts ? t('forum.recommendations') : t('forum.publications');
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" />
-
-      {/* ── HEADER ── */}
-      <LinearGradient colors={['#4F46E5', '#7C3AED']} style={styles.header}>
-        <View style={styles.headerInner}>
-          <View style={styles.headerLeft}>
-            <LinearGradient colors={['#ffffff30', '#ffffff15']} style={styles.headerAvatar}>
-              <Text style={styles.headerAvatarText}>{userInitial}</Text>
-            </LinearGradient>
-            <View>
-              <Text style={styles.headerGreeting}>Hola, {firstName} 👋</Text>
-              <Text style={styles.headerSub}>Comunidad Moodify</Text>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <LinearGradient colors={['#fde3e9', '#fde3e9']} style={styles.header}>
+          <View style={styles.headerInner}>
+            <View style={styles.headerLeft}>
+              <View style={styles.headerAvatarContainer}><Image source={avatarMap[currentUserAvatar]} style={styles.avatarImgSmall} /></View>
+              <View>
+                <Text style={styles.headerGreeting}>{t('forum.hi')}, {userValue?.user?.name?.split(' ')[0]}</Text>
+                <Text style={styles.headerSub}>{t('forum.community')} Moodify</Text>
+              </View>
             </View>
           </View>
-          <TouchableOpacity style={styles.headerIcon}>
-            <Feather name="bell" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Tab bar inside header */}
-        <View style={styles.tabBar}>
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'feed' && styles.tabItemActive]}
-            onPress={() => setActiveTab('feed')}
-            activeOpacity={0.8}
-          >
-            <Feather name="layout" size={14} color={activeTab === 'feed' ? '#4F46E5' : '#ffffffaa'} />
-            <Text style={[styles.tabText, activeTab === 'feed' && styles.tabTextActive]}>Feed</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'personas' && styles.tabItemActive]}
-            onPress={() => setActiveTab('personas')}
-            activeOpacity={0.8}
-          >
-            <Feather name="users" size={14} color={activeTab === 'personas' ? '#4F46E5' : '#ffffffaa'} />
-            <Text style={[styles.tabText, activeTab === 'personas' && styles.tabTextActive]}>Personas</Text>
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
-
-      {/* ── CONTENT ── */}
-      {activeTab === 'feed' ? (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {/* Friends moods */}
-          <View style={styles.section}>
-            <FriendsMoods onDiscoverPress={() => setActiveTab('personas')} />
-          </View>
-
-          {/* Staff announcements */}
-          <View style={styles.section}>
-            <StaffAnnouncements />
-          </View>
-
-          {/* Create post */}
-          <TouchableOpacity
-            style={styles.composeBar}
-            onPress={() => setShowPostModal(true)}
-            activeOpacity={0.85}
-          >
-            <LinearGradient colors={['#6366F1', '#A855F7']} style={styles.composeAvatar}>
-              <Text style={styles.composeAvatarText}>{userInitial}</Text>
-            </LinearGradient>
-            <Text style={styles.composePlaceholder}>¿Qué tienes en mente?</Text>
-            <LinearGradient colors={['#6366F1', '#A855F7']} style={styles.composeButton}>
-              <Feather name="edit-3" size={14} color="#fff" />
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {/* Posts feed header */}
-          <View style={styles.feedHeader}>
-            <Text style={styles.feedTitle}>Publicaciones</Text>
-            <TouchableOpacity style={styles.refreshBtn} onPress={fetchPosts}>
-              <Feather name="refresh-cw" size={14} color="#6366F1" />
+          <View style={styles.tabBar}>
+            <TouchableOpacity style={[styles.tabItem, activeTab === 'feed' && styles.tabItemActive]} onPress={() => setActiveTab('feed')}>
+              <Text style={[styles.tabText, activeTab === 'feed' && styles.tabTextActive]}>{t('forum.feed')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.tabItem, activeTab === 'personas' && styles.tabItemActive]} onPress={() => setActiveTab('personas')}>
+              <Text style={[styles.tabText, activeTab === 'personas' && styles.tabTextActive]}>{t('forum.people')}</Text>
             </TouchableOpacity>
           </View>
+        </LinearGradient>
 
-          {/* Posts */}
-          {loadingPosts ? (
-            <ActivityIndicator color="#6366F1" style={{ marginVertical: 40 }} />
-          ) : posts.length === 0 ? (
-            <View style={styles.emptyFeed}>
-              <Text style={styles.emptyEmoji}>💬</Text>
-              <Text style={styles.emptyTitle}>Sé el primero en publicar</Text>
-              <Text style={styles.emptySub}>La comunidad te está esperando</Text>
-              <TouchableOpacity
-                style={styles.emptyBtn}
-                onPress={() => setShowPostModal(true)}
-                activeOpacity={0.85}
-              >
-                <LinearGradient colors={['#6366F1', '#A855F7']} style={styles.emptyBtnGrad}>
-                  <Feather name="edit-3" size={14} color="#fff" />
-                  <Text style={styles.emptyBtnText}>Publicar algo</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            posts.map(post => (
-              <PostCard key={post.id} post={post} onLikeToggle={handleLikeToggle} />
-            ))
-          )}
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+          {activeTab === 'feed' ? (
+            <>
+              <StaffAnnouncements />
+              <Text style={styles.sectionTitle}>{t('forum.post')}</Text>
+              <View style={styles.inlineComposeContainer}>
+                <View style={styles.inlineComposeHeader}>
+                  <View style={styles.composeAvatar}><Image source={avatarMap[currentUserAvatar]} style={styles.avatarImgSmall} /></View>
+                  
+                  <TextInput
+                    style={[styles.inlineInput, { height: Math.max(45, inputHeight) }]}
+                    placeholder={t('forum.mind')}
+                    multiline
+                    value={inputText}
+                    onChangeText={setInputText}
+                    onContentSizeChange={(e) => setInputHeight(e.nativeEvent.contentSize.height)}
+                  />
+                </View>
+                {inputText.trim().length > 0 && (
+                  <View style={styles.inlineActionRow}>
+                     <TouchableOpacity style={styles.inlinePublishBtn} onPress={handleAction} disabled={postingLoading}>
+                        {postingLoading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.inlinePublishBtnText}>{t('forum.post')}</Text>}
+                     </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.feedHeader}><Text style={styles.feedTitle}>{feedTitle}</Text></View>
+
+              {loadingPosts && posts.length === 0 ? <ActivityIndicator color="'#FFECF0'" style={{ marginVertical: 40 }} /> : (
+                posts.length === 0 ? (
+                    <View style={styles.emptyFeedContainer}>
+                      <Feather name="users" size={40} color="#CBD5E1" />
+                      <Text style={styles.emptyFeedText}>{t('forum.notFollowingAnyoneYet')}</Text>
+                      <TouchableOpacity style={styles.discoverBtn} onPress={() => setActiveTab('personas')}><Text style={styles.discoverBtnText}>{t('forum.explorePeople')}</Text></TouchableOpacity>
+                    </View>
+                  ) : posts.map(post => (
+                      <PostCard 
+                        key={post.id} 
+                        post={post} 
+                        onLikeToggle={updatePostState} 
+                        onDelete={handleDeletePost}
+                        onBlockUser={handleBlockUser}
+                        onFollowToggle={handleFollowToggle}
+                        onCommentPress={() => { router.push("/community/comment/"+post.id); fetchComments(post.id); }} 
+                      />
+                  ))
+              )}
+            </>
+          ) : <DiscoverPeople />}
         </ScrollView>
-      ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <DiscoverPeople />
-        </ScrollView>
-      )}
-
-      <StaticBottomNavBar activeTab="community" />
-
-      {/* ── MODAL: Nueva publicación ── */}
-      <Modal visible={showPostModal} animationType="slide" transparent statusBarTranslucent>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <View style={styles.overlay}>
-            {/* Backdrop — tap to dismiss */}
-            <Pressable
-              style={StyleSheet.absoluteFill}
-              onPress={() => !postingLoading && setShowPostModal(false)}
+      </KeyboardAvoidingView>
+      <StaticBottomNavBar 
+              activeTab="community/feed" 
+              hasNotifications={unreadCount > 0} 
             />
-
-            {/* Sheet — isolated from backdrop taps */}
-            <View style={styles.sheet}>
-              <View style={styles.sheetHandle} />
-
-              <View style={styles.sheetHeader}>
-                <Text style={styles.sheetTitle}>Nueva publicación</Text>
-                <TouchableOpacity
-                  style={styles.sheetCloseBtn}
-                  onPress={() => setShowPostModal(false)}
-                  disabled={postingLoading}
-                >
-                  <Feather name="x" size={18} color="#64748B" />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.sheetDivider} />
-
-              <View style={styles.postInputRow}>
-                <LinearGradient colors={['#6366F1', '#A855F7']} style={styles.postAvatar}>
-                  <Text style={styles.postAvatarText}>{userInitial}</Text>
-                </LinearGradient>
-                <TextInput
-                  style={styles.postInput}
-                  placeholder="Comparte cómo te sientes, un logro o un pensamiento..."
-                  placeholderTextColor="#CBD5E1"
-                  value={postContent}
-                  onChangeText={setPostContent}
-                  multiline
-                  maxLength={1000}
-                  autoFocus
-                  editable={!postingLoading}
-                />
-              </View>
-
-              <View style={styles.postFooter}>
-                <Text style={styles.charCount}>{postContent.length}/1000</Text>
-                <TouchableOpacity
-                  onPress={handleCreatePost}
-                  disabled={!postContent.trim() || postingLoading}
-                  activeOpacity={0.85}
-                >
-                  <LinearGradient
-                    colors={(!postContent.trim() || postingLoading) ? ['#CBD5E1', '#CBD5E1'] : ['#6366F1', '#A855F7']}
-                    style={styles.publishBtn}
-                  >
-                    {postingLoading
-                      ? <ActivityIndicator color="#fff" size="small" />
-                      : <Text style={styles.publishBtnText}>Publicar</Text>
-                    }
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#F8FAFC' },
-
-  // Header
-  header: {
-    paddingTop: Platform.OS === 'ios' ? 54 : 44,
-    paddingBottom: 0,
-    paddingHorizontal: 20,
+  sectionTitle: {fontSize: 18, fontWeight: '800', color: '#7D5A5A', marginLeft: 20 },
+  root: { 
+    flex: 1, 
+    backgroundColor: '#FFF9FB' // Un blanco rosado muy suave
   },
-  headerInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+  header: { 
+    paddingTop: 60, 
+    paddingHorizontal: 20, 
+    paddingBottom: 15,
+    backgroundColor: '#FFDDE4' // Rosa pastel suave
   },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+  headerInner: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center' 
   },
-  headerAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#ffffff40',
+  headerLeft: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 12 
   },
-  headerAvatarText: { fontSize: 16, fontWeight: '800', color: '#fff' },
-  headerGreeting: { fontSize: 16, fontWeight: '800', color: '#fff' },
-  headerSub: { fontSize: 12, color: '#ffffff99', marginTop: 1 },
-  headerIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: '#ffffff15',
-    justifyContent: 'center',
-    alignItems: 'center',
+  headerAvatarContainer: { 
+    width: 44, 
+    height: 44, 
+    borderRadius: 22, 
+    borderWidth: 2, 
+    borderColor: '#FFF', 
+    overflow: 'hidden' 
   },
-
-  // Tabs
-  tabBar: {
-    flexDirection: 'row',
-    backgroundColor: '#ffffff20',
-    borderRadius: 16,
-    padding: 4,
-    marginBottom: -1,
-    gap: 4,
+  avatarImgSmall: { 
+    width: '100%', 
+    height: '100%', 
+    resizeMode: 'cover' 
   },
-  tabItem: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    borderRadius: 13,
+  headerGreeting: { 
+    color: '#7D5A5A', // Marrón suave para mejor contraste Kawaii
+    fontSize: 18, 
+    fontWeight: '800' 
   },
-  tabItemActive: {
-    backgroundColor: '#fff',
-    shadowColor: '#4F46E5',
+  headerSub: { 
+    color: '#7D5A5A', 
+    opacity: 0.6, 
+    fontSize: 13,
+    fontWeight: '600'
+  },
+  tabBar: { 
+    flexDirection: 'row', 
+    backgroundColor: 'rgba(255,255,255,0.4)', 
+    borderRadius: 20, 
+    marginTop: 20, 
+    padding: 5 
+  },
+  tabItem: { 
+    flex: 1, 
+    paddingVertical: 10, 
+    alignItems: 'center', 
+    borderRadius: 15 
+  },
+  tabItemActive: { 
+    backgroundColor: '#FFF',
+    // Sombra suave para que parezca "flotante"
+    shadowColor: '#FFB7C5',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
-    elevation: 3,
   },
-  tabText: { fontSize: 13, fontWeight: '700', color: '#ffffffaa' },
-  tabTextActive: { color: '#4F46E5' },
-
-  // Scroll
-  scrollContent: { paddingBottom: 110 },
-  section: { marginTop: 20 },
-
-  // Compose bar
-  composeBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 16,
-    marginTop: 20,
+  tabText: { 
+    color: '#A28B8B', 
+    fontWeight: '600' 
+  },
+  tabTextActive: { 
+    color: '#FF8DA1' // Rosa vibrante pero dulce
+  },
+  scrollContent: { 
+    paddingBottom: 120 
+  },
+  inlineComposeContainer: { 
+    backgroundColor: '#FFF', 
+    marginHorizontal: 20, 
+    marginTop: 15, 
+    borderRadius: 25, 
+    padding: 15, 
+    borderWidth: 2,
+    borderColor: '#FFECF0'
+  },
+  inlineComposeHeader: { 
+    flexDirection: 'row', 
+    alignItems: 'flex-start', 
+    gap: 10 
+  },
+  composeAvatar: { 
+    width: 40, 
+    height: 40, 
+    borderRadius: 20, 
+    overflow: 'hidden'
+  },
+  inlineInput: { 
+    flex: 1, 
+    fontSize: 16, 
+    color: '#7D5A5A', 
+    paddingTop: 10, 
+    textAlignVertical: 'top', 
+    minHeight: 45 
+  },
+  inlineActionRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'flex-end', 
+    marginTop: 10, 
+    borderTopWidth: 1.5, 
+    borderTopColor: '#FFECF0', 
+    paddingTop: 10 
+  },
+  inlinePublishBtn: { 
+    backgroundColor: '#B2E2F2', // Azul cielo pastel
+    paddingHorizontal: 22, 
+    paddingVertical: 10, 
+    borderRadius: 15 
+  },
+  inlinePublishBtnText: { 
+    color: '#5A808D', 
+    fontWeight: '800', 
+    fontSize: 14 
+  },
+  feedHeader: { 
+    paddingHorizontal: 20, 
+    marginTop: 25, 
+    marginBottom: 10 
+  },
+  feedTitle: { 
+    fontSize: 20, 
+    fontWeight: '900', 
+    color: '#7D5A5A' 
+  },
+  emptyFeedContainer: { 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    paddingHorizontal: 40, 
+    marginTop: 40 
+  },
+  emptyFeedText: { 
+    textAlign: 'center', 
+    color: '#B8A1A1', 
+    marginTop: 15, 
+    fontSize: 15, 
+    lineHeight: 22 
+  },
+  discoverBtn: { 
+    marginTop: 20, 
+    backgroundColor: '#E2F0CB', // Verde menta suave
+    paddingHorizontal: 25, 
+    paddingVertical: 12, 
+    borderRadius: 18 
+  },
+  discoverBtnText: { 
+    color: '#7B8D5A', 
+    fontWeight: '800' 
+  },
+  commentHeader: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between', 
+    paddingHorizontal: 20, 
+    paddingTop: 60, 
+    paddingBottom: 20, 
+    backgroundColor: '#FFF', 
+    borderBottomWidth: 2, 
+    borderBottomColor: '#FFECF0' 
+  },
+  commentHeaderTitle: { 
+    fontSize: 18, 
+    fontWeight: '800', 
+    color: '#7D5A5A' 
+  },
+  divider: { 
+    height: 2, 
+    backgroundColor: '#FFECF0', 
+    marginVertical: 12 
+  },
+  repliesTitle: { 
+    fontSize: 14, 
+    fontWeight: '800', 
+    color: '#D4A5A5', 
+    marginLeft: 20, 
+    marginBottom: 15 
+  },
+  commentCard: { 
+    flexDirection: 'row', 
+    marginBottom: 20, 
+    paddingHorizontal: 20, 
+    gap: 12 
+  },
+  avatar: { 
+    width: 40, 
+    height: 40, 
     borderRadius: 20,
-    padding: 14,
-    gap: 12,
-    shadowColor: '#6366F1',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
+    borderWidth: 1.5,
+    borderColor: '#FFDDE4'
   },
-  composeAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
+  avatarSmall: { 
+    width: 30, 
+    height: 30, 
+    borderRadius: 15 
   },
-  composeAvatarText: { fontSize: 14, fontWeight: '800', color: '#fff' },
-  composePlaceholder: { flex: 1, fontSize: 14, color: '#94A3B8' },
-  composeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  // Feed header
-  feedHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginTop: 24,
-    marginBottom: 14,
-  },
-  feedTitle: { fontSize: 17, fontWeight: '800', color: '#1E293B' },
-  refreshBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#EEF2FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  // Empty feed
-  emptyFeed: {
-    alignItems: 'center',
-    paddingVertical: 50,
-    gap: 8,
-  },
-  emptyEmoji: { fontSize: 48, marginBottom: 4 },
-  emptyTitle: { fontSize: 17, fontWeight: '800', color: '#1E293B' },
-  emptySub: { fontSize: 14, color: '#94A3B8' },
-  emptyBtn: { marginTop: 16, borderRadius: 20, overflow: 'hidden' },
-  emptyBtnGrad: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 24,
-    paddingVertical: 13,
-  },
-  emptyBtnText: { fontSize: 15, fontWeight: '700', color: '#fff' },
-
-  // Modal
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(15,23,42,0.5)',
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    padding: 24,
-    paddingBottom: 44,
-  },
-  sheetHandle: {
-    width: 36,
-    height: 4,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  sheetHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sheetTitle: { fontSize: 20, fontWeight: '800', color: '#1E293B' },
-  sheetCloseBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: '#F1F5F9',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sheetDivider: { height: 1, backgroundColor: '#F1F5F9', marginBottom: 20 },
-
-  // Post modal
-  postInputRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
-  postAvatar: {
-    width: 40,
-    height: 40,
+  commentContent: { 
+    flex: 1, 
+    backgroundColor: '#FFF0F3', // Rosa nube muy claro
+    padding: 15, 
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexShrink: 0,
+    borderTopLeftRadius: 5 // Estilo burbuja de chat
   },
-  postAvatarText: { fontSize: 16, fontWeight: '800', color: '#fff' },
-  postInput: {
-    flex: 1,
+  author: { 
+    fontWeight: '800', 
+    marginBottom: 4, 
+    fontSize: 14, 
+    color: '#7D5A5A' 
+  },
+  text: { 
+    color: '#8A6E6E', 
     fontSize: 15,
-    color: '#1E293B',
-    minHeight: 110,
-    textAlignVertical: 'top',
-    lineHeight: 23,
+    lineHeight: 20
   },
-  postFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 14,
-    borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
+  replyBtnText: { 
+    color: '#FF8DA1', 
+    fontSize: 13, 
+    fontWeight: '800', 
+    marginTop: 8 
   },
-  charCount: { fontSize: 12, color: '#CBD5E1', fontWeight: '500' },
-  publishBtn: {
-    paddingHorizontal: 28,
-    paddingVertical: 13,
-    borderRadius: 22,
-    minWidth: 110,
-    alignItems: 'center',
+  replyInfoBar: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    paddingHorizontal: 20, 
+    paddingVertical: 10, 
+    backgroundColor: '#FFF0F3' 
   },
-  publishBtnText: { fontSize: 15, fontWeight: '700', color: '#fff' },
+  replyInfoText: { 
+    fontSize: 13, 
+    color: '#D4A5A5',
+    fontWeight: '600'
+  },
+  commentInputBar: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: 15, 
+    backgroundColor: '#FFF', 
+    borderTopWidth: 2, 
+    borderTopColor: '#FFECF0', 
+    gap: 12 
+  },
+  inputField: { 
+    flex: 1, 
+    backgroundColor: '#FFF9FB', 
+    borderRadius: 25, 
+    paddingHorizontal: 20, 
+    paddingVertical: 10, 
+    maxHeight: 100,
+    borderWidth: 1.5,
+    borderColor: '#FFECF0',
+    color: '#7D5A5A'
+  },
+  emptyText: { 
+    textAlign: 'center', 
+    marginTop: 20, 
+    color: '#D4A5A5',
+    fontWeight: '600'
+  },
 });
 
 export default ForumView;
