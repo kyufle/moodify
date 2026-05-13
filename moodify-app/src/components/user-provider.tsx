@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 import { createContext, ReactNode, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export const getUserThemeFromContext = (userValue: any) => ({
     bgName: userValue?.user?.bg_image,
@@ -18,12 +19,21 @@ export const UserContext = createContext<any>(null);
 
 export default function UserProvider({ children }: { children: ReactNode }) {
     const router = useRouter();
+    const { i18n } = useTranslation();
     const [unreadCount, setUnreadCount] = useState(0);
     const [userValue, setUserValue] = useState(defaultUserValue);
     const logout = () => {
         router.replace('/');
         setUserValue(defaultUserValue);
     }
+
+    useEffect(() => {
+        // @ts-ignore
+        if (!userValue?.user?.language)
+            return;
+         // @ts-ignore
+        i18n.changeLanguage(userValue.user.language)
+    }, [userValue]);
 
     useEffect(() => {
         if (!userValue.accessToken) return;

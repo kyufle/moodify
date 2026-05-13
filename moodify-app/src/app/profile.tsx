@@ -187,9 +187,20 @@ export default function ProfileScreen() {
     finally { setLoading(false); }
   };
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    setActiveModal(null);
+  const changeLanguage = async (lng: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}profile/update`, {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({ language: lng }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUserValue({ ...userValue, user: data.user });
+      }
+    } catch (e) { Alert.alert("Error", "Error de conexión"); }
+    finally { setLoading(false); setActiveModal(null);}
   };
 
   return (
