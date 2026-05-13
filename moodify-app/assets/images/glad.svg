@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 2400 1800" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(3.585592,0,0,2.933838,-772.958052,-1166.712969)">
+        <ellipse cx="338.231" cy="725.773" rx="67.025" ry="65.075" style="fill:rgb(255,127,114);stroke:rgb(255,127,114);stroke-width:3.75px;"/>
+    </g>
+    <g transform="matrix(3.585592,0,0,2.933838,747.442012,-1184.958092)">
+        <ellipse cx="338.231" cy="725.773" rx="67.025" ry="65.075" style="fill:rgb(255,127,114);stroke:rgb(255,127,114);stroke-width:3.75px;"/>
+    </g>
+    <g transform="matrix(-1.636395,-0.021763,0.020636,-1.637183,2187.44469,3522.579813)">
+        <path d="M149.705,1680.472L170.287,1680.472C170.287,1775.584 254.37,1852.687 358.093,1852.687C461.816,1852.687 545.899,1775.584 545.899,1680.472L566.481,1680.472C566.481,1786.007 473.183,1871.56 358.093,1871.56C243.004,1871.56 149.705,1786.007 149.705,1680.472Z" style="stroke:black;stroke-width:7.5px;"/>
+    </g>
+    <g transform="matrix(-1.636395,-0.021763,0.020636,-1.637183,1268.475749,3518.542135)">
+        <path d="M149.705,1680.472L170.287,1680.472C170.287,1775.584 254.37,1852.687 358.093,1852.687C461.816,1852.687 545.899,1775.584 545.899,1680.472L566.481,1680.472C566.481,1786.007 473.183,1871.56 358.093,1871.56C243.004,1871.56 149.705,1786.007 149.705,1680.472Z" style="stroke:black;stroke-width:7.5px;"/>
+    </g>
+    <g transform="matrix(4.385004,0,0,3.350257,-99.210331,-951.332141)">
+        <path d="M218.218,636.097C232.549,627.541 339.253,625.322 355.046,632.805C370.839,640.288 327.306,672.44 312.975,680.996C300.373,688.519 282.321,690.426 269.058,684.142C253.265,676.658 203.886,644.653 218.218,636.097Z" style="fill:rgb(255,218,218);stroke:rgb(255,218,218);stroke-width:0.26px;"/>
+    </g>
+</svg>
