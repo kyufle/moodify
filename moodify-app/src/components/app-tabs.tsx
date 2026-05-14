@@ -4,7 +4,6 @@ import { Tabs } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { UserContext } from './user-provider';
 
-// Componente custom para la barra de navegación inferior
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
@@ -14,7 +13,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
       {/* Botón 1: Calendario */}
       <TouchableOpacity 
         style={styles.tabItem} 
-        onPress={() => navigation.navigate('calendar')} // Ruta placeholder
+        onPress={() => navigation.navigate('calendar')}
       >
         <Feather name="calendar" size={24} color={state.index === 0 ? "#1E293B" : "#94A3B8"} />
       </TouchableOpacity>
@@ -22,7 +21,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
       {/* Botón 2: Comunidad/Usuarios */}
       <TouchableOpacity 
         style={styles.tabItem} 
-        onPress={() => navigation.navigate('community/feed')} // Ruta placeholder
+        onPress={() => navigation.navigate('community/feed')}
       >
         <Feather name="users" size={24} color={state.index === 1 ? "#1E293B" : "#94A3B8"} />
       </TouchableOpacity>
@@ -41,7 +40,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
       {/* Botón 4: Perfil */}
       <TouchableOpacity 
         style={styles.tabItem} 
-        onPress={() => navigation.navigate('profile')} // Ruta placeholder
+        onPress={() => navigation.navigate('profile')}
       >
         <Feather name="user" size={24} color={state.index === 3 ? "#1E293B" : "#94A3B8"} />
       </TouchableOpacity>
@@ -49,7 +48,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
       {/* Botón 5: Chat */}
       <TouchableOpacity 
         style={styles.tabItem} 
-        onPress={() => navigation.navigate('chat')} // Ruta placeholder
+        onPress={() => navigation.navigate('chat')}
       >
         <Feather name="message-circle" size={24} color={state.index === 4 ? "#1E293B" : "#94A3B8"} />
       </TouchableOpacity>
@@ -99,7 +98,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   homeButtonWrapper: {
-    top: -20, // Elevarlo fuera de la barra
+    top: -20,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -107,7 +106,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#334155', // Color base oscuro del UI
+    backgroundColor: '#334155',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',

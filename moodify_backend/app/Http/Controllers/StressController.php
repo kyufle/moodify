@@ -64,7 +64,7 @@ class StressController extends Controller
                 return response()->json(['exists' => false]);
             }
 
-            arsort($totals); // Sorts associative array by value in descending order
+            arsort($totals);
             $dominantEmotion = array_key_first($totals);
             $count = $totals[$dominantEmotion];
 
@@ -72,7 +72,7 @@ class StressController extends Controller
                 'exists' => true,
                 'dominant_emotion' => $dominantEmotion,
                 'total_occurrences' => $count,
-                'all_totals' => $totals, // Optional: returns the full breakdown for the month
+                'all_totals' => $totals,
                 'month' => now()->format('F')
             ]);
 

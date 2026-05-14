@@ -24,7 +24,6 @@ export const MoodCalendar = () => {
   const [calendarData, setCalendarData] = useState<Record<string, string>>({});
   const [history, setHistory] = useState<any[]>([]);
 
-  // Efecto para cargar datos iniciales
   useEffect(() => {
     if (token) {
       fetchData();
@@ -41,7 +40,6 @@ export const MoodCalendar = () => {
     if (!token) return;
     setLoading(true);
     try {
-      // Cargamos calendario e historial en paralelo
       const [resCal, resHis] = await Promise.all([
         fetch(`${API_BASE_URL}/get-mood-calendar`, { headers: getHeaders() }),
         fetch(`${API_BASE_URL}/get-today-timeline`, { headers: getHeaders() })
@@ -84,7 +82,6 @@ export const MoodCalendar = () => {
         setSelectedMood(null);
         setShowDiaryInput(false);
         setCurrentView('calendar');
-        // fetchData() se disparará por el useEffect al cambiar el view
       } else {
         Alert.alert("Error", result.message || "No se pudo guardar");
       }
@@ -95,7 +92,6 @@ export const MoodCalendar = () => {
     }
   };
 
-  // --- LÓGICA DE CALENDARIO ---
   const daysOfWeek = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
   const today = new Date();
   const currentDay = today.getDate();
@@ -106,7 +102,6 @@ export const MoodCalendar = () => {
   for (let i = 0; i < startDay; i++) gridCells.push({ day: null });
   for (let i = 1; i <= daysInMonth; i++) gridCells.push({ day: i });
 
-  // --- VISTAS ---
   if (currentView === 'register') {
     return (
       <ScrollView style={styles.registerContainer}>

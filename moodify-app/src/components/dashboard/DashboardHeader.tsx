@@ -6,15 +6,13 @@ import { ThemedText } from '../themed-text';
 import { avatarMap } from '../../utils/utils';
 import { useTranslation } from 'react-i18next';
 
-// Asegúrate de que la ruta sea correcta
 import AlertsDrawer from './AlertsDrawer'; 
 
 export const DashboardHeader = () => {
-  const { userValue } = React.useContext(UserContext); // Cambiado a useContext por convención
+  const { userValue } = React.useContext(UserContext);
   const { t } = useTranslation();
   
   const [isAlertsVisible, setIsAlertsVisible] = useState(false);
-  // NUEVO: Estado para saber cuántas notificaciones hay
   const [unreadAlerts, setUnreadAlerts] = useState(0);
 
   if (userValue?.user == null) return null;
@@ -36,8 +34,6 @@ export const DashboardHeader = () => {
             onPress={() => setIsAlertsVisible(true)}
           >
             <Feather name="bell" size={18} color="#64748B" />
-            
-            {/* NUEVO: Puntito rojo si hay notificaciones */}
             {unreadAlerts > 0 && (
               <View style={styles.redBadge} />
             )}
@@ -69,11 +65,10 @@ export const DashboardHeader = () => {
         </View>
       </View>
 
-      {/* RENDERIZAMOS SIEMPRE EL DRAWER (Aunque esté oculto) para que el setInterval funcione */}
       <AlertsDrawer 
         isVisible={isAlertsVisible} 
         onClose={() => setIsAlertsVisible(false)} 
-        onUnreadCount={(count) => setUnreadAlerts(count)} // Recibimos la cantidad
+        onUnreadCount={(count) => setUnreadAlerts(count)}
       />
     </>
   );
@@ -171,9 +166,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative' // Necesario para colocar el puntito encima
+    position: 'relative'
   },
-  // NUEVO: Estilo para el puntito rojo
   redBadge: {
     position: 'absolute',
     top: 6,

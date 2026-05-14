@@ -36,7 +36,6 @@ export default function BloomChatScreen() {
   const { t, i18n } = useTranslation();
   const { unreadCount } = useContext(UserContext);
   
-  // Estados
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -48,7 +47,6 @@ export default function BloomChatScreen() {
   const userContext = useContext(UserContext);
   const token = userContext?.userValue?.accessToken;
 
-  // 1. Efecto para inicializar el mensaje de bienvenida traducido
   useEffect(() => {
     if (messages.length === 0) {
       setMessages([
@@ -63,7 +61,6 @@ export default function BloomChatScreen() {
     }
   }, [t]);
 
-  // 2. Efecto para scroll automático al final (Android requiere onContentSizeChange también)
   const scrollToBottom = () => {
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -138,13 +135,10 @@ export default function BloomChatScreen() {
       <DashboardBackground>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
           <KeyboardAvoidingView 
-            // En Android 'height' es más estable que padding
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.keyboardView}
-            // Offset ajustado para Android y iOS considerando la barra inferior
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
           >
-            {/* Header */}
             <View style={styles.header}>
               <View style={styles.headerLeft}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -166,7 +160,6 @@ export default function BloomChatScreen() {
               </View>
             </View>
 
-            {/* Área de Chat */}
             <View style={styles.chatContainer}>
               <ScrollView 
                 ref={scrollViewRef}
@@ -174,7 +167,6 @@ export default function BloomChatScreen() {
                 contentContainerStyle={styles.chatContent}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
-                // Crucial para Android: hace scroll cuando el contenido cambia al abrir teclado
                 onContentSizeChange={scrollToBottom}
               >
                 {messages.map((msg) => (
@@ -197,7 +189,6 @@ export default function BloomChatScreen() {
               </ScrollView>
             </View>
 
-            {/* Sección de Entrada (Sin margin fijo abajo) */}
             <View style={styles.inputSection}>
               {!isBlocked && (
                 <View style={styles.quickActionsArea}>
@@ -252,7 +243,6 @@ export default function BloomChatScreen() {
         onToggleBlock={() => setIsBlocked(!isBlocked)}
       />
       
-      {/* El BottomNav se queda fuera del KeyboardAvoidingView para no estorbar */}
       <StaticBottomNavBar 
         activeTab="chat" 
         hasNotifications={unreadCount > 0} 
@@ -304,7 +294,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FCE7F3',
     elevation: 8,
-    paddingBottom: Platform.OS === 'android' ? 65 : 20, // Compensamos la altura de la Nav Bar
+    paddingBottom: Platform.OS === 'android' ? 65 : 20,
   },
   quickActionsArea: {
     paddingVertical: 10,

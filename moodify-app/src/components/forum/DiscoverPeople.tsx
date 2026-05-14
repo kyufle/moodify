@@ -110,14 +110,12 @@ export const DiscoverPeople = () => {
   const fetchData = useCallback(async () => {
     if (!token) { setLoadingSuggested(false); return; }
     try {
-      // 1. Obtener bloqueados
       const blockRes = await fetch(`${API}community/blocked-users`, { headers: authHeaders });
       const blockedData = await blockRes.json();
       if (Array.isArray(blockedData)) {
         setBlockedIds(blockedData.map((u: any) => u.id));
       }
 
-      // 2. Obtener sugeridos
       const suggRes = await fetch(`${API}community/suggested`, { headers: authHeaders });
       const suggData = await suggRes.json();
       if (Array.isArray(suggData)) {
@@ -164,7 +162,6 @@ export const DiscoverPeople = () => {
     } catch {}
   };
 
-  // Filtrar por IDs bloqueados
   const displayList = (query.trim() ? searchResults : suggested)
     .filter(person => !blockedIds.includes(person.id));
 

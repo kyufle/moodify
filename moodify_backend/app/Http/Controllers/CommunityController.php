@@ -7,7 +7,7 @@ use App\Models\Publication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema; // CRÍTICO: Importar Schema
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 class CommunityController extends Controller
@@ -82,7 +82,6 @@ class CommunityController extends Controller
             $postsQuery = DB::table('publications')
                 ->join('users', 'publications.user_id', '=', 'users.id');
 
-            // Incluimos al propio usuario para que pueda ver sus propios posts (opcional)
             $allowedUserIds = array_merge($followingIds, [$userId]);
             $postsQuery->whereIn('publications.user_id', $allowedUserIds);
 
@@ -112,8 +111,6 @@ class CommunityController extends Controller
 
                 $commentsCount = DB::table('comments')->where('publication_id', $post->id)->count();
 
-                // Como ya filtramos por seguidos arriba, sabemos que si el user_id 
-                // está en el array $followingIds, lo estamos siguiendo.
                 $isFollowing = in_array($post->user_id, $followingIds);
 
                 return array_merge((array) $post, [
@@ -275,8 +272,8 @@ class CommunityController extends Controller
                 'followed_id' => $id
             ],
             [
-                'created_at' => \Carbon\Carbon::now(), // <-- Añade esto
-                'updated_at' => \Carbon\Carbon::now()  // <-- Añade esto
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now()
             ]
         );
         
@@ -294,7 +291,6 @@ class CommunityController extends Controller
     public function blockUser(Request $request, $id) {
         $userId = Auth::id();
         
-        // Aseguramos que la tabla exista antes de insertar
         if (Schema::hasTable('user_blocks')) {
             DB::table('user_blocks')->insert([
                 'blocker_id' => $userId,
@@ -311,7 +307,6 @@ class CommunityController extends Controller
     try {
         $userId = Auth::id();
         
-        // Importante: Verifica que el nombre de la tabla sea 'user_blocks'
         $blocked = DB::table('user_blocks')
             ->join('users', 'user_blocks.blocked_id', '=', 'users.id')
             ->where('user_blocks.blocker_id', $userId)
@@ -320,7 +315,6 @@ class CommunityController extends Controller
 
         return response()->json($blocked);
     } catch (\Exception $e) {
-        // Esto te ayudará a ver el error en el cuerpo de la respuesta si estás en desarrollo
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
@@ -329,7 +323,6 @@ public function unblockUser($id)
     try {
         $userId = Auth::id();
         
-        // Eliminamos el registro de la tabla
         $deleted = DB::table('user_blocks')
             ->where('blocker_id', $userId)
             ->where('blocked_id', $id)
@@ -345,12 +338,10 @@ public function unblockUser($id)
         try {
             $userId = Auth::id();
 
-            // 1. Obtener las alertas descartadas por este usuario
             $dismissed = DB::table('dismissed_alerts')
                 ->where('user_id', $userId)
                 ->get(['alert_type', 'reference_id']);
 
-            // 2. Obtener Likes
             $likes = DB::table('post_likes')
                 ->join('publications', 'post_likes.publication_id', '=', 'publications.id')
                 ->join('users', 'post_likes.user_id', '=', 'users.id')
@@ -359,7 +350,6 @@ public function unblockUser($id)
                 ->select('post_likes.id as id', 'post_likes.publication_id as publication_id', 'users.name as user_name', 'users.username', 'users.image_id as avatar', 'post_likes.created_at as date', DB::raw("'like' as type"))
                 ->get();
 
-            // 3. Obtener Comentarios
             $comments = DB::table('comments')
                 ->join('publications', 'comments.publication_id', '=', 'publications.id')
                 ->join('users', 'comments.user_id', '=', 'users.id')
@@ -368,7 +358,6 @@ public function unblockUser($id)
                 ->select('comments.id as id', 'comments.publication_id as publication_id', 'users.name as user_name', 'users.username', 'users.image_id as avatar', 'comments.date as date', DB::raw("'comment' as type"))
                 ->get();
 
-            // 4. Obtener Follows (Nuevos seguidores)
             $follows = DB::table('followed_follower')
                 ->join('users', 'followed_follower.follower_id', '=', 'users.id')
                 ->where('followed_follower.followed_id', $userId)
@@ -377,15 +366,13 @@ public function unblockUser($id)
                     'users.name as user_name', 
                     'users.username', 
                     'users.image_id as avatar', 
-                    'followed_follower.created_at as date', // <-- ¡CAMBIA ESTO AQUÍ!
+                    'followed_follower.created_at as date',
                     DB::raw("'follow' as type")
                 )
                 ->get();
 
-            // 5. Unir todas, FILTRAR las descartadas, y ordenar por fecha
             $alerts = $likes->concat($comments)->concat($follows)
                 ->reject(function ($alert) use ($dismissed) {
-                    // Si la alerta coincide con una descartada, se ignora y no se envía a la app
                     return $dismissed->where('alert_type', $alert->type)->where('reference_id', $alert->id)->count() > 0;
                 })
                 ->sortByDesc('date')
@@ -412,8 +399,5 @@ public function unblockUser($id)
         ]);
 
         return response()->json(['success' => true]);
-    }
-
-    // ACTUALIZA TU getAlerts ACTUAL CON ESTO:
-  
+    }  
 }

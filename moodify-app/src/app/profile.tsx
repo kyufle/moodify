@@ -12,7 +12,6 @@ import { DashboardBackground } from '@/components/dashboard/DashboardBackground'
 import { StaticBottomNavBar } from '@/components/StaticBottomNavBar';
 import { avatarMap } from '../utils/utils';
 
-// Componentes de perfil
 import { HabitProgress } from '@/components/profile/HabitProgress';
 import { ChallengesSection } from '@/components/profile/ChallengesSection';
 import { AchievementsBar } from '@/components/profile/AchievementsBar';
@@ -20,7 +19,6 @@ import { ProgressDashboard } from '@/components/calendar/ProgressDashboard';
 
 const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://moodify_backend.test/api/';
 
-// --- COMPONENTE SUB-MODAL ---
 const SettingsModal = ({ visible, title, onClose, onSave, loading, showSave = true, children }: any) => {
   const { t } = useTranslation();
   return (
@@ -127,7 +125,6 @@ export default function ProfileScreen() {
     });
 
     if (res.ok) {
-      // Filtramos el usuario de la lista local para que desaparezca de la vista
       setBlockedUsers((prev) => prev.filter(user => user.id !== blockedUserId));
       Alert.alert(t('exito'), t('Usuario desbloqueado'));
     } else {
@@ -283,7 +280,6 @@ export default function ProfileScreen() {
         </ScrollView>
       </DashboardBackground>
 
-      {/* MODAL PERFIL */}
       <SettingsModal visible={activeModal === 'perfil'} title={t('profile.editarPerfil')} onClose={() => setActiveModal(null)} onSave={handleUpdateInfo} loading={loading}>
           <Text style={styles.inputLabel}>{t('profile.username')} (@)</Text>
           <View style={styles.inputWithPrefix}>
@@ -301,7 +297,6 @@ export default function ProfileScreen() {
           <TextInput style={styles.input} value={formProfile.email} onChangeText={(text) => setFormProfile({...formProfile, email: text})} keyboardType="email-address" autoCapitalize="none" />
       </SettingsModal>
 
-      {/* MODAL PASSWORD */}
       <SettingsModal visible={activeModal === 'password'} title={t('profile.changePassword')} onClose={() => setActiveModal(null)} onSave={handleChangePassword} loading={loading}>
           <Text style={styles.inputLabel}>{t('profile.currentPassword')}</Text>
           <TextInput style={styles.input} secureTextEntry value={formPassword.current_password} onChangeText={(text) => setFormPassword({...formPassword, current_password: text})} />
@@ -311,7 +306,6 @@ export default function ProfileScreen() {
           <TextInput style={styles.input} secureTextEntry value={formPassword.password_confirmation} onChangeText={(text) => setFormPassword({...formPassword, password_confirmation: text})} />
       </SettingsModal>
 
-      {/* MODAL IDIOMA */}
       <SettingsModal visible={activeModal === 'idioma'} title={t('profile.language')} onClose={() => setActiveModal(null)} showSave={false}>
         <TouchableOpacity style={styles.langOption} onPress={() => changeLanguage('es')}>
           <Text style={[styles.langText, i18n.language === 'es' && styles.langTextActive]}>Español</Text>
@@ -327,7 +321,6 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </SettingsModal>
 
-      {/* MODAL AVATAR */}
       <SettingsModal visible={activeModal === 'avatar'} title={t('seleccionar_avatar')} onClose={() => setActiveModal(null)} showSave={false}>
         <View style={styles.avatarGrid}>
           {Object.keys(avatarMap).map((key) => (
@@ -339,7 +332,6 @@ export default function ProfileScreen() {
         </View>
       </SettingsModal>
 
-      {/* MODAL BLOQUEADOS */}
       <SettingsModal visible={activeModal === 'bloqueados'} title={t('profile.userBlocked')} onClose={() => setActiveModal(null)} showSave={false}>
         {loading ? (
           <ActivityIndicator color="#8a5cf6" style={{ marginVertical: 20 }} />

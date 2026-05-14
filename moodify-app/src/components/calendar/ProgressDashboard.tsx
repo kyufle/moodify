@@ -25,7 +25,6 @@ export const ProgressDashboard: React.FC = () => {
         'Accept': 'application/json' 
       };
 
-      // Basado en tus capturas, asumimos que estos endpoints devuelven la info del mes
       const [resMoods, resStress, resSleep] = await Promise.all([
         fetch(`${process.env.EXPO_PUBLIC_API_URL}get-monthly-stats`, { headers }),
         fetch(`${process.env.EXPO_PUBLIC_API_URL}stressSummary`, { headers }),

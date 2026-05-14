@@ -153,12 +153,8 @@ const es = {
     icon: 'Icono',
     color: 'Color',
     close: 'Cerrar',
-    // save: 'Guardar', // Duplicado en tu original
-    // changePassword: 'Cambiar contraseña', // Duplicado
     userBlocked: 'Usuarios bloqueados',
     dontBlocked: 'No tienes usuarios bloqueados',
-    // currentPassword: 'Contraseña actual', // Duplicado
-    // newPassword: 'Nueva contraseña', // Duplicado
     confirmPassword: 'Confirma la nueva contraseña',
     delete: 'Borrar',
   },

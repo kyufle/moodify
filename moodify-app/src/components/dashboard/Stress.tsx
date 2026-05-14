@@ -201,7 +201,7 @@ if (view === 'ROCO') {
         </View>
 
         <TouchableOpacity 
-          style={[styles.btnSecondaryOutline, { backgroundColor: mainLevel.color }]} // Aquí aplicamos el color dinámico
+          style={[styles.btnSecondaryOutline, { backgroundColor: mainLevel.color }]}
           onPress={startQuiz}
         >
           <Text style={styles.btnSecondaryText}>{t('dashboard.repeatTest')}</Text>

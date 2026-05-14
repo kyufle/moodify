@@ -94,7 +94,6 @@ export default function UserProvider({ children }: { children: ReactNode }) {
         return () => clearInterval(interval);
     }, [userValue.accessToken]);
 
-    // Prevent rendering children until we know if the user is logged in
     if (!isLoaded) return null;
 
     return <UserContext value={{

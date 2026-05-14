@@ -10,13 +10,11 @@ interface MonthlySummaryProps {
 export const MonthlySummary = ({ calendarData }: MonthlySummaryProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // 1. Contar frecuencias
   const moodCounts: Record<string, number> = {};
   Object.values(calendarData).forEach((mood) => {
     moodCounts[mood] = (moodCounts[mood] || 0) + 1;
   });
 
-  // 2. Convertir a array y ordenar de mayor a menor
   const sortedMoods = Object.entries(moodCounts).sort((a, b) => b[1] - a[1]);
   const totalDays = Object.values(moodCounts).reduce((a, b) => a + b, 0);
 
@@ -40,7 +38,6 @@ export const MonthlySummary = ({ calendarData }: MonthlySummaryProps) => {
         <View style={styles.content}>
           <Text style={styles.totalText}>Has registrado {totalDays} días este mes</Text>
           
-          {/* DIAGRAMA DE BARRAS / LEYENDA */}
           {sortedMoods.map(([mood, count]) => {
             const config = MOOD_CONFIG[mood] || { color: '#E2E8F0', icon: null };
             const percentage = (count / totalDays) * 100;

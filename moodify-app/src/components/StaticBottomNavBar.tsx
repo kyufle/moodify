@@ -3,7 +3,6 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-// Añadimos hasNotifications a la interfaz
 interface Props {
   activeTab: 'calendar' | 'community/feed' | 'home' | 'user' | 'chat';
   hasNotifications?: boolean;
@@ -24,7 +23,6 @@ export const StaticBottomNavBar = ({ activeTab, hasNotifications }: Props) => {
         <Feather name="users" size={24} color={activeTab === 'community/feed' ? '#1E293B' : '#94A3B8'} />
       </TouchableOpacity>
 
-      {/* Botón Home (Elevado) */}
       <View style={styles.homeButtonWrapper}>
         <TouchableOpacity 
           style={[styles.homeButton, activeTab !== 'home' && styles.homeButtonInactive]} 
@@ -50,7 +48,6 @@ export const StaticBottomNavBar = ({ activeTab, hasNotifications }: Props) => {
       >
         <View>
           <Feather name="message-circle" size={24} color={activeTab === 'chat' ? '#1E293B' : '#94A3B8'} />
-          {/* Círculo de notificación */}
           {hasNotifications && <View style={styles.notificationDot} />}
         </View>
       </TouchableOpacity>
@@ -59,7 +56,6 @@ export const StaticBottomNavBar = ({ activeTab, hasNotifications }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  // ... (tus otros estilos se mantienen igual)
   tabBarContainer: {
     position: 'absolute',
     bottom: 0,
@@ -92,7 +88,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#bf98eb', // Rojo vibrante
+    backgroundColor: '#bf98eb',
     borderWidth: 1.5,
     borderColor: '#FFFFFF',
   },

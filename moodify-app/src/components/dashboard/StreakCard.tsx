@@ -164,10 +164,10 @@ const styles = StyleSheet.create({
   card: { backgroundColor: '#E8EAFD', borderRadius: 24, padding: 20, marginHorizontal: 20, marginTop: 20, elevation: 4, minHeight: 180 },
   title: { fontSize: 18, fontWeight: '700', color: '#334155', marginBottom: 16 },
   weekContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
-  dayItem: { alignItems: 'center', justifyContent: 'center', width: 40, height: 52, borderRadius: 20 }, // Reducido de 60 a 52
+  dayItem: { alignItems: 'center', justifyContent: 'center', width: 40, height: 52, borderRadius: 20 },
   dayItemToday: { backgroundColor: '#FFF1E6', borderWidth: 2, borderColor: '#FFFFFF', height: 70 },
   diamondIcon: { width: 24, height: 24 },
-  dayLabel: { fontSize: 12, color: '#94A3B8', marginTop: -2, fontWeight: '500' }, // Cambiado de 4 a -2 para acercarlo
+  dayLabel: { fontSize: 12, color: '#94A3B8', marginTop: -2, fontWeight: '500' },
   dayLabelToday: { color: '#D97706', fontWeight: '700', position: 'relative', top: -7 },
   dayLabelRecorded: { color: '#6B21A8', fontWeight: '600' },
   button: { backgroundColor: '#FFFFFF', borderRadius: 20, paddingVertical: 14, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', elevation: 3 },

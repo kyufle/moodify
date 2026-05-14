@@ -75,9 +75,8 @@ export const CalendarGrid = () => {
     if (!selectedMood) return Alert.alert("Aviso", "Selecciona una emoción");
     setLoading(true);
 
-    // Capturamos la fecha manual YYYY-MM-DD para evitar desfases de día
     const now = new Date();
-    const dateString = now.toLocaleDateString('en-CA'); // Formato YYYY-MM-DD local
+    const dateString = now.toLocaleDateString('en-CA');
 
     try {
       const response = await fetch(`${API_BASE_URL}/save-mood`, {
@@ -230,8 +229,6 @@ export const CalendarGrid = () => {
             {isHistoryExpanded && (
               <View style={styles.historyList}>
                 {history.map(item => {
-                  // TRUCO: Si la fecha viene del servidor sin zona, le añadimos 'Z' 
-                  // para que JS sepa que es UTC y la convierta a local (+2h en España)
                   let dateStr = item.time || item.created_at || item.date;
                   if (dateStr && !dateStr.includes('Z') && !dateStr.includes('+')) {
                     dateStr += 'Z';

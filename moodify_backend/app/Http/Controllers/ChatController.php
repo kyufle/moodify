@@ -21,9 +21,6 @@ class ChatController extends Controller
         $this->psicologo = $psicologo;
     }
 
-    /**
-     * Lista las conversaciones P2P del usuario logueado.
-     */
 public function index()
     {
         try {
@@ -65,7 +62,6 @@ public function getMessagesByUserId($recipientId)
         $authUserId = Auth::id();
         $recipientId = (int)$recipientId;
 
-        // Actualizar última conexión
         User::where('id', $authUserId)->update(['last_seen_at' => now()]);
 
         $recipient = User::find($recipientId);
@@ -74,9 +70,6 @@ public function getMessagesByUserId($recipientId)
             $isOnline = $recipient->last_seen_at->diffInSeconds(now()) < 30;
         }
 
-        // --- SOLUCIÓN AL UNDEFINED ---
-        // Buscamos la conversación, y si no existe (chat nuevo), la creamos al momento.
-        // Así el frontend siempre recibe un ID válido en 'data.conversation.id'
         $conversation = Conversation::where('type', 'p2p')
             ->where(function($query) use ($authUserId, $recipientId) {
                 $query->where(function($q) use ($authUserId, $recipientId) {
@@ -103,7 +96,7 @@ public function getMessagesByUserId($recipientId)
         return response()->json([
             'messages' => $messages,
             'recipient_online' => $isOnline,
-            'conversation' => $conversation // Ahora esto NUNCA será null ni undefined
+            'conversation' => $conversation
         ]);
 
     } catch (\Exception $e) {

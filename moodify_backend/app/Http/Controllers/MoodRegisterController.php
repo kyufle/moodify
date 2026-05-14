@@ -9,13 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class MoodRegisterController extends Controller
 {
-    /**
-     * Guarda un nuevo registro de estado de ánimo.
-     */
     public function saveMood(Request $request)
     {
         try {
-            // Establecemos la zona horaria de España para toda la ejecución de este método
             $tz = 'Europe/Madrid';
             
             $validated = $request->validate([
@@ -24,7 +20,6 @@ class MoodRegisterController extends Controller
                 'date' => 'nullable|date',
             ]);
 
-            // Si no viene fecha del frontend, usamos la de España hoy
             $fechaFinal = $validated['date'] ?? Carbon::now($tz)->toDateString();
 
             $register = MoodRegister::create([
@@ -34,7 +29,6 @@ class MoodRegisterController extends Controller
                 'date' => $fechaFinal,
             ]);
 
-            // Forzamos que la respuesta también devuelva el objeto con la fecha parseada
             return response()->json([
                 'ok' => true,
                 'data' => $register
@@ -48,9 +42,6 @@ class MoodRegisterController extends Controller
         }
     }
 
-    /**
-     * Obtiene los estados de ánimo del mes actual para el calendario.
-     */
     public function getMoodCalendar(Request $request)
     {
         $user = $request->user();
@@ -86,9 +77,6 @@ class MoodRegisterController extends Controller
         return response()->json(['data' => $finalGrid]);
     }
 
-    /**
-     * Obtiene el historial (timeline) de los registros de hoy.
-     */
     public function getTodayTimeline(Request $request)
     {
         $user = $request->user();

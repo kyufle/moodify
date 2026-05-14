@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 interface BadgeProps {
-  unlockedIds: string[]; // Usaremos esto como fuente de verdad
+  unlockedIds: string[];
 }
 
 export const AchievementsBar = ({ unlockedIds = [] }: BadgeProps) => {
@@ -34,7 +34,6 @@ export const AchievementsBar = ({ unlockedIds = [] }: BadgeProps) => {
       
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         {badges.map(badge => {
-          // LA CLAVE: Si el ID está en el array que viene de Laravel, se ilumina.
           const isUnlocked = unlockedIds.includes(badge.id);
 
           return (

@@ -41,7 +41,6 @@ export default function SettingsScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.btn}
-              // Pasamos el parámetro "tab=ajustes"
               onPress={() => router.replace('/profile?tab=ajustes')}
               activeOpacity={0.85}
             >

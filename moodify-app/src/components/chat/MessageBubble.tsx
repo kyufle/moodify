@@ -24,7 +24,6 @@ export const MessageBubble = ({
   otherTextColor 
 }: MessageBubbleProps) => {
 
-  // Determinamos los colores finales. Si no vienen por props, usamos los del StyleSheet.
   const finalBubbleColor = isAI ? (otherBubbleColor || '#FFFFFF') : (myBubbleColor || '#6366F1');
   const finalTextColor = isAI ? (otherTextColor || '#1E293B') : (myTextColor || '#FFFFFF');
 
@@ -32,13 +31,11 @@ export const MessageBubble = ({
     <View style={[
       styles.container, 
       isAI ? styles.aiContainer : styles.meContainer,
-      // Sobrescribimos el color de fondo con el elegido por el usuario
       { backgroundColor: finalBubbleColor }
     ]}>
       <Text style={[
         styles.text, 
         isAI ? styles.aiText : styles.meText,
-        // Sobrescribimos el color del texto con el elegido por el usuario
         { color: finalTextColor }
       ]}>
         {text}
@@ -48,7 +45,6 @@ export const MessageBubble = ({
         <Text style={[
           styles.time, 
           isAI ? styles.aiTime : styles.meTime,
-          // La hora hereda el color del texto pero con opacidad para que no resalte tanto
           { color: finalTextColor, opacity: 0.6 }
         ]}>
           {time}
@@ -59,7 +55,6 @@ export const MessageBubble = ({
             {status === 'read' ? (
               <Ionicons name="checkmark-done" size={15} color="#34B7F1" />
             ) : (
-              // El check también se adapta al color del texto si no está leído
               <Ionicons name="checkmark" size={15} color={finalTextColor} style={{ opacity: 0.5 }} />
             )}
           </View>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers; // Namespace simple
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -29,7 +29,6 @@ class ProfileController extends Controller
                 'current_password' => 'required_with:password', 
             ]);
 
-            // Cambio de Password
             if ($request->filled('password')) {
                 if (!Hash::check($request->current_password, $user->password)) {
                     return response()->json(['message' => 'La contraseña actual es incorrecta'], 422);
@@ -37,7 +36,6 @@ class ProfileController extends Controller
                 $user->password = Hash::make($request->password);
             }
 
-            // Actualización de campos
             if ($request->has('name')) $user->name = $request->name;
             if ($request->has('email')) $user->email = $request->email;
             if ($request->has('username')) $user->username = $request->username;

@@ -16,7 +16,6 @@ import { ThemedView } from '@/components/themed-view';
 import CreateUser from '@/components/CreateUser';
 import Login from '@/components/Login';
 import { useTranslation } from 'react-i18next';
-// import FondoClaro from '@/assets/images/fondo_claro.svg';
 const backgroundSource = require('@/assets/images/fondo_claro.jpg')
 import FondoFirstTime  from '@/assets/images/fondofirsttime.svg';
 
@@ -68,7 +67,6 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      {/* <FondoClaro width={null} height={null} style={styles.backgroundImage}  /> */}
       
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

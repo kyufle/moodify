@@ -74,19 +74,15 @@ public function actionAlert(Request $request)
     try {
         $user = $request->user();
         
-        // Obtenemos los registros de hoy para el usuario
-        // Asegúrate de que la tabla se llame 'mood_registers'
         $todayMoods = \Illuminate\Support\Facades\DB::table('mood_registers')
             ->where('user_id', $user->id)
             ->whereDate('date', \Carbon\Carbon::today())
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Devolvemos el array directamente para que history.length funcione
         return response()->json($todayMoods);
         
     } catch (\Exception $e) {
-        // Si algo falla, devolvemos un error en JSON (no HTML)
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }

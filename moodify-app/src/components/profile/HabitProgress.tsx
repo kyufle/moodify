@@ -47,14 +47,13 @@ export const HabitProgress = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [weeklyStatus, setWeeklyStatus] = useState<DayStatus[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t, i18n } = useTranslation(); // Extraemos i18n para saber el idioma actual
+  const { t, i18n } = useTranslation();
   
   const [modalVisible, setModalVisible] = useState(false);
   const [newName, setNewName] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('target');
   const [selectedColor, setSelectedColor] = useState('#8a5cf69c');
 
-  // Mapeo de locales para date-fns
   const locales: { [key: string]: Locale } = { 
     es: es, 
     en: enUS, 
@@ -62,7 +61,6 @@ export const HabitProgress = () => {
   };
   const currentLocale = locales[i18n.language] || es;
 
-  // Fecha de hoy formateada según idioma
   const todayName = format(new Date(), "EEEE, dd 'de' MMMM", { locale: currentLocale });
 
   const loadAllData = async () => {
@@ -158,7 +156,6 @@ export const HabitProgress = () => {
 
   return (
     <View style={styles.container}>
-      {/* 1. CABECERA */}
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>{t('profile.myRoutine')}</Text>
@@ -168,10 +165,8 @@ export const HabitProgress = () => {
           <Feather name="plus" size={24} color="white" />
         </TouchableOpacity>
       </View>
-      {/* 2. WEEKLY STRIP - TRADUCIDO DINÁMICAMENTE */}
       <View style={styles.weeklyStrip}>
         {weeklyStatus.map((item, index) => {
-          // Parseamos la fecha que viene de la API para obtener el nombre del día en el idioma actual
           const dayNameLocal = format(parseISO(item.date), 'EEEEEE', { locale: currentLocale });
           
           const dayNumber = parseISO(item.date)?.getDate();
@@ -197,7 +192,6 @@ export const HabitProgress = () => {
         })}
       </View>
 
-      {/* 3. CARD DE ESTADÍSTICAS */}
       <View style={styles.statsCard}>
         <View>
           <Text style={styles.statsCount}>{completedCount} de {habits.length}</Text>
@@ -206,7 +200,6 @@ export const HabitProgress = () => {
         <Text style={styles.statsPercent}>{progressPercent}%</Text>
       </View>
 
-      {/* 4. LISTA DE HÁBITOS */}
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
         {habits.map((habit) => (
           <TouchableOpacity 
@@ -226,7 +219,6 @@ export const HabitProgress = () => {
         ))}
       </ScrollView>
 
-      {/* MODAL CREACIÓN */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.overlay}>
           <View style={styles.modal}>

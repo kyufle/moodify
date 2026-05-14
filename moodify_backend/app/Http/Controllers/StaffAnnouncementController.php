@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/StaffAnnouncementController.php
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -8,17 +7,14 @@ use Illuminate\Support\Facades\Log;
 
 class StaffAnnouncementController extends Controller
 {
-    // Obtener todos los anuncios (Para todos los usuarios)
     public function index()
     {
         return response()->json(StaffAnnouncement::latest()->get());
     }
 
-    // Guardar nuevo anuncio (Solo Admin)
     public function store(Request $request)
     {
         try {
-            // Verificación extra de seguridad basada en tu tabla users
             if ($request->user()->type_user !== 'admin') {
                 return response()->json(['error' => 'No autorizado'], 403);
             }
@@ -41,14 +37,12 @@ class StaffAnnouncementController extends Controller
     }
     public function destroy($id)
 {
-    // Buscamos el anuncio
     $announcement = StaffAnnouncement::find($id);
 
     if (!$announcement) {
         return response()->json(['message' => 'Aviso no encontrado'], 404);
     }
 
-    // Opcional: Verificar aquí también si el usuario es admin
     if (auth()->user()->type_user !== 'admin') {
         return response()->json(['message' => 'No tienes permiso'], 403);
     }

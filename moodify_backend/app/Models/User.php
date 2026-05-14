@@ -11,9 +11,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * Atributos que se pueden asignar masivamente.
-     */
     protected $fillable = [
         'name',
         'email',
@@ -31,20 +28,15 @@ class User extends Authenticatable
         'notifications_enabled',
         'app_bg',
         'language',
-        'image_id', // Importante: debe estar aquí para que fill() funcione
+        'image_id',
     ];
 
-    /**
-     * Atributos que deben ocultarse en las respuestas JSON.
-     */
+    
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Casts de tipos.
-     */
     protected function casts(): array
     {
         return [

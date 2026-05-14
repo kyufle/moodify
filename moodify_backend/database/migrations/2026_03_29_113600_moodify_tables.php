@@ -205,17 +205,17 @@ return new class extends Migration {
         Schema::create('dismissed_alerts', function (Blueprint $table) {
         $table->id();
         $table->foreignId('user_id')->constrained()->onDelete('cascade');
-        $table->string('alert_type'); // Guardará 'like', 'comment', o 'follow'
-        $table->unsignedBigInteger('reference_id'); // El ID del post_like, comment, o followed_id
+        $table->string('alert_type');
+        $table->unsignedBigInteger('reference_id');
         $table->timestamps();
     });
     Schema::create('staff_announcements', function (Blueprint $table) {
     $table->id();
     $table->string('title');
     $table->text('content');
-    $table->string('tag'); // OFICIAL, AVISO, CONSEJO
+    $table->string('tag');
     $table->string('icon');
-    $table->json('colors'); // Guardaremos el array de colores
+    $table->json('colors');
     $table->timestamps();
 });
     }

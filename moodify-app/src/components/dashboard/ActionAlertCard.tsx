@@ -72,7 +72,6 @@ export const ActionAlertCard = () => {
     );
   })();
 
-  // CASO A: NO HAY REGISTRO HOY (Gris)
   if (!lastEntry || !isToday || !config) {
     const ConfusedIcon = MOOD_CONFIG.confused.icon;
     return (
@@ -98,7 +97,6 @@ export const ActionAlertCard = () => {
     );
   }
   
-  // CASO B: SÍ HAY REGISTRO HOY (Color)
   const WatermarkIcon = config.icon;
 
   return (
@@ -133,7 +131,7 @@ const styles = StyleSheet.create({
     padding: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    minHeight: 150, // Un poco más alto para que quepa el botón bien
+    minHeight: 150,
     overflow: 'hidden',
     position: 'relative',
     elevation: 3,

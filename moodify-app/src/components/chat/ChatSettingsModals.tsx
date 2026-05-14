@@ -10,15 +10,14 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
-// Colores sugeridos para el tema del chat
 const THEME_COLORS = [
-  '#F472B6', // Rosa Bloom
-  '#6366F1', // Indigo
-  '#10B981', // Esmeralda
-  '#F59E0B', // Ámbar
-  '#3B82F6', // Azul
-  '#EF4444', // Rojo
-  '#8B5CF6', // Violeta
+  '#F472B6',
+  '#6366F1',
+  '#10B981',
+  '#F59E0B',
+  '#3B82F6',
+  '#EF4444',
+  '#8B5CF6',
 ];
 
 interface ChatSettingsModalProps {
@@ -44,7 +43,6 @@ export const ChatSettingsModal = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      {/* Overlay para cerrar al tocar fuera */}
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>

@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, LayoutAnimation, 
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
-// Habilitar animaciones en Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
@@ -49,8 +48,6 @@ export const ChatQuickActions = ({ onAction }: { onAction: (label: string) => vo
               style={styles.chip}
               onPress={() => {
                 onAction(action.label);
-                // Opcional: cerrar al pulsar una acción
-                // toggleActions(); 
               }}
             >
               <Feather name={action.icon as any} size={14} color={action.color} />

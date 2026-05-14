@@ -9,7 +9,6 @@ class StaffAnnouncement extends Model
 {
     use HasFactory;
 
-    // These must match the keys in your $request->validate() call
     protected $fillable = [
         'title',
         'content',
@@ -18,7 +17,6 @@ class StaffAnnouncement extends Model
         'colors'
     ];
 
-    // Since 'colors' is sent as an array, tell Laravel to cast it
     protected $casts = [
         'colors' => 'array',
     ];

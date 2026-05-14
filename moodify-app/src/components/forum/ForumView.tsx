@@ -23,7 +23,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
   const token = userValue?.accessToken;
   const currentUserAvatar = userValue?.user?.image_id;
   const { unreadCount } = useContext(UserContext);
-  // const [activeTab, setActiveTab] = useState<>('feed');
+
   const setActiveTab = (newTab: 'feed' | 'personas') => {
     if(newTab === 'feed')
       router.push('/community/feed');
@@ -50,7 +50,6 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
     'Content-Type': 'application/json',
   };
 
-  // Función de carga de posts (separada para poder usarla en polling sin loading visual)
   const fetchPosts = useCallback(async (showLoading = true) => {
     if (!token) { setLoadingPosts(false); return; }
     if (showLoading) setLoadingPosts(true);
@@ -67,16 +66,15 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
     }
   }, [token, selectedPost?.id]);
 
-  // 1. POLLING: Actualización cada 5 segundos
   useEffect(() => {
-    fetchPosts(true); // Carga inicial con spinner
+    fetchPosts(true);
 
     const interval = setInterval(() => {
-      fetchPosts(false); // Carga silenciosa cada 5 seg
+      fetchPosts(false);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [token]); // Solo depende del token
+  }, [token]);
 
   const updatePostState = (id: number, liked: boolean, count: number) => {
     setPosts(prev => prev.map(p => p.id === id ? { ...p, is_liked: liked, likes_count: count } : p));
@@ -142,7 +140,6 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
       if (r.ok) {
         setCommentText('');
         setReplyingTo(null);
-        // Actualizamos comentarios e inmediatamente posts para ver el contador
         await fetchComments(selectedPost.id);
         fetchPosts(false);
       }
@@ -181,7 +178,7 @@ export const ForumView: React.FC<{ activeTab: 'feed' | 'personas' | 'comment', s
       <View style={styles.root}>
         <KeyboardAvoidingView 
           style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // En Android 'undefined' suele ser más estable
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
         <View style={styles.commentHeader}>
           <TouchableOpacity onPress={() => router.push("/community/feed")}>
@@ -336,13 +333,13 @@ const styles = StyleSheet.create({
   sectionTitle: {fontSize: 18, fontWeight: '800', color: '#7D5A5A', marginLeft: 20 },
   root: { 
     flex: 1, 
-    backgroundColor: '#FFF9FB' // Un blanco rosado muy suave
+    backgroundColor: '#FFF9FB'
   },
   header: { 
     paddingTop: 60, 
     paddingHorizontal: 20, 
     paddingBottom: 15,
-    backgroundColor: '#FFDDE4' // Rosa pastel suave
+    backgroundColor: '#FFDDE4'
   },
   headerInner: { 
     flexDirection: 'row', 
@@ -368,7 +365,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover' 
   },
   headerGreeting: { 
-    color: '#7D5A5A', // Marrón suave para mejor contraste Kawaii
+    color: '#7D5A5A',
     fontSize: 18, 
     fontWeight: '800' 
   },
@@ -393,7 +390,6 @@ const styles = StyleSheet.create({
   },
   tabItemActive: { 
     backgroundColor: '#FFF',
-    // Sombra suave para que parezca "flotante"
     shadowColor: '#FFB7C5',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -404,7 +400,7 @@ const styles = StyleSheet.create({
     fontWeight: '600' 
   },
   tabTextActive: { 
-    color: '#FF8DA1' // Rosa vibrante pero dulce
+    color: '#FF8DA1'
   },
   scrollContent: { 
     paddingBottom: 120 
@@ -446,7 +442,7 @@ const styles = StyleSheet.create({
     paddingTop: 10 
   },
   inlinePublishBtn: { 
-    backgroundColor: '#B2E2F2', // Azul cielo pastel
+    backgroundColor: '#B2E2F2',
     paddingHorizontal: 22, 
     paddingVertical: 10, 
     borderRadius: 15 
@@ -481,7 +477,7 @@ const styles = StyleSheet.create({
   },
   discoverBtn: { 
     marginTop: 20, 
-    backgroundColor: '#E2F0CB', // Verde menta suave
+    backgroundColor: '#E2F0CB',
     paddingHorizontal: 25, 
     paddingVertical: 12, 
     borderRadius: 18 
@@ -538,10 +534,10 @@ const styles = StyleSheet.create({
   },
   commentContent: { 
     flex: 1, 
-    backgroundColor: '#FFF0F3', // Rosa nube muy claro
+    backgroundColor: '#FFF0F3',
     padding: 15, 
     borderRadius: 20,
-    borderTopLeftRadius: 5 // Estilo burbuja de chat
+    borderTopLeftRadius: 5
   },
   author: { 
     fontWeight: '800', 

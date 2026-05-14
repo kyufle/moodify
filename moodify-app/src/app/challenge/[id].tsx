@@ -5,7 +5,6 @@ import { Feather } from '@expo/vector-icons';
 import { DashboardBackground } from '@/components/dashboard/DashboardBackground';
 import { LinearGradient } from 'expo-linear-gradient';
 
-// Mock data for challenges
 const CHALLENGE_DATA: any = {
   '1': { name: '30 Días sin Azúcar', current: 12, total: 30, color: '#F472B6', icon: 'coffee', description: 'Elimina el azúcar procesado de tu dieta para mejorar tu energía y salud dental.' },
   '2': { name: 'Caminar 10k Pasos', current: 5, total: 7, color: '#60A5FA', icon: 'trending-up', description: 'Mantente activo caminando al menos 10,000 pasos cada día de esta semana.' },
@@ -17,7 +16,6 @@ export default function ChallengeDetail() {
   const router = useRouter();
   const challenge = CHALLENGE_DATA[id as string] || CHALLENGE_DATA['1'];
 
-  // Crear 30 días para el grid
   const days = Array.from({ length: 30 }, (_, i) => ({
     day: i + 1,
     status: i < challenge.current ? 'completed' : (i === challenge.current ? 'today' : 'pending')

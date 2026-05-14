@@ -13,7 +13,6 @@ import { Feather } from '@expo/vector-icons';
 import { MessageBubble } from './MessageBubble';
 import { ChatQuickActions } from './ChatQuickActions';
 
-// Definimos el tipo de mensaje
 interface Message {
   id: string;
   text: string;
@@ -62,7 +61,7 @@ export const ChatScreen = () => {
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: data.respuesta, // Lo que devuelve tu PsicologoService
+        text: data.respuesta,
         isAI: true,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
@@ -70,13 +69,11 @@ export const ChatScreen = () => {
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error("Error conectando con el psicólogo:", error);
-      // Mensaje de error amigable
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Auto-scroll al final cuando hay mensajes nuevos
   useEffect(() => {
     flatListRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
@@ -88,7 +85,6 @@ export const ChatScreen = () => {
         style={styles.container}
         keyboardVerticalOffset={90}
       >
-        {/* Lista de Mensajes */}
         <FlatList
           ref={flatListRef}
           data={messages}
@@ -99,10 +95,8 @@ export const ChatScreen = () => {
           contentContainerStyle={styles.chatList}
         />
 
-        {/* Acciones Rápidas (Chips) */}
         <ChatQuickActions onAction={(label) => handleSend(label)} />
 
-        {/* Input de texto */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}

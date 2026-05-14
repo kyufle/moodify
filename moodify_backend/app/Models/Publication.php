@@ -5,8 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Publication extends Model
 {
-    protected $table = 'publications'; // Forzamos el nombre de la tabla
-    public $timestamps = false; // Como usas 'date' manualmente, quita los timestamps de Laravel
+    protected $table = 'publications';
+    public $timestamps = false;
 
     protected $fillable = [
         'title',

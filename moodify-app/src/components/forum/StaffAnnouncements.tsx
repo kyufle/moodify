@@ -283,8 +283,6 @@ const styles = StyleSheet.create({
   cardTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '800', marginBottom: 4 },
   cardInfo: { color: 'rgba(255, 255, 255, 0.9)', fontSize: 13, lineHeight: 18 },
   noDataText: { marginLeft: 20, color: '#D4A5A5', fontStyle: 'italic' },
-  
-  // ESTILOS DEL MODAL CENTRADO
   modalOverlay: { 
     flex: 1, 
     backgroundColor: 'rgba(125, 90, 90, 0.6)', 
@@ -298,7 +296,7 @@ const styles = StyleSheet.create({
     padding: 25, 
     width: '100%',
     maxWidth: 400,
-    maxHeight: '80%', // Evita que en pantallas pequeñas se corte el contenido
+    maxHeight: '80%',
     borderWidth: 2, 
     borderColor: '#FFECF0',
     elevation: 10,

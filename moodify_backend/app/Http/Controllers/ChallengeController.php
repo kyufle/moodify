@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ChallengeController extends Controller
 {
-    // Listar retos del usuario autenticado
     public function index(Request $request) {
         $challenges = Challenge::where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
@@ -20,16 +19,13 @@ class ChallengeController extends Controller
         return response()->json($challenges);
     }
 
-    // Marcar el día de hoy como completado
     public function markDay($id, Request $request) {
         try {
             $userId = Auth::id();
-            // Aseguramos que el reto pertenece al usuario
             $challenge = Challenge::where('user_id', $userId)->findOrFail($id);
             
             $today = Carbon::today()->toDateString();
 
-            // Verificar si ya existe un registro para hoy en la tabla de logs
             $exists = DB::table('challenge_logs')
                 ->where('challenge_id', $id)
                 ->whereDate('date', $today)
@@ -39,7 +35,6 @@ class ChallengeController extends Controller
                 return response()->json(['error' => 'Ya has marcado este reto hoy'], 422);
             }
 
-            // Usar transacción para asegurar que el log y el incremento ocurran juntos
             return DB::transaction(function () use ($challenge, $id, $today, $userId) {
                 DB::table('challenge_logs')->insert([
                     'challenge_id' => $id,
@@ -51,9 +46,6 @@ class ChallengeController extends Controller
                 $challenge->increment('current_days');
                 $challenge->refresh();
 
-                // LÓGICA DE LOGROS (BADGES)
-                
-                // Logro id 6: Completar un reto (llegar al total de días)
                 if ($challenge->current_days >= $challenge->total_days) {
                     UserBadge::firstOrCreate([
                         'user_id' => $userId, 
@@ -61,7 +53,6 @@ class ChallengeController extends Controller
                     ], ['unlocked_at' => now()]);
                 }
 
-                // Logro id 3: Tener 3 o más retos creados
                 if (Challenge::where('user_id', $userId)->count() >= 3) {
                     UserBadge::firstOrCreate([
                         'user_id' => $userId, 
@@ -79,7 +70,6 @@ class ChallengeController extends Controller
         }
     }
 
-    // Crear un nuevo reto
     public function store(Request $request) {
         try {
             $v = $request->validate([
@@ -107,13 +97,11 @@ class ChallengeController extends Controller
         }
     }
 
-    // Eliminar un reto
     public function destroy($id) {
         $userId = Auth::id();
         $deleted = Challenge::where('id', $id)->where('user_id', $userId)->delete();
         
         if ($deleted) {
-            // Opcional: Eliminar también los logs del reto eliminado
             DB::table('challenge_logs')->where('challenge_id', $id)->delete();
             return response()->json(['success' => true]);
         }

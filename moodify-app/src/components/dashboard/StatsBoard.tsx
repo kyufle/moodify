@@ -50,7 +50,6 @@ export const StatsBoard: React.FC<StatsBoardProps> = ({ onPressSleep, onPressStr
       if (resStress.ok) {
         const sData = await resStress.json();
         
-      // ... dentro del fetch de Stress
 if (sData.exists && sData.data) {
   const breakdown = sData.data.breakdown;
   

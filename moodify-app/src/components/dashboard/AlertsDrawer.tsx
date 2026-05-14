@@ -16,7 +16,6 @@ const { width } = Dimensions.get('window');
 interface AlertsDrawerProps {
   isVisible: boolean;
   onClose: () => void;
-  // NUEVO: Prop para avisar al padre de cuántas notificaciones hay
   onUnreadCount?: (count: number) => void; 
 }
 
@@ -39,7 +38,6 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ isVisible, onClose, onUnrea
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [shouldRender, setShouldRender] = useState<boolean>(isVisible);
-  // NUEVO: Ejecutar una comprobación silenciosa al montar el componente para saber si hay notis ANTES de abrir
   useEffect(() => {
     fetchAlerts(false);
   }, []);
@@ -60,7 +58,6 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ isVisible, onClose, onUnrea
       if (response.ok) {
         const data = await response.json();
         setAlerts(data);
-        // NUEVO: Le decimos al padre cuántas alertas han llegado
         if (onUnreadCount) {
           onUnreadCount(data.length);
         }
@@ -94,7 +91,6 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ isVisible, onClose, onUnrea
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    // NUEVO: El intervalo funciona siempre, incluso si el panel está cerrado, para actualizar la bolita roja
     if (token) {
       interval = setInterval(() => {
         fetchAlerts(false); 
@@ -104,7 +100,7 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ isVisible, onClose, onUnrea
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [token]); // Quitamos isVisible de las dependencias del intervalo
+  }, [token]);
 
   const dismissAlert = async (alertToRemove: AlertItem) => {
     const updatedAlerts = alerts.filter(alert => 
@@ -112,7 +108,6 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ isVisible, onClose, onUnrea
     );
     setAlerts(updatedAlerts);
     
-    // Actualizamos la bolita roja al borrar
     if (onUnreadCount) onUnreadCount(updatedAlerts.length);
 
     if (!token) return;
@@ -141,7 +136,6 @@ const formatDateTime = (dateString: string | null, type: 'like' | 'comment' | 'f
     
   const date = safeDateString ? new Date(safeDateString) : new Date();
 
-  // Extraemos los datos manuales
   const day = date.getDate().toString().padStart(2, '0');
   const monthName = t('months.'+date.getMonth());
   
@@ -150,7 +144,6 @@ const formatDateTime = (dateString: string | null, type: 'like' | 'comment' | 'f
 
   const alertName = t('alert.'+type);
 
-  // Construimos el mensaje final
   return `${alertName} ${day} ${monthName} ${t('alert.at')} ${hours}:${minutes}`;
 };
 
@@ -186,10 +179,9 @@ const formatDateTime = (dateString: string | null, type: 'like' | 'comment' | 'f
         style={styles.notificationCard}
         activeOpacity={0.7}
         onPress={() => {
-          onClose(); // Cerramos el panel
+          onClose();
           
           if (item.type === 'follow') {
-            // Añadimos "as any" para silenciar a TypeScript
             router.push('/community/discover'); 
           } else {
             // @ts-ignore

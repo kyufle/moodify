@@ -12,7 +12,6 @@ export const CalendarHeader = () => {
   const currentLanguage = i18n.language || 'ca';
   return (
     <View style={styles.container}>
-      {/* Botón Atrás */}
       <TouchableOpacity 
         style={styles.backButton}
         onPress={() => navigation.goBack()}
@@ -21,7 +20,6 @@ export const CalendarHeader = () => {
         <Feather name="chevron-left" size={24} color="#334155" />
       </TouchableOpacity>
 
-      {/* Textos centrales */}
       <View style={styles.textContainer}>
         <Text style={styles.title}>{t('calendarGrid.moodCalendar')}</Text>
         <Text style={styles.subtitle}>
@@ -32,7 +30,6 @@ export const CalendarHeader = () => {
         </Text>
       </View>
 
-      {/* Botón Cerrar Sesión */}
       <TouchableOpacity 
         style={styles.backButton}
         onPress={logout}
@@ -52,7 +49,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 20,
-    backgroundColor: 'transparent', // Se apoya en el fondo blanco de la tarjeta de calendario
+    backgroundColor: 'transparent',
   },
   backButton: {
     width: 44,
